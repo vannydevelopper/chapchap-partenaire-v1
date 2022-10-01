@@ -30,7 +30,8 @@ export const SubCategoriesSkeletons = () => {
           )
 }
 
-export const HomeProductsSkeletons = () => {
+
+export const HomeProductsSkeletons = ({ wrap = false }) => {
           const { width } = useWindowDimensions()
           const PRODUCT_MARGIN = 10
           const PRODUCT_WIDTH = (width / 2) - PRODUCT_MARGIN - 10
@@ -44,22 +45,17 @@ export const HomeProductsSkeletons = () => {
           return (
                     <>
                     <View style={{...styles.title, height: 15, width: '25%', backgroundColor: '#d9ddde', marginLeft: 10, marginTop: 20, borderRadius: 5, marginBottom: 10}} />
-                    <ScrollView
-                                        horizontal={true}
-                                        // onContentSizeChange={() => scrollViewRef.current.scrollToEnd({ animated: false })}
-                                        showsHorizontalScrollIndicator={false}
-                                        // style={styles.categories}
-                                        >
+                    <View style={[{ flexDirection: "row", alignItems: "center"}, wrap && { flexWrap: "wrap" }]}>
                               {(new Array(10).fill(0)).map((category, index) => {
                                         return (
-                                                  <View key={index.toString()} style={[styles.product,additionStyles]}>
+                                                  <View key={index.toString()} style={[styles.product,additionStyles, wrap && { marginTop: 10 }]}>
                                                             <View style={{...styles.actionIcon, backgroundColor: '#d9ddde'}}>
                                                             </View>
                                                             <View style={{...styles.actionTitle, width: 50, height: 10, borderRadius: 10,backgroundColor: '#d9ddde'}} />
                                                   </View>
                                         )}
                               )}
-                    </ScrollView>
+                    </View>
                     </>
           )
 }

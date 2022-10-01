@@ -2,7 +2,7 @@ import React, { useCallback, useState, useEffect } from "react";
 import { Text, View, useWindowDimensions, ImageBackground, StatusBar, StyleSheet, Image, TextInput, ScrollView, TouchableOpacity, FlatList, TouchableNativeFeedback } from "react-native";
 import { EvilIcons, MaterialIcons, AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome, SimpleLineIcons } from '@expo/vector-icons';
 import fetchApi from "../../helpers/fetchApi";
-import { useFocusEffect } from "@react-navigation/native";
+import { DrawerActions, useFocusEffect, useNavigation } from "@react-navigation/native";
 import { COLORS } from "../../styles/COLORS";
 import SubCategories from "../../components/ecommerce/home/SubCategories";
 import HomeProducts from "../../components/ecommerce/home/HomeProducts";
@@ -13,105 +13,36 @@ import { CategoriesSkeletons, HomeProductsSkeletons, SubCategoriesSkeletons } fr
 export default function EcommerceHomeScreen() {
           const { height } = useWindowDimensions()
           
-          const [loadingCategories, setLoadingCatagories] = useState(true)
-          const [categories, setCategories] = useState([])
-          const [selectedCategorie, setSelectedCategorie] = useState(null)
-          
-          
-          const [loadingSubCategories, setLoadingSubCategories] = useState(false)
-          const [sousCategories, SetSousCategories] = useState([])
-          const [selectedsousCategories, setSelectedsousCategories] = useState(null)
-          
           const [firstLoadingProducts, setFirstLoadingProducts] = useState(true)
-          const [loadingProducts, setLoadingProducts] = useState(false)
           const [products, setProducts] = useState([])
 
-          const fecthProduits = async () => {
-                    try {
-                              const response = await fetchApi("/products/categories", {
-                                        method: "GET",
-                                        headers: { "Content-Type": "application/json" },
-                              })
-                              setCategories(response.result)
-                    }
-                    catch (error) {
-                              console.log(error)
-                    } finally {
-                              setLoadingCatagories(false)
-                    }
-          }
           useFocusEffect(useCallback(() => {
-                    fecthProduits()
-          }, []))
-
-          const onCategoryPress = (categorie) => {
-                    if(loadingSubCategories || loadingProducts) return false
-                    if(categorie.ID_CATEGORIE_PRODUIT == selectedCategorie?.ID_CATEGORIE_PRODUIT) {
-                              return setSelectedCategorie(null)
-                    }
-                    setSelectedCategorie(categorie)
-                    setSelectedsousCategories(null)
-          }
-
-          const selectedItemSousCategories = (souscategorie) => {
-                    setSelectedsousCategories(souscategorie)
-          }
-
-          //fetch des sous  categories
-          useEffect(() => {
                     (async () => {
                               try {
-                                        setLoadingSubCategories(true)
-                                        if (selectedCategorie?.ID_CATEGORIE_PRODUIT) {
-                                                  const subCategories = await fetchApi(`/products/sub_categories/${selectedCategorie?.ID_CATEGORIE_PRODUIT}`, {
-                                                            method: "GET",
-                                                            headers: { "Content-Type": "application/json" },
-                                                  })
-                                                  SetSousCategories(subCategories.result)
-                                        }
-                              } catch (error) {
-                                        console.log(error)
-                              } finally {
-                                        setLoadingSubCategories(false)
-                              }
-                    })()
-          }, [selectedCategorie])
-
-          useEffect(() => {
-                    (async () => {
-                              try {
-                                        if(firstLoadingProducts == false) {
-                                                  setLoadingProducts(true)
-                                        }
                                         var url = "/products"
-                                        if(selectedCategorie) {
-                                                  url = `/products?category=${selectedCategorie?.ID_CATEGORIE_PRODUIT}`
-                                        }
                                         const produits = await fetchApi(url)
                                         setProducts(produits.result)
                               } catch (error) {
                                         console.log(error)
                               } finally {
                                         setFirstLoadingProducts(false)
-                                        setLoadingProducts(false)
                               }
                     })()
-          }, [selectedCategorie, selectedsousCategories])
+          }, []))
+
+          const navigation = useNavigation()
 
           return (
                     <View style={styles.container}>
                               <View style={styles.cardHeader}>
-                                        <View style={styles.menuOpener}>
+                                        <TouchableOpacity style={styles.menuOpener} onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
                                                   <View style={styles.menuOpenerLine} />
                                                   <View style={[styles.menuOpenerLine, { width: 15 }]} />
                                                   <View style={[styles.menuOpenerLine, { width: 25 }]} />
-                                        </View>
-                                        <View style={{ marginTop: 25 }}>
-                                                  <Ionicons name="cart-outline" size={30} color={COLORS.ecommercePrimaryColor} />
-                                        </View>
+                                        </TouchableOpacity>
                               </View>
-                              <ScrollView style={styles.cardOrginal} stickyHeaderIndices={[2]}>
-                                        <Text style={styles.titlePrincipal}>Achat des produits</Text>
+                              <ScrollView style={styles.cardOrginal}>
+                                        <Text style={styles.titlePrincipal}>Vos produits</Text>
                                         <View style={{ flexDirection: "row", alignItems: "center", alignContent: "center", justifyContent: "space-between", marginBottom: 25, paddingHorizontal: 10 }}>
                                                   <View style={styles.searchSection}>
                                                             <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
@@ -124,7 +55,7 @@ export default function EcommerceHomeScreen() {
                                                             <SimpleLineIcons name="equalizer" size={24} color="white" style={{ fontWeight: 'bold', transform: [{ rotate: '-90deg' }] }} />
                                                   </View>
                                         </View>
-                                        {(loadingCategories || firstLoadingProducts) ? <CategoriesSkeletons /> :
+                                        {/* {(loadingCategories || firstLoadingProducts) ? <CategoriesSkeletons /> :
                                         <View>
                                                   <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 10, backgroundColor: '#fff', paddingBottom: 10 }}>
                                                             {categories.map((categorie, index) => {
@@ -146,24 +77,8 @@ export default function EcommerceHomeScreen() {
                                                   sousCategories={sousCategories}
                                                   selectedItemSousCategories={selectedItemSousCategories}
                                                   selectedsousCategories={selectedsousCategories}
-                                        />)}
-                                        
-                                        {(firstLoadingProducts || loadingCategories || loadingProducts || loadingSubCategories ) ? <HomeProductsSkeletons /> : 
-                                                  <HomeProducts products={products} />}
-
-                                        <Shops products={products} />
-                                        
-                                        <TouchableNativeFeedback
-                                                  accessibilityRole="button"
-                                                  background={TouchableNativeFeedback.Ripple('#c9c5c5')}
-                                        >
-                                                  <View style={styles.productsHeader}>
-                                                            <Text style={styles.title}>Recommandé pour vous</Text>
-                                                            <MaterialIcons name="navigate-next" size={24} color="black" />
-                                                  </View>
-                                        </TouchableNativeFeedback>
-
-                                        <View style={styles.products}>
+                                        />)} */}
+                                        {firstLoadingProducts ? <HomeProductsSkeletons wrap /> :<View style={styles.products}>
                                                   {products.map((product, index) => {
                                                             return (
                                                                       <Product
@@ -175,8 +90,11 @@ export default function EcommerceHomeScreen() {
                                                                       />
                                                             )
                                                   })}
-                                        </View>
+                                        </View>}
                               </ScrollView>
+                              <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewProductSreen')}>
+                                        <Text style={styles.addBtnText}>Nouveau produit</Text>
+                              </TouchableOpacity>
                     </View>
           )
 }
@@ -189,7 +107,7 @@ const styles = StyleSheet.create({
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    paddingHorizontal: 20,
+                    paddingHorizontal: 10,
                     height: 88
           },
           menuOpener: {
@@ -283,5 +201,19 @@ const styles = StyleSheet.create({
           products: {
                     flexDirection: 'row',
                     flexWrap: 'wrap'
+          },
+          addBtn: {
+                    paddingVertical: 10,
+                    minWidth: "90%",
+                    alignSelf: "center",
+                    backgroundColor: COLORS.ecommerceOrange,
+                    borderRadius: 10,
+                    paddingVertical: 15,
+                    marginBottom: 10,
+          },
+          addBtnText: {
+                    color: '#FFF',
+                    fontWeight: "bold",
+                    textAlign: "center",
           }
 })

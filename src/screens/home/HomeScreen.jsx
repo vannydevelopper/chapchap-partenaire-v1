@@ -3,7 +3,8 @@ import {
           Text, StyleSheet, View, ScrollView, ImageBackground, Dimensions,
           Image,
           FlatList,
-          useWindowDimensions
+          useWindowDimensions,
+          TouchableOpacity
 } from "react-native";
 import { Feather, FontAwesome, EvilIcons, AntDesign } from '@expo/vector-icons';
 import { StatusBar } from "expo-status-bar";
@@ -11,18 +12,20 @@ import Animated from "react-native-reanimated";
 import Carousel from "../../components/app/Carousel";
 import ServicesCategories from "../../components/app/ServicesCategories";
 import { COLORS } from "../../styles/COLORS";
+import { DrawerActions, useNavigation } from "@react-navigation/native";
 
 export default function HomeScreen() {
+          const navigation = useNavigation()
           return (
                     <>
                     <StatusBar backgroundColor='#fff' barStyle='dark-content' />
                     <View style={styles.imgBackground}>
                               <View style={styles.cardHeader}>
-                                        <View style={styles.menuOpener}>
+                                        <TouchableOpacity style={styles.menuOpener} onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
                                                   <View style={styles.menuOpenerLine} />
                                                   <View style={[styles.menuOpenerLine, { width: 15 }]} />
                                                   <View style={[styles.menuOpenerLine, { width: 25 }]} />
-                                        </View>
+                                        </TouchableOpacity>
                                         <View style={styles.imageContainer}>
                                                   <Image source={require('../../../assets/images/chapchap.png')} style={styles.logo} />
                                         </View>
