@@ -7,14 +7,19 @@ import fetchApi from "../../helpers/fetchApi";
 import useFetch from "../../hooks/useFetch";
 import { useForm } from "../../hooks/useForm";
 import { COLORS } from "../../styles/COLORS";
-import { SimpleLineIcons, AntDesign } from '@expo/vector-icons'; 
-import { Feather } from '@expo/vector-icons'; 
+import { SimpleLineIcons, AntDesign } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { useFormErrorsHandle } from "../../hooks/useFormErrorsHandle";
+import Loading from "../../components/app/Loading";
+import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 
 export default function NewProductSreen() {
 
           const [isOpen, setIsOpen] = useState(false)
           const [loadingForm, setLoadingForm] = useState(true)
-          
+          const [isLoading, setIsLoading] = useState(false)
+
           const produitsModalizeRef = useRef(null)
           const categoriesModalizeRef = useRef(null)
           const subCategoriesModalizeRef = useRef()
@@ -26,10 +31,58 @@ export default function NewProductSreen() {
                     nom: "",
                     description: "",
                     quantite: "",
-                    montant: "",
-                    image_1: "",
-                    image_2: "",
-                    image_3: "",
+                    montant: ""
+          })
+          const { errors, setError, getErrors, setErrors, checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
+                    produit: {
+                              required: true,
+                    },
+                    category: {
+                              required: true,
+                    },
+                    subCategory: {
+                              required: true
+                    },
+                    nom: {
+                              required: true,
+                              length: [2, 100]
+                    },
+                    description: {
+                              length: [1, 3000]
+                    },
+                    quantite: {
+                              required: true,
+                              length: [1, 11]
+                    },
+                    montant: {
+                              required: true,
+                              length: [1, 11]
+                    }
+          }, {
+                    produit: {
+                              required: "Veuillez choisir le produit",
+                    },
+                    category: {
+                              required: "Veuillez choisir la catégorie",
+                    },
+                    subCategory: {
+                              required: "Veuillez choisir le sous-catégorie",
+                    },
+                    nom: {
+                              required: "Le nom du produit est obligatoire",
+                              length: "Le nom du produit ne peut pas dépasser 100 caractères"
+                    },
+                    description: {
+                              length: "La description du produit ne peut pas dépasser 3000 caractères"
+                    },
+                    quantite: {
+                              required: "La quantité est obligatoire",
+                              length: "Quantité invalide"
+                    },
+                    montant: {
+                              required: "Le prix unitaire est obligatoire",
+                              length: "Prix unitaire invalide"
+                    }
           })
 
           const [produits, setProduits] = useState([])
@@ -49,6 +102,8 @@ export default function NewProductSreen() {
           const descriptionRef = useRef(null)
           const amountRef = useRef(null)
           const priceRef = useRef(null)
+
+          const [images, setImages] = useState([])
 
           const fetchProduits = async () => {
                     try {
@@ -83,19 +138,81 @@ export default function NewProductSreen() {
                     }
           }
 
+          const onImageSelect = async () => {
+                    const image = await ImagePicker.launchImageLibraryAsync({
+                              mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                              quality: 0.6
+                    });
+                    if (!image.cancelled) {
+                              setImages(t => [...t, image])
+                    }
+          }
+
+          const onRemoveImage = index => {
+                    const newImages = images.filter((_, i) => i != index)
+                    setImages(newImages)
+          }
+
+          const onSubmit = async () => {
+                    try {
+                              setIsLoading(true)
+                              if (!isValidate()) throw { errors: getErrors() }
+                              const form = new FormData()
+                              form.append("ID_PRODUIT", data.produit.ID_PRODUIT)
+                              form.append("ID_CATEGORIE_PRODUIT", data.category.ID_CATEGORIE_PRODUIT)
+                              form.append("ID_PRODUIT_SOUS_CATEGORIE", data.subCategory.ID_PRODUIT_SOUS_CATEGORIE)
+                              form.append("NOM", data.nom)
+                              form.append("QUANTITE_STOCKE", data.quantite)
+                              form.append("QUANTIPRIX", data.montant)
+                              if (data.DESCRIPTION != "") {
+                                        form.append("DESCRIPTION", data.description)
+                              }
+                              if (images.length > 0) {
+                                        await Promise.all(images.map(async (image, index) => {
+                                                  const key = `IMAGE_${index + 1}`
+                                                  // const manipResult = await manipulateAsync(
+                                                  //           image.uri,
+                                                  //           [
+                                                  //                     { resize: { width: 500 } }
+                                                  //           ],
+                                                  //           { compress: 0.8, format: SaveFormat.JPEG }
+                                                  // );
+                                                  const manipResult = image
+                                                  let localUri = manipResult.uri;
+                                                  let filename = localUri.split('/').pop();
+                                                  let match = /\.(\w+)$/.exec(filename);
+                                                  let type = match ? `image/${match[1]}` : `image`;
+                                                  form.append(key, {
+                                                            uri: localUri, name: filename, type
+                                                  })
+                                        }))
+                              }
+                              console.log(form)
+                              const newProduct = await fetchApi('/partenaire/produit/create', {
+                                        method: "POST",
+                                        body: form
+                              })
+                              console.log(newProduct)
+                    } catch (error) {
+                              console.log(error)
+                    } finally {
+                              setIsLoading(false)
+                    }
+          }
+
           useEffect(() => {
                     fetchProduits()
                     fetchCategories()
           }, [])
 
           useEffect(() => {
-                    if(data.category) {
+                    if (data.category) {
                               fetchSubCategories()
                     }
           }, [data])
 
           useEffect(() => {
-                    if(isOpen) {
+                    if (isOpen) {
                               const timer = setTimeout(() => {
                                         setLoadingForm(false)
                               })
@@ -113,38 +230,38 @@ export default function NewProductSreen() {
                                         color='#777'
                                         style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
                               /> :
-                              <View style={styles.modalContainer}>
-                                        <Text style={styles.modalTitle}>Les produits</Text>
-                                        <View style={styles.modalHeader}>
-                                                  <TouchableOpacity style={styles.newProductBtn}>
-                                                            <Text style={styles.newProductText}>Nouveau</Text>
-                                                  </TouchableOpacity>
-                                                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                            <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                      <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor}  />
+                                        <View style={styles.modalContainer}>
+                                                  <Text style={styles.modalTitle}>Les produits</Text>
+                                                  <View style={styles.modalHeader}>
+                                                            <TouchableOpacity style={styles.newProductBtn}>
+                                                                      <Text style={styles.newProductText}>Nouveau</Text>
                                                             </TouchableOpacity>
-                                                            <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                      <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                            </TouchableOpacity>
+                                                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                                      </TouchableOpacity>
+                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                                      </TouchableOpacity>
+                                                            </View>
                                                   </View>
-                                        </View>
-                                        {produits.result?.map((produit, index) => {
-                                                  return (
-                                                            <TouchableNativeFeedback onPress={() => {
-                                                                      handleChange("produit", produit)
-                                                                      produitsModalizeRef.current.close()
-                                                            }}
-                                                            key={produit.ID_PRODUIT.toString()}>
-                                                                      <View style={[styles.modalItem,  produit.ID_PRODUIT == data.produit?.ID_PRODUIT && { backgroundColor: '#ddd'}]}>
-                                                                                <View style={styles.modalImageContainer}>
-                                                                                          <Image style={styles.modalImage} source={{ uri: produit.IMAGE}} />
+                                                  {produits.result?.map((produit, index) => {
+                                                            return (
+                                                                      <TouchableNativeFeedback onPress={() => {
+                                                                                handleChange("produit", produit)
+                                                                                produitsModalizeRef.current.close()
+                                                                      }}
+                                                                                key={produit.ID_PRODUIT.toString()}>
+                                                                                <View style={[styles.modalItem, produit.ID_PRODUIT == data.produit?.ID_PRODUIT && { backgroundColor: '#ddd' }]}>
+                                                                                          <View style={styles.modalImageContainer}>
+                                                                                                    <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
+                                                                                          </View>
+                                                                                          <Text style={styles.itemTitle}>{produit.NOM}</Text>
                                                                                 </View>
-                                                                                <Text style={styles.itemTitle}>{ produit.NOM }</Text>
-                                                                      </View>
-                                                            </TouchableNativeFeedback>
-                                                  )
-                                        })}
-                              </View>
+                                                                      </TouchableNativeFeedback>
+                                                            )
+                                                  })}
+                                        </View>
                     )
           }
 
@@ -156,34 +273,34 @@ export default function NewProductSreen() {
                                         color='#777'
                                         style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
                               /> :
-                              <View style={styles.modalContainer}>
-                                        <View style={styles.modalHeader}>
-                                                  <Text style={styles.modalTitle}>Les categories</Text>
-                                                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                            <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                      <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor}  />
-                                                            </TouchableOpacity>
-                                                            <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                      <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                            </TouchableOpacity>
+                                        <View style={styles.modalContainer}>
+                                                  <View style={styles.modalHeader}>
+                                                            <Text style={styles.modalTitle}>Les categories</Text>
+                                                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                                      </TouchableOpacity>
+                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                                      </TouchableOpacity>
+                                                            </View>
                                                   </View>
-                                        </View>
-                                        {categories.result?.map((produit, index) => {
-                                                  return (
-                                                            <TouchableNativeFeedback onPress={() => {
-                                                                      handleChange("category", produit)
-                                                                      categoriesModalizeRef.current.close()
-                                                            }} key={index.toString()}>
-                                                                      <View style={[styles.modalItem,  produit.ID_CATEGORIE_PRODUIT == data.category?.ID_CATEGORIE_PRODUIT && { backgroundColor: '#ddd'}]} >
-                                                                                <View style={styles.modalImageContainer}>
-                                                                                          <Image style={styles.modalImage} source={{ uri: produit.IMAGE}} />
+                                                  {categories.result?.map((produit, index) => {
+                                                            return (
+                                                                      <TouchableNativeFeedback onPress={() => {
+                                                                                handleChange("category", produit)
+                                                                                categoriesModalizeRef.current.close()
+                                                                      }} key={index.toString()}>
+                                                                                <View style={[styles.modalItem, produit.ID_CATEGORIE_PRODUIT == data.category?.ID_CATEGORIE_PRODUIT && { backgroundColor: '#ddd' }]} >
+                                                                                          <View style={styles.modalImageContainer}>
+                                                                                                    <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
+                                                                                          </View>
+                                                                                          <Text style={styles.itemTitle}>{produit.NOM}</Text>
                                                                                 </View>
-                                                                                <Text style={styles.itemTitle}>{ produit.NOM }</Text>
-                                                                      </View>
-                                                            </TouchableNativeFeedback>
-                                                  )
-                                        })}
-                              </View>
+                                                                      </TouchableNativeFeedback>
+                                                            )
+                                                  })}
+                                        </View>
                     )
           }
 
@@ -195,146 +312,155 @@ export default function NewProductSreen() {
                                         color='#777'
                                         style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
                               /> :
-                              <View style={styles.modalContainer}>
-                                        <View style={styles.modalHeader}>
-                                                  <Text style={styles.modalTitle}>Les sous categories</Text>
-                                                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                            <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                      <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor}  />
-                                                            </TouchableOpacity>
-                                                            <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                      <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                            </TouchableOpacity>
+                                        <View style={styles.modalContainer}>
+                                                  <View style={styles.modalHeader}>
+                                                            <Text style={styles.modalTitle}>Les sous categories</Text>
+                                                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                                      </TouchableOpacity>
+                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                                      </TouchableOpacity>
+                                                            </View>
                                                   </View>
+                                                  {subCategories.result?.map((produit, index) => {
+                                                            return (
+                                                                      <TouchableNativeFeedback key={produit.ID_PRODUIT_SOUS_CATEGORIE} onPress={() => {
+                                                                                handleChange("subCategory", produit)
+                                                                                subCategoriesModalizeRef.current.close()
+                                                                      }} >
+                                                                                <View style={[styles.modalItem, produit.ID_PRODUIT_SOUS_CATEGORIE == data.category?.ID_PRODUIT_SOUS_CATEGORIE && { backgroundColor: '#ddd' }]}>
+                                                                                          <Text style={[styles.itemTitle, { marginLeft: 0 }]}>{produit.NOM_SOUS_CATEGORIE}</Text>
+                                                                                </View>
+                                                                      </TouchableNativeFeedback>
+                                                            )
+                                                  })}
                                         </View>
-                                        {subCategories.result?.map((produit, index) => {
-                                                  return (
-                                                            <TouchableNativeFeedback key={produit.ID_PRODUIT_SOUS_CATEGORIE} onPress={() => {
-                                                                      handleChange("subCategory", produit)
-                                                                      subCategoriesModalizeRef.current.close()
-                                                            }} >
-                                                                      <View style={[styles.modalItem,  produit.ID_PRODUIT_SOUS_CATEGORIE == data.category?.ID_PRODUIT_SOUS_CATEGORIE && { backgroundColor: '#ddd'}]}>
-                                                                                <Text style={[styles.itemTitle, { marginLeft: 0 }]}>{ produit.NOM_SOUS_CATEGORIE }</Text>
-                                                                      </View>
-                                                            </TouchableNativeFeedback>
-                                                  )
-                                        })}
-                              </View>
                     )
           }
           return (
-                    <ScrollView style={styles.container}>
-                              <Text style={styles.title}>Nouveau produit</Text>
-                              <View style={styles.selectControl}>
-                                        <Text style={styles.selectLabel}>Produit</Text>
-                                        <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
-                                                  setIsOpen(true)
-                                                  produitsModalizeRef.current?.open()
-                                        }}>
-                                                  <Text style={styles.selectedLabel} >
-                                                            {data.produit ? data.produit.NOM : "Aucun produit selectionné"}
-                                                  </Text>
-                                        </TouchableOpacity>
-                              </View>
-                              <View style={styles.selectControl}>
-                                        <Text style={styles.selectLabel}>Nom du produit</Text>
-                                        <TextInput
-                                                  style={[styles.input, isFocused && { borderColor: COLORS.primary}]}
-                                                  value={data.nom}
-                                                  onChangeText={e => handleChange("nom", e)}
-                                                  onFocus={() => setIsFocused(true)}
-                                                  placeholder="Ecrire votre propre nom du produit"
-                                                  onBlur={() => {
-                                                            setIsFocused(false)
-                                                  }}
-                                        />
-                              </View>
-                              <View style={styles.selectControl}>
-                                        <Text style={styles.selectLabel}>Categorie</Text>
-                                        <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
-                                                  setIsOpen(true)
-                                                  categoriesModalizeRef.current?.open()
-                                        }}>
-                                                  <Text style={styles.selectedLabel} >
-                                                            {data.category ? data.category.NOM : "Aucune catégorie selectionné"}
-                                                  </Text>
-                                        </TouchableOpacity>
-                              </View>
-                              <View style={styles.selectControl}>
-                                        <Text style={styles.selectLabel}>Sous catégorie</Text>
-                                        <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
-                                                  setIsOpen(true)
-                                                  subCategoriesModalizeRef.current?.open()
-                                        }}>
-                                                  <Text style={styles.selectedLabel} >
-                                                            {data.subCategory ? data.subCategory.NOM_SOUS_CATEGORIE : "Aucun sous-catégorie selectionné"}
-                                                  </Text>
-                                        </TouchableOpacity>
-                              </View>
-                              <View style={styles.selectControl}>
-                                        <Text style={styles.selectLabel}>Description du produit</Text>
-                                        <TextInput
-                                                  ref={descriptionRef}
-                                                  style={[styles.input, isDescFocused && { borderColor: COLORS.primary}]}
-                                                  value={data.description}
-                                                  onChangeText={e => handleChange("description", e)}
-                                                  onFocus={() => setIsDescFocused(true)}
-                                                  placeholder="Décrire votre produit(facultatif)"
-                                                  onBlur={() => {
-                                                            setIsDescFocused(false)
-                                                  }}
-                                                  returnKeyType="next"
-                                                  onSubmitEditing={() => amountRef.current.focus()}
-                                                  blurOnSubmit={false}
-                                        />
-                              </View>
-                              <View style={styles.selectControl}>
-                                        <Text style={styles.selectLabel}>Quantité</Text>
-                                        <TextInput
-                                                  ref={amountRef}
-                                                  style={[styles.input, isAmountFocused && { borderColor: COLORS.primary}]}
-                                                  value={data.quantite}
-                                                  onChangeText={e => handleChange("quantite", e)}
-                                                  onFocus={() => setIsAmountFocused(true)}
-                                                  placeholder="Combien de pièces à mettre en stock ?"
-                                                  onBlur={() => {
-                                                            setIsAmountFocused(false)
-                                                  }}
-                                                  keyboardType="decimal-pad"
-                                                  returnKeyType="next"
-                                                  onSubmitEditing={() => priceRef.current.focus()}
-                                                  blurOnSubmit={false}
-                                        />
-                              </View>
-                              <View style={styles.selectControl}>
-                                        <Text style={styles.selectLabel}>Prix unitaire</Text>
-                                        <TextInput
-                                                  ref={priceRef}
-                                                  style={[styles.input, isPriceFocused && { borderColor: COLORS.primary}]}
-                                                  value={data.montant}
-                                                  onChangeText={e => handleChange("montant", e)}
-                                                  onFocus={() => setIsPriceFocused(true)}
-                                                  placeholder="Prix pour chaque pièce ?"
-                                                  onBlur={() => {
-                                                            setIsPriceFocused(false)
-                                                  }}
-                                                  keyboardType="decimal-pad"
-                                        />
-                              </View>
-                              <View style={styles.selectControl}>
-                                        <Text style={styles.selectLabel}>Images du produit</Text>
-                                        <TouchableWithoutFeedback>
-                                                  <View style={styles.addImager}>
-                                                            <Feather name="image" size={30} color="#777" />
+                    <>
+                              <ScrollView style={styles.container}>
+                                        {isLoading && <Loading />}
+                                        <Text style={styles.title}>Nouveau produit</Text>
+                                        <View style={styles.selectControl}>
+                                                  <Text style={styles.selectLabel}>Produit</Text>
+                                                  <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
+                                                            setIsOpen(true)
+                                                            produitsModalizeRef.current?.open()
+                                                  }}>
+                                                            <Text style={styles.selectedLabel} >
+                                                                      {data.produit ? data.produit.NOM : "Aucun produit selectionné"}
+                                                            </Text>
+                                                  </TouchableOpacity>
+                                        </View>
+                                        <View style={styles.selectControl}>
+                                                  <Text style={styles.selectLabel}>Nom du produit</Text>
+                                                  <TextInput
+                                                            style={[styles.input, isFocused && { borderColor: COLORS.primary }]}
+                                                            value={data.nom}
+                                                            onChangeText={e => handleChange("nom", e)}
+                                                            onFocus={() => setIsFocused(true)}
+                                                            placeholder="Ecrire votre propre nom du produit"
+                                                            onBlur={() => {
+                                                                      setIsFocused(false)
+                                                            }}
+                                                  />
+                                        </View>
+                                        <View style={styles.selectControl}>
+                                                  <Text style={styles.selectLabel}>Categorie</Text>
+                                                  <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
+                                                            setIsOpen(true)
+                                                            categoriesModalizeRef.current?.open()
+                                                  }}>
+                                                            <Text style={styles.selectedLabel} >
+                                                                      {data.category ? data.category.NOM : "Aucune catégorie selectionné"}
+                                                            </Text>
+                                                  </TouchableOpacity>
+                                        </View>
+                                        <View style={styles.selectControl}>
+                                                  <Text style={styles.selectLabel}>Sous catégorie</Text>
+                                                  <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
+                                                            setIsOpen(true)
+                                                            subCategoriesModalizeRef.current?.open()
+                                                  }}>
+                                                            <Text style={styles.selectedLabel} >
+                                                                      {data.subCategory ? data.subCategory.NOM_SOUS_CATEGORIE : "Aucun sous-catégorie selectionné"}
+                                                            </Text>
+                                                  </TouchableOpacity>
+                                        </View>
+                                        <View style={styles.selectControl}>
+                                                  <Text style={styles.selectLabel}>Description du produit</Text>
+                                                  <TextInput
+                                                            ref={descriptionRef}
+                                                            style={[styles.input, isDescFocused && { borderColor: COLORS.primary }, { height: 80 }]}
+                                                            value={data.description}
+                                                            onChangeText={e => handleChange("description", e)}
+                                                            onFocus={() => setIsDescFocused(true)}
+                                                            placeholder="Décrire votre produit(facultatif)"
+                                                            onBlur={() => {
+                                                                      setIsDescFocused(false)
+                                                            }}
+                                                            multiline
+                                                  />
+                                        </View>
+                                        <View style={styles.selectControl}>
+                                                  <Text style={styles.selectLabel}>Quantité</Text>
+                                                  <TextInput
+                                                            ref={amountRef}
+                                                            style={[styles.input, isAmountFocused && { borderColor: COLORS.primary }]}
+                                                            value={data.quantite}
+                                                            onChangeText={e => handleChange("quantite", e)}
+                                                            onFocus={() => setIsAmountFocused(true)}
+                                                            placeholder="Combien de pièces à mettre en stock ?"
+                                                            onBlur={() => {
+                                                                      setIsAmountFocused(false)
+                                                            }}
+                                                            keyboardType="decimal-pad"
+                                                            returnKeyType="next"
+                                                            onSubmitEditing={() => priceRef.current.focus()}
+                                                            blurOnSubmit={false}
+                                                  />
+                                        </View>
+                                        <View style={styles.selectControl}>
+                                                  <Text style={styles.selectLabel}>Prix unitaire</Text>
+                                                  <TextInput
+                                                            ref={priceRef}
+                                                            style={[styles.input, isPriceFocused && { borderColor: COLORS.primary }]}
+                                                            value={data.montant}
+                                                            onChangeText={e => handleChange("montant", e)}
+                                                            onFocus={() => setIsPriceFocused(true)}
+                                                            placeholder="Prix pour chaque pièce ?"
+                                                            onBlur={() => {
+                                                                      setIsPriceFocused(false)
+                                                            }}
+                                                            keyboardType="decimal-pad"
+                                                  />
+                                        </View>
+                                        <View style={styles.selectControl}>
+                                                  <Text style={styles.selectLabel}>Images du produit</Text>
+                                                  <View style={styles.images}>
+                                                            {images.map((image, index) => {
+                                                                      return (
+                                                                                <TouchableWithoutFeedback onPress={() => onRemoveImage(index)} key={index}>
+                                                                                          <Image style={[styles.addImager, index > 0 && { marginLeft: 10 }]} source={{ uri: image.uri }} />
+                                                                                </TouchableWithoutFeedback>
+                                                                      )
+                                                            })}
+                                                            {images.length < 3 ? <TouchableWithoutFeedback onPress={onImageSelect}>
+                                                                      <View style={[styles.addImager, images.length > 0 && { marginLeft: 10 }]}>
+                                                                                <Feather name="image" size={30} color="#777" />
+                                                                      </View>
+                                                            </TouchableWithoutFeedback> : null}
                                                   </View>
-                                        </TouchableWithoutFeedback>
-                              </View>
-                              <TouchableOpacity style={styles.addBtn}>
-                                        <Text style={styles.addBtnText}>Publier le produit</Text>
-                              </TouchableOpacity>
+                                        </View>
+                                        <TouchableOpacity style={[styles.addBtn, (!isValidate() || images.length == 0) && { opacity: 0.5 }]} onPress={onSubmit} disabled={!isValidate() || images.length == 0}>
+                                                  <Text style={[styles.addBtnText]}>Publier le produit</Text>
+                                        </TouchableOpacity>
+                              </ScrollView>
                               <Modalize
                                         ref={produitsModalizeRef}
-                                        adjustToContentHeight
                                         handlePosition='inside'
                                         modalStyle={{
                                                   borderTopRightRadius: 25,
@@ -392,7 +518,7 @@ export default function NewProductSreen() {
                               >
                                         <SubCategoriesModalize />
                               </Modalize>
-                    </ScrollView>
+                    </>
           )
 }
 
@@ -512,5 +638,8 @@ const styles = StyleSheet.create({
                     justifyContent: "center",
                     alignItems: "center",
                     marginTop: 5
+          },
+          images: {
+                    flexDirection: "row"
           }
 })
