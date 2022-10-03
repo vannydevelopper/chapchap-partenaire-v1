@@ -13,9 +13,10 @@ import * as ImagePicker from 'expo-image-picker';
 import { useFormErrorsHandle } from "../../hooks/useFormErrorsHandle";
 import Loading from "../../components/app/Loading";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
+import { useNavigation } from "@react-navigation/native";
 
 export default function NewProductSreen() {
-
+    const navigation=useNavigation()
           const [isOpen, setIsOpen] = useState(false)
           const [loadingForm, setLoadingForm] = useState(true)
           const [isLoading, setIsLoading] = useState(false)
@@ -33,6 +34,7 @@ export default function NewProductSreen() {
                     quantite: "",
                     montant: ""
           })
+          console.log(data)
           const { errors, setError, getErrors, setErrors, checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
                     produit: {
                               required: true,
@@ -105,17 +107,6 @@ export default function NewProductSreen() {
 
           const [images, setImages] = useState([])
 
-          const fetchProduits = async () => {
-                    try {
-                              const pdts = await fetchApi('/partenaire/produits')
-                              setProduits(pdts)
-                    } catch (error) {
-                              console.log(error)
-                    } finally {
-                              setLoadingProduits(false)
-                    }
-          }
-
           const fetchCategories = async () => {
                     try {
                               const pdts = await fetchApi('/products/categories')
@@ -126,7 +117,18 @@ export default function NewProductSreen() {
                               setLoadingCategories(false)
                     }
           }
-
+ const fetchProduits = async () => {
+                    try {
+                              const pdts = await fetchApi(`/partenaire/produits/${data.category.ID_CATEGORIE_PRODUIT}`)
+                              setProduits(pdts)
+                              console.log("produits")
+                              console.log(produits)
+                    } catch (error) {
+                              console.log(error)
+                    } finally {
+                              setLoadingProduits(false)
+                    }
+          }
           const fetchSubCategories = async () => {
                     try {
                               const pdts = await fetchApi(`/products/sub_categories/${data.category.ID_CATEGORIE_PRODUIT}`)
@@ -192,6 +194,7 @@ export default function NewProductSreen() {
                                         method: "POST",
                                         body: form
                               })
+                              navigation.navigate("NeProductDetail",{product:newProduct})
                               console.log(newProduct)
                     } catch (error) {
                               console.log(error)
@@ -201,9 +204,14 @@ export default function NewProductSreen() {
           }
 
           useEffect(() => {
-                    fetchProduits()
                     fetchCategories()
           }, [])
+          useEffect(() => {
+            if (data.category) {
+                fetchProduits()
+
+            }
+  }, [data])
 
           useEffect(() => {
                     if (data.category) {
@@ -222,48 +230,61 @@ export default function NewProductSreen() {
                     }
           }, [isOpen])
 
-          const ProduitsModalize = () => {
-                    return (
-                              (loadingForm || loadingProduits) ? <ActivityIndicator
-                                        animating
-                                        size={"small"}
-                                        color='#777'
-                                        style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
-                              /> :
-                                        <View style={styles.modalContainer}>
-                                                  <Text style={styles.modalTitle}>Les produits</Text>
-                                                  <View style={styles.modalHeader}>
-                                                            <TouchableOpacity style={styles.newProductBtn}>
-                                                                      <Text style={styles.newProductText}>Nouveau</Text>
-                                                            </TouchableOpacity>
-                                                            <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                            </View>
-                                                  </View>
-                                                  {produits.result?.map((produit, index) => {
-                                                            return (
-                                                                      <TouchableNativeFeedback onPress={() => {
-                                                                                handleChange("produit", produit)
-                                                                                produitsModalizeRef.current.close()
-                                                                      }}
-                                                                                key={produit.ID_PRODUIT.toString()}>
-                                                                                <View style={[styles.modalItem, produit.ID_PRODUIT == data.produit?.ID_PRODUIT && { backgroundColor: '#ddd' }]}>
-                                                                                          <View style={styles.modalImageContainer}>
-                                                                                                    <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
-                                                                                          </View>
-                                                                                          <Text style={styles.itemTitle}>{produit.NOM}</Text>
-                                                                                </View>
-                                                                      </TouchableNativeFeedback>
-                                                            )
-                                                  })}
-                                        </View>
-                    )
-          }
+        //   const ProduitsModalize = () => {
+        //             return (
+        //                       (loadingForm || loadingProduits) ? <ActivityIndicator
+        //                                 animating
+        //                                 size={"small"}
+        //                                 color='#777'
+        //                                 style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
+        //                       /> :
+        //                                 <View style={styles.modalContainer}>
+        //                                           <Text style={styles.modalTitle}>Les produits</Text>
+        //                                           <View style={styles.modalHeader}>
+        //                                                     <TouchableOpacity style={styles.newProductBtn}>
+        //                                                               <Text style={styles.newProductText}>Nouveau</Text>
+        //                                                     </TouchableOpacity>
+        //                                                     <View style={{ flexDirection: "row", alignItems: "center" }}>
+        //                                                               <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+        //                                                                         <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
+        //                                                               </TouchableOpacity>
+        //                                                               <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+        //                                                                         <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
+        //                                                               </TouchableOpacity>
+        //                                                     </View>
+        //                                           </View>
+                                                  
+        //                                           {/* {produits.result?.map((produit, index) => {
+        //                                                     return (
+        //                                                               <TouchableNativeFeedback onPress={() => {
+        //                                                                         handleChange("produit", produit)
+        //                                                                         produitsModalizeRef.current.close()
+        //                                                               }}
+        //                                                                         key={produit.ID_PRODUIT.toString()}>
+        //                                                                         <View style={[styles.modalItem, produit.ID_PRODUIT == data.produit?.ID_PRODUIT && { backgroundColor: '#ddd' }]}>
+        //                                                                                   <View style={styles.modalImageContainer}>
+        //                                                                                             <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
+        //                                                                                   </View>
+        //                                                                                   <Text style={styles.itemTitle}>{produit.NOM}</Text>
+        //                                                                         </View>
+        //                                                               </TouchableNativeFeedback>
+        //                                                     )
+        //                                           })} */}
+        //                                            {produits.result?.map((produit, index) => {
+        //                                                     return (
+        //                                                               <TouchableNativeFeedback key={produit.ID_PRODUIT} onPress={() => {
+        //                                                                 handleChange("produit", produit)
+        //                                                                 produitsModalizeRef.current.close()
+        //                                                               }} >
+        //                                                                         <View style={[styles.modalItem, produit.ID_PRODUIT == data.category?.ID_PRODUIT && { backgroundColor: '#ddd' }]}>
+        //                                                                                   <Text style={[styles.itemTitle, { marginLeft: 0 }]}>{produit.NOM_PRODUIT}</Text>
+        //                                                                         </View>
+        //                                                               </TouchableNativeFeedback>
+        //                                                     )
+        //                                           })}
+        //                                 </View>
+        //             )
+        //   }
 
           const CategoriesModalize = () => {
                     return (
@@ -330,7 +351,7 @@ export default function NewProductSreen() {
                                                                                 handleChange("subCategory", produit)
                                                                                 subCategoriesModalizeRef.current.close()
                                                                       }} >
-                                                                                <View style={[styles.modalItem, produit.ID_PRODUIT_SOUS_CATEGORIE == data.category?.ID_PRODUIT_SOUS_CATEGORIE && { backgroundColor: '#ddd' }]}>
+                                                                                <View style={[styles.modalItem, produit.ID_PRODUIT_SOUS_CATEGORIE == data.subCategory?.ID_PRODUIT_SOUS_CATEGORIE && { backgroundColor: '#ddd' }]}>
                                                                                           <Text style={[styles.itemTitle, { marginLeft: 0 }]}>{produit.NOM_SOUS_CATEGORIE}</Text>
                                                                                 </View>
                                                                       </TouchableNativeFeedback>
@@ -339,35 +360,46 @@ export default function NewProductSreen() {
                                         </View>
                     )
           }
+          const ProduitsModalize = () => {
+            return (
+                (loadingForm || loadingProduits) ?  <ActivityIndicator
+                                animating
+                                size={"small"}
+                                color='#777'
+                                style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
+                      /> :
+                                <View style={styles.modalContainer}>
+                                          <View style={styles.modalHeader}>
+                                                    <Text style={styles.modalTitle}>Les produits</Text>
+                                                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                              <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                        <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                              </TouchableOpacity>
+                                                              <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                        <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                              </TouchableOpacity>
+                                                    </View>
+                                          </View>
+                                          {produits.result?.map((produit, index) => {
+                                                            return (
+                                                                      <TouchableNativeFeedback key={produit.ID_PRODUIT} onPress={() => {
+                                                                        handleChange("produit", produit)
+                                                                        produitsModalizeRef.current.close()
+                                                                      }} >
+                                                                                <View style={[styles.modalItem, produit.ID_PRODUIT == data.produit?.ID_PRODUIT && { backgroundColor: '#ddd' }]}>
+                                                                                          <Text style={[styles.itemTitle, { marginLeft: 0 }]}>{produit.NOM_PRODUIT}</Text>
+                                                                                </View>
+                                                                      </TouchableNativeFeedback>
+                                                            )
+                                                  })}
+                                </View>
+            )
+  }
           return (
                     <>
                               <ScrollView style={styles.container}>
                                         {isLoading && <Loading />}
                                         <Text style={styles.title}>Nouveau produit</Text>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Produit</Text>
-                                                  <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
-                                                            setIsOpen(true)
-                                                            produitsModalizeRef.current?.open()
-                                                  }}>
-                                                            <Text style={styles.selectedLabel} >
-                                                                      {data.produit ? data.produit.NOM : "Aucun produit selectionné"}
-                                                            </Text>
-                                                  </TouchableOpacity>
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Nom du produit</Text>
-                                                  <TextInput
-                                                            style={[styles.input, isFocused && { borderColor: COLORS.primary }]}
-                                                            value={data.nom}
-                                                            onChangeText={e => handleChange("nom", e)}
-                                                            onFocus={() => setIsFocused(true)}
-                                                            placeholder="Ecrire votre propre nom du produit"
-                                                            onBlur={() => {
-                                                                      setIsFocused(false)
-                                                            }}
-                                                  />
-                                        </View>
                                         <View style={styles.selectControl}>
                                                   <Text style={styles.selectLabel}>Categorie</Text>
                                                   <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
@@ -390,6 +422,30 @@ export default function NewProductSreen() {
                                                             </Text>
                                                   </TouchableOpacity>
                                         </View>
+                                        <View style={styles.selectControl}>
+                                                  <Text style={styles.selectLabel}>Produit</Text>
+                                                  <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
+                                                            setIsOpen(true)
+                                                            produitsModalizeRef.current?.open()
+                                                  }}>
+                                                            <Text style={styles.selectedLabel} >
+                                                                      {data.produit ? data.produit.NOM_PRODUIT : "Aucun produit selectionné"}
+                                                            </Text>
+                                                  </TouchableOpacity>
+                                        </View>
+                                        <View style={styles.selectControl}>
+                                                  <Text style={styles.selectLabel}>Nom du produit</Text>
+                                                  <TextInput
+                                                            style={[styles.input, isFocused && { borderColor: COLORS.primary }]}
+                                                            value={data.nom}
+                                                            onChangeText={e => handleChange("nom", e)}
+                                                            onFocus={() => setIsFocused(true)}
+                                                            placeholder="Ecrire votre propre nom du produit"
+                                                            onBlur={() => {
+                                                                      setIsFocused(false)
+                                                            }}
+                                                  />
+                                        </View>                                     
                                         <View style={styles.selectControl}>
                                                   <Text style={styles.selectLabel}>Description du produit</Text>
                                                   <TextInput
@@ -461,6 +517,7 @@ export default function NewProductSreen() {
                               </ScrollView>
                               <Modalize
                                         ref={produitsModalizeRef}
+                                        adjustToContentHeight
                                         handlePosition='inside'
                                         modalStyle={{
                                                   borderTopRightRadius: 25,
