@@ -45,11 +45,11 @@ export default function InscriptionScreen() {
                 },
                 password: {
                         required: true,
-                        length: [8]
+                       // length: [8]
                 },
                 password_confirm: {
                         required: true,
-                        length: [8],
+                        //length: [8],
                         match: "password"
                 }
         }, {
@@ -114,7 +114,7 @@ export default function InscriptionScreen() {
                                 <ScrollView keyboardShouldPersistTaps="handled">
                                         <View>
                                                 <View style={styles.cardTitle}>
-                                                        <Text style={styles.Title}>Compte client</Text>
+                                                        <Text style={styles.Title}>Compte partenaire</Text>
                                                         <Text style={styles.description}> Chap Chap</Text>
                                                 </View>
 
