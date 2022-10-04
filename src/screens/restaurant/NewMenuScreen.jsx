@@ -25,6 +25,76 @@ export default function NewMenuScreen() {
         const sousSousCategoriesModalizeRef = useRef(null)
         const unitesModalizeRef = useRef(null)
 
+        const [data, handleChange] = useForm({
+                repas: null,
+                category: null,
+                subcategory: null,
+                subSubcategory: null,
+                unity: null,
+                nom: "",
+                descriptionrepas: "",
+                quantite: "",
+                descriptionTaille: "",
+                montant: ""
+        })
+        const { errors, setError, getErrors, setErrors, checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
+                repas: {
+                        required: true,
+                },
+                category: {
+                        required: true,
+                },
+                nom: {
+                        required: true,
+                        length: [2, 100]
+                },
+                descriptionrepas: {
+                        length: [1, 3000]
+                },
+                descriptionTaille: {
+                        length: [1, 3000]
+                },
+                quantite: {
+                        required: true,
+                        length: [1, 11]
+                },
+                montant: {
+                        required: true,
+                        length: [1, 11]
+                }
+        }, {
+                repas: {
+                        required: "Veuillez choisir le produit",
+                },
+                category: {
+                        required: "Veuillez choisir la catégorie",
+                },
+                nom: {
+                        required: "Le nom du produit est obligatoire",
+                        length: "Le nom du produit ne peut pas dépasser 100 caractères"
+                },
+                descriptionrepas: {
+                        length: "La description du produit ne peut pas dépasser 3000 caractères"
+                },
+                descriptionTaille: {
+                        length: "La description du produit ne peut pas dépasser 3000 caractères"
+                },
+                quantite: {
+                        required: "La quantité est obligatoire",
+                        length: "Quantité invalide"
+                },
+                montant: {
+                        required: "Le prix unitaire est obligatoire",
+                        length: "Prix unitaire invalide"
+                }
+        })
+
+        const nomRef = useRef(null)
+        const descriptionrepasRef = useRef(null)
+        const quantiteRef = useRef(null)
+        const descriptionTailleRef = useRef(null)
+        const amountRef = useRef(null)
+
         const [repas, setRepas] = useState([])
         const [loadingRepas, setLoadingRepas] = useState(true)
 
@@ -126,6 +196,28 @@ export default function NewMenuScreen() {
                 })()
         }, []))
 
+        const onSubmit = async () => {
+                try {
+                        if (!isValidate()) throw { errors: getErrors() }
+                        const form = new FormData()
+                        form.append("ID_CATEGORIE_MENU", data.category.ID_CATEGORIE_MENU)
+                        form.append("ID_SOUS_CATEGORIE_MENU", data.subcategory.ID_SOUS_CATEGORIE_MENU)
+                        form.append("ID_SOUS_SOUS_CATEGORIE", data.subSubcategory.ID_SOUS_SOUS_CATEGORIE)
+                        form.append("ID_REPAS", data.repas.ID_REPAS)
+                        // form.append("ID_PARTENAIRE", data.category.ID_CATEGORIE_PRODUIT)
+                        form.append("DESCRIPTION_REPAS", data.nom)
+                        form.append("DESCRIPTION_FOURNISSEUR", data.descriptionrepas)
+                        form.append("QUANTITE", data.quantite)
+                        form.append("DESCRIPTION", data.descriptionTaille)
+                        form.append("MONTANT", data.category.ID_CATEGORIE_PRODUIT)
+                        form.append("ID_UNITE", data.montant)
+                } catch (error) {
+                        console.log(error)
+                } finally {
+                        // setIsLoading(false)
+                }
+        }
+
         const RepasModalize = () => {
                 return (
                         <View style={styles.modalContainer}>
@@ -144,9 +236,10 @@ export default function NewMenuScreen() {
                                 {repas.map((repa, index) => {
                                         return (
                                                 <TouchableNativeFeedback onPress={() => {
+                                                        handleChange("repas", repa)
                                                         repasModalizeRef.current.close()
                                                 }} key={index.toString()}>
-                                                        <View style={styles.modalItem} >
+                                                        <View style={[styles.modalItem, repa.ID_REPAS == data.repas?.ID_REPAS && { backgroundColor: '#ddd' }]} >
                                                                 {/* <View style={styles.modalImageContainer}>
                                                                 <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
                                                         </View> */}
@@ -176,9 +269,10 @@ export default function NewMenuScreen() {
                                 {categories.map((categorie, index) => {
                                         return (
                                                 <TouchableNativeFeedback onPress={() => {
+                                                        handleChange("category", categorie)
                                                         categoriesModalizeRef.current.close()
                                                 }} key={index.toString()}>
-                                                        <View style={styles.modalItem} >
+                                                        <View style={[styles.modalItem, categorie.ID_CATEGORIE_MENU == data.category?.ID_CATEGORIE_MENU && { backgroundColor: '#ddd' }]} >
                                                                 {/* <View style={styles.modalImageContainer}>
                                                                                         <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
                                                                                 </View> */}
@@ -208,9 +302,10 @@ export default function NewMenuScreen() {
                                 {sousCategorie.map((sousCateg, index) => {
                                         return (
                                                 <TouchableNativeFeedback onPress={() => {
+                                                        handleChange("subcategory", sousCateg)
                                                         sousCategoriesModalizeRef.current.close()
                                                 }} key={index.toString()}>
-                                                        <View style={styles.modalItem} >
+                                                        <View style={[styles.modalItem, sousCateg.ID_SOUS_CATEGORIE_MENU == data.subcategory?.ID_SOUS_CATEGORIE_MENU && { backgroundColor: '#ddd' }]} >
                                                                 {/* <View style={styles.modalImageContainer}>
                                                                                         <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
                                                                                 </View> */}
@@ -240,9 +335,10 @@ export default function NewMenuScreen() {
                                 {sousSousCategorie.map((soussousCateg, index) => {
                                         return (
                                                 <TouchableNativeFeedback onPress={() => {
+                                                        handleChange("subSubcategory", soussousCateg)
                                                         sousSousCategoriesModalizeRef.current.close()
                                                 }} key={index.toString()} >
-                                                        <View style={styles.modalItem} >
+                                                        <View style={[styles.modalItem, soussousCateg.ID_SOUS_SOUS_CATEGORIE == data.subSubcategory?.ID_SOUS_SOUS_CATEGORIE && { backgroundColor: '#ddd' }]} >
                                                                 {/* <View style={styles.modalImageContainer}>
                                                                                         <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
                                                                                 </View> */}
@@ -273,9 +369,10 @@ export default function NewMenuScreen() {
                                         return (
                                                 <TouchableNativeFeedback
                                                         onPress={() => {
+                                                                handleChange("unity", unite)
                                                                 unitesModalizeRef.current.close()
                                                         }} key={index.toString()} >
-                                                        <View style={styles.modalItem} >
+                                                        <View style={[styles.modalItem, unite.ID_UNITE == data.unity?.ID_UNITE && { backgroundColor: '#ddd' }]} >
                                                                 {/* <View style={styles.modalImageContainer}>
                                                         <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
                                                 </View> */}
@@ -302,7 +399,7 @@ export default function NewMenuScreen() {
                                                 }}
                                         >
                                                 <Text style={styles.selectedLabel} >
-                                                        Aucun Nom du repas selectionné
+                                                        {data.repas ? data.repas.DESCRIPTION : " Aucun Nom du repas selectionné"}
                                                 </Text>
                                         </TouchableOpacity>
                                 </View>
@@ -315,7 +412,7 @@ export default function NewMenuScreen() {
                                                 }}
                                         >
                                                 <Text style={styles.selectedLabel} >
-                                                        Aucune catégorie selectionné
+                                                        {data.category ? data.category.NOM : "Aucune catégorie selectionné"}
                                                 </Text>
                                         </TouchableOpacity>
                                 </View>
@@ -328,7 +425,7 @@ export default function NewMenuScreen() {
                                                 }}
                                         >
                                                 <Text style={styles.selectedLabel} >
-                                                        Aucun sous-catégorie selectionné
+                                                        {data.subcategory ? data.subcategory.NOM : "Aucun sous-catégorie selectionné"}
                                                 </Text>
                                         </TouchableOpacity>
                                 </View>
@@ -341,17 +438,17 @@ export default function NewMenuScreen() {
                                                 }}
                                         >
                                                 <Text style={styles.selectedLabel} >
-                                                        Aucun sous-sous-catégorie selectionné
+                                                        {data.subSubcategory ? data.subSubcategory.DESCRIPTION : "Aucun sous-sous-catégorie selectionné"}
                                                 </Text>
                                         </TouchableOpacity>
                                 </View>
                                 <View style={styles.selectControl}>
                                         <Text style={styles.selectLabel}>Nom du repas</Text>
                                         <TextInput
-                                                // ref={descriptionRef}
+                                                ref={nomRef}
                                                 style={styles.input}
-                                                // value={data.description}
-                                                // onChangeText={e => handleChange("description", e)}
+                                                value={data.nom}
+                                                onChangeText={e => handleChange("nom", e)}
                                                 // onFocus={() => setIsDescFocused(true)}
                                                 placeholder="Décrire nom du repas"
                                                 // onBlur={() => {
@@ -363,10 +460,10 @@ export default function NewMenuScreen() {
                                 <View style={styles.selectControl}>
                                         <Text style={styles.selectLabel}>Description du repas</Text>
                                         <TextInput
-                                                // ref={descriptionRef}
+                                                ref={descriptionrepasRef}
                                                 style={styles.input}
-                                                // value={data.description}
-                                                // onChangeText={e => handleChange("description", e)}
+                                                value={data.descriptionrepas}
+                                                onChangeText={e => handleChange("descriptionrepas", e)}
                                                 // onFocus={() => setIsDescFocused(true)}
                                                 placeholder="Décrire leur description"
                                                 // onBlur={() => {
@@ -378,10 +475,10 @@ export default function NewMenuScreen() {
                                 <View style={styles.selectControl}>
                                         <Text style={styles.selectLabel}>Quantite</Text>
                                         <TextInput
-                                                //  ref={amountRef}
+                                                ref={quantiteRef}
                                                 style={styles.input}
-                                                //  value={data.quantite}
-                                                //  onChangeText={e => handleChange("quantite", e)}
+                                                value={data.quantite}
+                                                onChangeText={e => handleChange("quantite", e)}
                                                 //  onFocus={() => setIsAmountFocused(true)}
                                                 placeholder="Combien de pièces à mettre en stock ?"
                                                 //  onBlur={() => {
@@ -396,10 +493,10 @@ export default function NewMenuScreen() {
                                 <View style={styles.selectControl}>
                                         <Text style={styles.selectLabel}>Description taille</Text>
                                         <TextInput
-                                                // ref={descriptionRef}
+                                                ref={descriptionTailleRef}
                                                 style={styles.input}
-                                                // value={data.description}
-                                                // onChangeText={e => handleChange("description", e)}
+                                                value={data.descriptionTaille}
+                                                onChangeText={e => handleChange("descriptionTaille", e)}
                                                 // onFocus={() => setIsDescFocused(true)}
                                                 placeholder="Décrire votre menu(facultatif)"
                                                 // onBlur={() => {
@@ -417,17 +514,18 @@ export default function NewMenuScreen() {
                                                 }}
                                         >
                                                 <Text style={styles.selectedLabel} >
-                                                        Aucun unite selectionné
+                                                        {data.unity ? data.unity.UNITES_MESURES : "Aucun unite selectionné"}
+
                                                 </Text>
                                         </TouchableOpacity>
                                 </View>
                                 <View style={styles.selectControl}>
                                         <Text style={styles.selectLabel}>Montant</Text>
                                         <TextInput
-                                                //  ref={amountRef}
+                                                ref={amountRef}
                                                 style={styles.input}
-                                                //  value={data.quantite}
-                                                //  onChangeText={e => handleChange("quantite", e)}
+                                                value={data.montant}
+                                                onChangeText={e => handleChange("montant", e)}
                                                 //  onFocus={() => setIsAmountFocused(true)}
                                                 placeholder="Combien d'argent"
                                                 //  onBlur={() => {
@@ -454,7 +552,7 @@ export default function NewMenuScreen() {
                                         </View>
                                 </View>
 
-                                <TouchableOpacity style={styles.addBtn}>
+                                <TouchableOpacity style={styles.addBtn} onPress={onSubmit}>
                                         <Text style={styles.addBtnText}>Publier un menu</Text>
                                 </TouchableOpacity>
 
