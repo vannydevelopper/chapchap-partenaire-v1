@@ -8,10 +8,10 @@ export default function Product({ product, index, totalLength, fixMargins = fals
           const MAX_WIDTH = 200
           const PRODUCT_MARGIN = 10
           const PRODUCT_WIDTH = (width / 2) - PRODUCT_MARGIN - 10
-          const PRODUCT_HEIGHT = 270
+          const PRODUCT_HEIGHT = 360
           const additionStyles = {
                     width: PRODUCT_WIDTH,
-                    height: PRODUCT_HEIGHT,
+                    maxHeight: PRODUCT_HEIGHT,
                     marginLeft: index > 0 ? PRODUCT_MARGIN : (fixMargins ? PRODUCT_MARGIN : 0),
                     marginRight: index == totalLength - 1 ? PRODUCT_MARGIN : (fixMargins ? 0 : 0)
           }
@@ -27,6 +27,20 @@ export default function Product({ product, index, totalLength, fixMargins = fals
                                         <Image source={{ uri: product.produit_partenaire.IMAGE_1 }} style={styles.image} />
                               </View>
                               {product.produit_partenaire.PRIX ? <Text style={styles.price}>{product.produit_partenaire.PRIX.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Fbu</Text> : null}
+                              <View style={styles.details}>
+                                        <View style={styles.detail}>
+                                                  <Text style={styles.detailLabel}>Quantité total</Text>
+                                                  <Text style={styles.detailValue}>{ product.stock.QUANTITE_STOCKE }</Text>
+                                        </View>
+                                        <View style={styles.detail}>
+                                                  <Text style={styles.detailLabel}>Vendus</Text>
+                                                  <Text style={styles.detailValue}>{ product.stock.QUANTITE_VENDUE }</Text>
+                                        </View>
+                                        <View style={styles.detail}>
+                                                  <Text style={styles.detailLabel}>Restante</Text>
+                                                  <Text style={[styles.detailValue, { fontSize: 18 }]}>{ product.stock.QUANTITE_RESTANTE }</Text>
+                                        </View>
+                              </View>
                     </View>
           )
 }
@@ -36,24 +50,22 @@ const styles = StyleSheet.create({
                     maxWidth: 200,
                     backgroundColor: '#F1F1F1',
                     borderRadius: 5,
-                    marginTop: 10
+                    marginTop: 10,
           },
           productHeader: {
                     padding: 5
           },
           productName: {
                     color: COLORS.ecommercePrimaryColor,
-                    fontWeight: "bold",
-                    textAlign: "center"
+                    fontWeight: "bold"
           },
           productCategory: {
                     fontSize: 13,
                     color: '#777',
                     marginLeft: 5,
-                    textAlign: "center"
           },
           imageCard: {
-                    height: "60%",
+                    height: "40%",
                     width: "100%"
           },
           image: {
@@ -64,7 +76,22 @@ const styles = StyleSheet.create({
           price: {
                     color: '#F29558',
                     fontWeight: "bold",
-                    padding: 5,
-                    textAlign: "center"
+                    padding: 5
+          },
+          details: {
+                    paddingHorizontal: 5
+          },
+          detail: {
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+          },
+          detailLabel: {
+                    color: '#c4bebe',
+                    fontSize: 13,
+                    fontWeight: "bold"
+          },
+          detailValue: {
+                    fontWeight: "bold"
           }
 })
