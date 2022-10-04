@@ -34,7 +34,7 @@ export default function NewProductSreen() {
                     quantite: "",
                     montant: ""
           })
-          console.log(data)
+          // console.log(data)
           const { errors, setError, getErrors, setErrors, checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
                     produit: {
                               required: true,
@@ -121,8 +121,6 @@ export default function NewProductSreen() {
                     try {
                               const pdts = await fetchApi(`/partenaire/produits/${data.category.ID_CATEGORIE_PRODUIT}`)
                               setProduits(pdts)
-                              console.log("produits")
-                              console.log(produits)
                     } catch (error) {
                               console.log(error)
                     } finally {
@@ -189,13 +187,17 @@ export default function NewProductSreen() {
                                                   })
                                         }))
                               }
-                              console.log(form)
+                              // console.log(form)
                               const newProduct = await fetchApi('/partenaire/produit/create', {
                                         method: "POST",
                                         body: form
                               })
-                              navigation.navigate("NeProductDetail",{product:newProduct})
-                              console.log(newProduct)
+                              // console.log(newProduct)
+                              navigation.navigate("NeProductDetail",{product:newProduct,
+                                index:3,
+                                totalLength:3,
+                                fixMargins:3})
+                              
                     } catch (error) {
                               console.log(error)
                     } finally {
