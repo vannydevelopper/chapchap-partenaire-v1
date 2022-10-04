@@ -6,7 +6,11 @@ import fetchApi from "../helpers/fetchApi"
  * @param {string} url l'url à appeler (GET)
  * @returns {Array} un tableau contenant [les donnes, le loading, le setDonnes]
  */
-export default function useFetch(url) {
+const initialOptions = {
+          cacheData: false,
+          checkInCacheFirst: false
+}
+export default function useFetch(url, options = initialOptions) {
           const [state, setState] = useState({
                     loading: true,
                     items: []
@@ -14,13 +18,12 @@ export default function useFetch(url) {
           useEffect(() => {
                     (async () => {
                               try {
-                                        const data = await fetchApi(url)
+                                        const data = await fetchApi(url, options)
                                         setState({
                                                   loading: false,
                                                   items: data
                                         })
                               } catch (error) {
-                                        console.log(error)
                                         setState({
                                                   loading: false,
                                                   items: []

@@ -8,7 +8,7 @@ const SERVICES = [{
           title: "Achat de produits",
           imageBg: require('../../../assets/images/ecommerce.png'),
           icon:  require('../../../assets/images/ecommerce-icon.png'),
-          route: "EcommerceHomeScreen"
+          route: "EcommerceNavigator"
 },{
           title: "Restauration",
           imageBg: require('../../../assets/images/resto.jpg'),

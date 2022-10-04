@@ -18,7 +18,7 @@ export default function LoginScreen() {
           }, [])
           return (
                     <>
-                              <ImageBackground style={styles.container} source={require('../../../assets/images/g52.png')}>
+                              <View style={styles.container}>
                                         <View style={{ backgroundColor: "#fff" }}>
                                                   <Image source={require('../../../assets/images/chapchap_logo.png')} style={styles.image} />
                                         </View>
@@ -40,7 +40,7 @@ export default function LoginScreen() {
                                                   <TopBar.Screen name='Inscription' component={InscriptionScreen} options={{ headerShown: false }} />
                                                   <TopBar.Screen name='Connexion' component={ConnexionScreen} options={{ headerShown: false }} />
                                         </TopBar.Navigator>
-                              </ImageBackground>
+                              </View>
                     </>
           )
 }

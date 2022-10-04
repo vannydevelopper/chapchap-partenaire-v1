@@ -33,7 +33,7 @@ export default function AppContainer() {
                                         <ActivityIndicator color="#007BFF" animating={userLoading} size='large' />
                               </View> :
                               <>
-                                        {!user ? <WelcomeNavigator showOnBoarding={showOnBoarding} /> :
+                                        {false ? <WelcomeNavigator showOnBoarding={showOnBoarding} /> :
                                                   <RootNavigator />
                                         }
                               </>

@@ -45,11 +45,11 @@ export default function InscriptionScreen() {
                 },
                 password: {
                         required: true,
-                       // length: [8]
+                        length: [8]
                 },
                 password_confirm: {
                         required: true,
-                        //length: [8],
+                       // length: [8],
                         match: "password"
                 }
         }, {
