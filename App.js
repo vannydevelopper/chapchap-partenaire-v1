@@ -12,8 +12,8 @@ export default function App() {
           return (
                     <Provider store={store}>
                               <Host>
-                                        {/* <AppContainer /> */}
-                                        <InscriptionPartenaireScreen/>
+                                        <AppContainer />
+                                        {/* <InscriptionPartenaireScreen/> */}
                                         {/* <HomeScreen/> */}
                               </Host>
                     </Provider>
