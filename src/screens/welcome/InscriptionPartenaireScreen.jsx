@@ -11,7 +11,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useToast } from 'native-base';
 import { COLORS } from '../../styles/COLORS';
 // import {  useToast } from 'native-base';
-import * as ImagePicker from 'expo-image-picker';
+import { Feather } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';  
 import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
 import * as Location from 'expo-location'
 import Loading from '../../components/app/Loading';
@@ -58,9 +59,9 @@ export default function InscriptionPartenaireScreen() {
             required: true,
 
         },
-        imagelogo: {
-            required: true
-        }
+        // imagelogo: {
+        //     required: true
+        // }
 
     }, {
 
@@ -71,9 +72,9 @@ export default function InscriptionPartenaireScreen() {
         telephone: {
             required: "Telephone est obligatoire"
         },
-        imagelogo: {
-            required: "Logo est obligatoire"
-        }
+        // imagelogo:{
+        //     required: "Logo est obligatoire"
+        // }
 
     })
     const askLocationPermission = async () => {
@@ -394,7 +395,7 @@ export default function InscriptionPartenaireScreen() {
                                     <View style={{ ...styles.addImage }}>
                                         {imagelogo ? <Image source={{ uri: imagelogo.uri }} style={{ width: '100%', height: '100%', borderRadius: 5 }} /> :
                                             <View style={{justifyContent:"center", alignItems:"center", flex:1}}>
-                                                <Image source={require('../../../assets/images/logo.png')} style={{ width: '30%', height: '30%' }} />
+                                                {/* <Image source={require('../../../assets/images/logo.png')} style={{ width: '30%', height: '30%' }} /> */}
                                             </View>}
                                     </View>
                                 </TouchableOpacity>
@@ -412,7 +413,7 @@ export default function InscriptionPartenaireScreen() {
                                     <View style={{ ...styles.addImage }}>
                                         {backgroundimage ? <Image source={{ uri: backgroundimage.uri }} style={{ width: '100%', height: '100%', borderRadius: 5 }} /> :
                                             <View style={{justifyContent:"center", alignItems:"center", flex:1}}>
-                                            <Image source={require('../../../assets/images/person-icon.png')} style={{ width: '30%', height: '30%', marginTop: 10 }} />
+                                            {/* <Image source={require('../../../assets/images/person-icon.png')} style={{ width: '30%', height: '30%', marginTop: 10 }} /> */}
                                             </View>}
                                     </View>
                                 </TouchableOpacity>
@@ -430,8 +431,9 @@ export default function InscriptionPartenaireScreen() {
 
                             />
                         </View>}
-                        <TouchableOpacity onPress={sendData} >
-                            <View style={styles.button}>
+                        <TouchableOpacity onPress={sendData} disabled={!isValidate()} >
+                        
+                            <View style={[styles.button, !isValidate() && { opacity: 0.5 }]}>
                                 <Text style={styles.buttonText} >Enregistrer</Text>
                             </View>
 
@@ -555,7 +557,7 @@ const styles = StyleSheet.create({
         // justifyContent: 'center',
         // alignItems: 'center',
         borderColor: '#777',
-        backgroundColor:'#ffcc',
+        backgroundColor:'#f1f1f1',
         borderWidth: 1,
         //alignSelf: 'center'
     },
