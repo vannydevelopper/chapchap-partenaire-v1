@@ -12,7 +12,8 @@ const SERVICES = [{
 },{
           title: "Restauration",
           imageBg: require('../../../assets/images/resto.jpg'),
-          icon:  require('../../../assets/images/resto-icon.png')
+          icon:  require('../../../assets/images/resto-icon.png'),
+          route:"RestaurantNavigator"
 },{
           title: "Evénement",
           imageBg: require('../../../assets/images/event.jpg'),
