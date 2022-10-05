@@ -12,9 +12,7 @@ export default function App() {
           return (
                     <Provider store={store}>
                               <Host>
-                                        {/* <AppContainer /> */}
-                                        <InscriptionPartenaireScreen/>
-                                        {/* <HomeScreen/> */}
+                                        <AppContainer />
                               </Host>
                     </Provider>
           )
