@@ -253,7 +253,7 @@ export default function NewMenuScreen() {
                                         })
                                 }))
                         }
-                        console.log(form)
+                        // console.log(form)
                         const newMenu = await fetchApi('/resto/menu/create', {
                                 method: "POST",
                                 body: form
