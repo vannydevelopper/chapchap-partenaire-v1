@@ -13,6 +13,7 @@ import { useFormErrorsHandle } from '../../hooks/useFormErrorsHandle';
 import Loading from '../../components/app/Loading';
 
 export default function InscriptionScreen() {
+        
         const dispatch = useDispatch()
         const navigation = useNavigation()
         const [loading, setLoading] = useState(false);
@@ -91,6 +92,7 @@ export default function InscriptionScreen() {
                         })
                         await AsyncStorage.setItem("user", JSON.stringify(res));
                         dispatch(setUserAction(res));
+                        navigation.navigate("partenaire",{partenaire:res})
                 }
                 catch (error) {
                         console.log(error)

@@ -6,6 +6,8 @@ import EcommerceNavigator from './EcommerceNavigator'
 import DrawerContent from '../components/app/DrawerContent';
 import RestaurantNavigator from './RestaurantNavigator';
 import CommandeEmiseScreen from '../screens/e-commerce/CommandeEmiseScreen';
+import InscriptionScreen from '../screens/welcome/InscriptionScreen';
+import InscriptionPartenaireScreen from '../screens/welcome/InscriptionPartenaireScreen';
 
 export default function RootNavigator() {
         const Drawer = createDrawerNavigator()
@@ -17,6 +19,10 @@ export default function RootNavigator() {
                                 },
                         }}>
                         <Drawer.Navigator screenOptions={{ headerShown: false }} drawerContent={props => <DrawerContent {...props} />}>
+                        <Drawer.Screen name='inscription' component={InscriptionScreen} />
+                        <Drawer.Screen name='partenaire' component={InscriptionPartenaireScreen} />
+
+                                
                                 <Drawer.Screen name='commande' component={CommandeEmiseScreen} />
                                 <Drawer.Screen name='HomeScreen' component={HomeScreen} />
                                 <Drawer.Screen name='EcommerceNavigator' component={EcommerceNavigator} />

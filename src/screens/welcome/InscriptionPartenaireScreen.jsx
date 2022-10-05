@@ -4,7 +4,7 @@ import { TextField, FilledTextField, InputAdornment, OutlinedTextField } from 'r
 import { useForm } from '../../hooks/useForm';
 import { Modalize } from 'react-native-modalize';
 import useFetch from "../../hooks/useFetch";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import fetchApi from '../../helpers/fetchApi';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -19,7 +19,8 @@ import Loading from '../../components/app/Loading';
 import { useFormErrorsHandle } from '../../hooks/useFormErrorsHandle';
 
 export default function InscriptionPartenaireScreen() {
-
+    const route= useRoute()
+ const  navigation=useNavigation()
     const [services, setService] = useState([])
     const [partenairetypes, setPartenairetype] = useState([])
     const [location, setLocation] = useState(null)
@@ -36,6 +37,8 @@ export default function InscriptionPartenaireScreen() {
     const [isLoading, setIsLoading] = useState(false)
     const [loading, setLoading] = useState(false);
     const toast = useToast()
+    const { partenaire}=route.params
+     console.log(partenaire.result.ID_USER)
     const [data, handleChange, setValue] = useForm({
         ServiceSelect: null,
         typepartenaireselect: null,
@@ -149,7 +152,7 @@ export default function InscriptionPartenaireScreen() {
         }
 
         const form = new FormData()
-        form.append('ID_USER', typepartenaireselect.ID_PARTENAIRE_TYPE)
+        form.append('ID_USER',partenaire.result.ID_USER)
         form.append('ID_TYPE_PARTENAIRE', typepartenaireselect.ID_PARTENAIRE_TYPE)
         form.append('NOM_ORGANISATION', data.organisation)
         form.append('TELEPHONE', data.telephone)
@@ -160,7 +163,7 @@ export default function InscriptionPartenaireScreen() {
         form.append('LATITUDE', location.coords.latitude)
         form.append('ID_SERVICE', ServiceSelect.ID_SERVICE)
 
-
+        
         if (imagelogo) {
             const manipResult = await manipulateAsync(
                 imagelogo.uri,
@@ -194,7 +197,7 @@ export default function InscriptionPartenaireScreen() {
             form.append('BACKGROUND_IMAGE', {
                 uri: localUri, name: filename, type
             })
-
+            console.log(form)
             try {
                 const data = await fetchApi("/partenaire/Ajouter", {
                     method: "POST",
@@ -212,6 +215,8 @@ export default function InscriptionPartenaireScreen() {
                     width: '90%',
                     minWidth: 300
                 })
+                navigation.navigate("commande")
+                
             }
             catch (error) {
                 console.log(error)
