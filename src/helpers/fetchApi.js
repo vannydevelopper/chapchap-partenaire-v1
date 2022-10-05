@@ -3,7 +3,9 @@ import cache from "../utils/cache";
 import wait from "../utils/wait";
 const API_URL = false
           ? "http://app.mediabox.bi:2522"
+
           : "http://192.168.43.84:3000";
+
 
 /**
  * consomer une api avec les options par défaut
