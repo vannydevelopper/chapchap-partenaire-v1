@@ -27,6 +27,7 @@ export default function NewMenuScreen() {
         const sousCategoriesModalizeRef = useRef(null)
         const sousSousCategoriesModalizeRef = useRef(null)
         const unitesModalizeRef = useRef(null)
+        const detailModalizeRef = useRef(null)
 
         const [data, handleChange] = useForm({
                 repas: null,
@@ -258,7 +259,7 @@ export default function NewMenuScreen() {
                                 method: "POST",
                                 body: form
                         })
-                        navigation.navigate("NewMenuDetailScreen", {menus:newMenu})
+                        navigation.navigate("NewMenuDetailScreen", { menus: newMenu })
                 } catch (error) {
                         console.log(error)
                 } finally {
@@ -268,7 +269,7 @@ export default function NewMenuScreen() {
 
         const RepasModalize = () => {
                 return (
-                         (loadingForm || loadingRepas)? <ActivityIndicator
+                        (loadingForm || loadingRepas) ? <ActivityIndicator
                                 animating
                                 size={"small"}
                                 color='#777'
@@ -309,118 +310,118 @@ export default function NewMenuScreen() {
 
         const CategoriesModalize = () => {
                 return (
-                        (loadingForm || loadingCategories)? <ActivityIndicator
+                        (loadingForm || loadingCategories) ? <ActivityIndicator
                                 animating
                                 size={"small"}
                                 color='#777'
                                 style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
                         /> :
-                        <View style={styles.modalContainer}>
-                                <View style={styles.modalHeader}>
-                                        <Text style={styles.modalTitle}>Les categories</Text>
-                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
+                                <View style={styles.modalContainer}>
+                                        <View style={styles.modalHeader}>
+                                                <Text style={styles.modalTitle}>Les categories</Text>
+                                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                </View>
                                         </View>
-                                </View>
-                                {categories.map((categorie, index) => {
-                                        return (
-                                                <TouchableNativeFeedback onPress={() => {
-                                                        handleChange("category", categorie)
-                                                        categoriesModalizeRef.current.close()
-                                                }} key={index.toString()}>
-                                                        <View style={[styles.modalItem, categorie.ID_CATEGORIE_MENU == data.category?.ID_CATEGORIE_MENU && { backgroundColor: '#ddd' }]} >
-                                                                {/* <View style={styles.modalImageContainer}>
+                                        {categories.map((categorie, index) => {
+                                                return (
+                                                        <TouchableNativeFeedback onPress={() => {
+                                                                handleChange("category", categorie)
+                                                                categoriesModalizeRef.current.close()
+                                                        }} key={index.toString()}>
+                                                                <View style={[styles.modalItem, categorie.ID_CATEGORIE_MENU == data.category?.ID_CATEGORIE_MENU && { backgroundColor: '#ddd' }]} >
+                                                                        {/* <View style={styles.modalImageContainer}>
                                                                                         <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
                                                                                 </View> */}
-                                                                <Text style={styles.itemTitle}>{categorie.NOM}</Text>
-                                                        </View>
-                                                </TouchableNativeFeedback>
-                                        )
-                                })}
-                        </View>
+                                                                        <Text style={styles.itemTitle}>{categorie.NOM}</Text>
+                                                                </View>
+                                                        </TouchableNativeFeedback>
+                                                )
+                                        })}
+                                </View>
                 )
         }
 
         const SousCategoriesModalize = () => {
                 return (
-                        (loadingForm || loadingSousCategorie)? <ActivityIndicator
+                        (loadingForm || loadingSousCategorie) ? <ActivityIndicator
                                 animating
                                 size={"small"}
                                 color='#777'
                                 style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
                         /> :
-                        <View style={styles.modalContainer}>
-                                <View style={styles.modalHeader}>
-                                        <Text style={styles.modalTitle}>Les des sous categories</Text>
-                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
+                                <View style={styles.modalContainer}>
+                                        <View style={styles.modalHeader}>
+                                                <Text style={styles.modalTitle}>Les des sous categories</Text>
+                                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                </View>
                                         </View>
-                                </View>
-                                {sousCategorie.map((sousCateg, index) => {
-                                        return (
-                                                <TouchableNativeFeedback onPress={() => {
-                                                        handleChange("subcategory", sousCateg)
-                                                        sousCategoriesModalizeRef.current.close()
-                                                }} key={index.toString()}>
-                                                        <View style={[styles.modalItem, sousCateg.ID_SOUS_CATEGORIE_MENU == data.subcategory?.ID_SOUS_CATEGORIE_MENU && { backgroundColor: '#ddd' }]} >
-                                                                {/* <View style={styles.modalImageContainer}>
+                                        {sousCategorie.map((sousCateg, index) => {
+                                                return (
+                                                        <TouchableNativeFeedback onPress={() => {
+                                                                handleChange("subcategory", sousCateg)
+                                                                sousCategoriesModalizeRef.current.close()
+                                                        }} key={index.toString()}>
+                                                                <View style={[styles.modalItem, sousCateg.ID_SOUS_CATEGORIE_MENU == data.subcategory?.ID_SOUS_CATEGORIE_MENU && { backgroundColor: '#ddd' }]} >
+                                                                        {/* <View style={styles.modalImageContainer}>
                                                                                         <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
                                                                                 </View> */}
-                                                                <Text style={styles.itemTitle}>{sousCateg.NOM}</Text>
-                                                        </View>
-                                                </TouchableNativeFeedback>
-                                        )
-                                })}
-                        </View>
+                                                                        <Text style={styles.itemTitle}>{sousCateg.NOM}</Text>
+                                                                </View>
+                                                        </TouchableNativeFeedback>
+                                                )
+                                        })}
+                                </View>
                 )
         }
 
         const SousSousCategoriesModalize = () => {
                 return (
-                        (loadingForm || loadingSousSousCategorie)? <ActivityIndicator
+                        (loadingForm || loadingSousSousCategorie) ? <ActivityIndicator
                                 animating
                                 size={"small"}
                                 color='#777'
                                 style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
                         /> :
-                        <View style={styles.modalContainer}>
-                                <View style={styles.modalHeader}>
-                                        <Text style={styles.modalTitle}>Les des sous categories</Text>
-                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
+                                <View style={styles.modalContainer}>
+                                        <View style={styles.modalHeader}>
+                                                <Text style={styles.modalTitle}>Les des sous categories</Text>
+                                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                </View>
                                         </View>
-                                </View>
-                                {sousSousCategorie.map((soussousCateg, index) => {
-                                        return (
-                                                <TouchableNativeFeedback onPress={() => {
-                                                        handleChange("subSubcategory", soussousCateg)
-                                                        sousSousCategoriesModalizeRef.current.close()
-                                                }} key={index.toString()} >
-                                                        <View style={[styles.modalItem, soussousCateg.ID_SOUS_SOUS_CATEGORIE == data.subSubcategory?.ID_SOUS_SOUS_CATEGORIE && { backgroundColor: '#ddd' }]} >
-                                                                {/* <View style={styles.modalImageContainer}>
+                                        {sousSousCategorie.map((soussousCateg, index) => {
+                                                return (
+                                                        <TouchableNativeFeedback onPress={() => {
+                                                                handleChange("subSubcategory", soussousCateg)
+                                                                sousSousCategoriesModalizeRef.current.close()
+                                                        }} key={index.toString()} >
+                                                                <View style={[styles.modalItem, soussousCateg.ID_SOUS_SOUS_CATEGORIE == data.subSubcategory?.ID_SOUS_SOUS_CATEGORIE && { backgroundColor: '#ddd' }]} >
+                                                                        {/* <View style={styles.modalImageContainer}>
                                                                                         <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
                                                                                 </View> */}
-                                                                <Text style={styles.itemTitle}>{soussousCateg.DESCRIPTION}</Text>
-                                                        </View>
-                                                </TouchableNativeFeedback>
-                                        )
-                                })}
-                        </View>
+                                                                        <Text style={styles.itemTitle}>{soussousCateg.DESCRIPTION}</Text>
+                                                                </View>
+                                                        </TouchableNativeFeedback>
+                                                )
+                                        })}
+                                </View>
                 )
         }
 
@@ -432,38 +433,39 @@ export default function NewMenuScreen() {
                                 color='#777'
                                 style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
                         /> :
-                        <View style={styles.modalContainer}>
-                                <View style={styles.modalHeader}>
-                                        <Text style={styles.modalTitle}>Les des sous categories</Text>
-                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
+                                <View style={styles.modalContainer}>
+                                        <View style={styles.modalHeader}>
+                                                <Text style={styles.modalTitle}>Les des sous categories</Text>
+                                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                </View>
                                         </View>
-                                </View>
-                                {unites.map((unite, index) => {
-                                        return (
-                                                <TouchableNativeFeedback
-                                                        onPress={() => {
-                                                                handleChange("unity", unite)
-                                                                unitesModalizeRef.current.close()
-                                                        }} key={index.toString()} >
-                                                        <View style={[styles.modalItem, unite.ID_UNITE == data.unity?.ID_UNITE && { backgroundColor: '#ddd' }]} >
-                                                                {/* <View style={styles.modalImageContainer}>
+                                        {unites.map((unite, index) => {
+                                                return (
+                                                        <TouchableNativeFeedback
+                                                                onPress={() => {
+                                                                        handleChange("unity", unite)
+                                                                        unitesModalizeRef.current.close()
+                                                                }} key={index.toString()} >
+                                                                <View style={[styles.modalItem, unite.ID_UNITE == data.unity?.ID_UNITE && { backgroundColor: '#ddd' }]} >
+                                                                        {/* <View style={styles.modalImageContainer}>
                                                         <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
                                                 </View> */}
-                                                                <Text style={styles.itemTitle}>{unite.UNITES_MESURES}</Text>
-                                                        </View>
-                                                </TouchableNativeFeedback>
-                                        )
-                                })}
+                                                                        <Text style={styles.itemTitle}>{unite.UNITES_MESURES}</Text>
+                                                                </View>
+                                                        </TouchableNativeFeedback>
+                                                )
+                                        })}
 
-                        </View>
+                                </View>
                 )
         }
+
 
         return (
                 <>
@@ -784,6 +786,16 @@ const styles = StyleSheet.create({
         addBtn: {
                 paddingVertical: 10,
                 minWidth: "90%",
+                alignSelf: "center",
+                backgroundColor: COLORS.ecommerceOrange,
+                borderRadius: 10,
+                paddingVertical: 15,
+                marginBottom: 10,
+                marginTop: 10
+        },
+        detailBouton: {
+                paddingVertical: 10,
+                minWidth: "100%",
                 alignSelf: "center",
                 backgroundColor: COLORS.ecommerceOrange,
                 borderRadius: 10,
