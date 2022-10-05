@@ -14,14 +14,14 @@ export default function NewMenuDetailScreen() {
         const route = useRoute()
         const navigation = useNavigation()
         const { menus } = route.params
-        console.log(menus.result)
+        // console.log(menus)
 
         var IMAGES = [
                 menus.result.IMAGES_1 ? menus.result.IMAGES_1 : undefined,
                 menus.result.IMAGES_2 ? menus.result.IMAGES_2 : undefined,
                 menus.result.IMAGES_3 ? menus.result.IMAGES_3 : undefined,
         ]
-        // console.log(IMAGES)
+        console.log(IMAGES)
         return (
                 <>
                         <View style={{ marginTop: 0, flex: 1 }}>
@@ -41,7 +41,7 @@ export default function NewMenuDetailScreen() {
                                                 <View>
                                                         <TouchableOpacity style={styles.category} >
                                                                 <Entypo name="shopping-cart" size={24} color={COLORS.primary} />
-                                                                <Text style={styles.categoryName} numberOfLines={2}>{menus.result.partenaire.NOM_ORGANISATION}</Text>
+                                                                <Text style={styles.categoryName} numberOfLines={2}>{menus.result.NOM_ORGANISATION}</Text>
                                                         </TouchableOpacity>
                                                         <View style={styles.productNames}>
                                                                 <Text style={styles.productName}>
@@ -61,7 +61,7 @@ export default function NewMenuDetailScreen() {
                                                         </View>
                                                         <View style={styles.cardMenu}>
                                                                 <Text style={{ fontSize: 20, fontWeight: "bold" }}>Unites</Text>
-                                                                <Text style={{ fontSize: 20, fontWeight: "bold" }}>{menus.result.UNITES_MESURES}</Text>
+                                                                <Text style={{ fontSize: 20, fontWeight: "bold" }}>{menus.result.unites.UNITES_MESURES}</Text>
                                                         </View>
                                                 </View>
                                                 <View style={{ justifyContent: "center", alignItems: "center" }}>
