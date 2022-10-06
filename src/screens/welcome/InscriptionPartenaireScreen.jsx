@@ -7,20 +7,24 @@ import useFetch from "../../hooks/useFetch";
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import fetchApi from '../../helpers/fetchApi';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {setUserAction} from "../../store/actions/userActions"
 
 import { useToast } from 'native-base';
 import { COLORS } from '../../styles/COLORS';
 // import {  useToast } from 'native-base';
-import { Feather } from '@expo/vector-icons';
+import { Feather, Entypo, AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
 import * as Location from 'expo-location'
 import Loading from '../../components/app/Loading';
 import { useFormErrorsHandle } from '../../hooks/useFormErrorsHandle';
+import { useDispatch } from 'react-redux';
 
 export default function InscriptionPartenaireScreen() {
     const route= useRoute()
  const  navigation=useNavigation()
+ const dispatch = useDispatch()
     const [services, setService] = useState([])
     const [partenairetypes, setPartenairetype] = useState([])
     const [location, setLocation] = useState(null)
@@ -205,6 +209,8 @@ export default function InscriptionPartenaireScreen() {
 
                 })
                 console.log(data)
+                await AsyncStorage.setItem("user", JSON.stringify(data));
+                dispatch(setUserAction(data));
                 //navigation.navigate("Home")
                 setLoading(false)
                 toast.show({
@@ -317,28 +323,28 @@ export default function InscriptionPartenaireScreen() {
                             <Text style={styles.description}> Chap Chap</Text>
                         </View>
 
-                        <TouchableNativeFeedback
-                            accessibilityRole='button'
-                            background={TouchableNativeFeedback.Ripple('#c9c5c5')}
-
-                            onPress={() => servicesModalizeRef.current.open()}>
-                            <View style={styles.CardModal} >
-                                <Text style={styles.openModalizeLabel} numberOfLines={1}>
-                                    {ServiceSelect != null ? ServiceSelect.NOM : "Choisir le service"}
+                        <View>
+                            <TouchableOpacity style={styles.modalCard}
+                            onPress={() => servicesModalizeRef.current.open()}
+                            >
+                                <Text style={styles.inputText}>
+                                {ServiceSelect != null ? ServiceSelect.NOM : "Choisir le service"}
                                 </Text>
-                            </View>
+                                <AntDesign name="caretdown" size={20} color="back"/>
+                            </TouchableOpacity>
+                        </View>
 
-                        </TouchableNativeFeedback>
-                        <TouchableNativeFeedback
-                            accessibilityRole='button'
-                            background={TouchableNativeFeedback.Ripple('#c9c5c5')}
-                            onPress={() => partenairetypesModalizeRef.current.open()}>
-                            <View style={styles.CardModal}>
-                                <Text style={styles.openModalizeLabel} numberOfLines={1}>
-                                    {typepartenaireselect != null ? typepartenaireselect.DESCRIPTION : "Choisir le type de partenaire"}
+                        <View style={{marginTop:10}}>
+                            <TouchableOpacity style={styles.modalCard}
+                            onPress={() => partenairetypesModalizeRef.current.open()}
+                            >
+                                <Text style={styles.inputText}>
+                                {typepartenaireselect != null ? typepartenaireselect.DESCRIPTION : "Choisir le type de partenaire"}
                                 </Text>
-                            </View>
-                        </TouchableNativeFeedback>
+                                <AntDesign name="caretdown" size={20} color="back"/>
+                            </TouchableOpacity>
+                        </View>
+
 
                         {typepartenaireselect != null && typepartenaireselect.ID_PARTENAIRE_TYPE == 2 && <View style={styles.inputCard}>
                             <OutlinedTextField
@@ -616,5 +622,15 @@ const styles = StyleSheet.create({
         fontSize: 16,
         textAlign: "center"
     },
+    modalCard:{
+        flexDirection:"row",
+        justifyContent:"space-between",
+        marginHorizontal:20,
+        backgroundColor:"#fff",
+        padding:13,
+        borderRadius:5,
+        borderWidth:1,
+        borderColor:"#ddd"
+    }
 
 })

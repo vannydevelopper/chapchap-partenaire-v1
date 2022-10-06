@@ -90,8 +90,8 @@ export default function InscriptionScreen() {
                                 }),
                                 headers: { "Content-Type": "application/json" },
                         })
-                        await AsyncStorage.setItem("user", JSON.stringify(res));
-                        dispatch(setUserAction(res));
+                        // await AsyncStorage.setItem("user", JSON.stringify(res));
+                        // dispatch(setUserAction(res));
                         navigation.navigate("InscriptionPartenaireScreen",{partenaire:res})
                 }
                 catch (error) {
