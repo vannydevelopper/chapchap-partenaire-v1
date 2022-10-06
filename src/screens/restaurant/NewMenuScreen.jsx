@@ -564,7 +564,7 @@ export default function NewMenuScreen() {
                                         </TouchableOpacity>
                                 </View>
                                 <View style={styles.selectControl}>
-                                        <Text style={styles.selectLabel}>Sous sous catégorie</Text>
+                                        <Text style={styles.selectLabel}>Autres precision</Text>
                                         <TouchableOpacity style={styles.selectedLabelContainer}
                                                 onPress={() => {
                                                         setIsOpen(true)
@@ -572,40 +572,11 @@ export default function NewMenuScreen() {
                                                 }}
                                         >
                                                 <Text style={styles.selectedLabel} >
-                                                        {data.subSubcategory ? data.subSubcategory.DESCRIPTION : "Aucun sous-sous-catégorie selectionné"}
+                                                        {data.subSubcategory ? data.subSubcategory.DESCRIPTION : "Autre precision selectionné"}
                                                 </Text>
                                         </TouchableOpacity>
                                 </View>
-                                {/* <View style={styles.selectControl}>
-                                        <Text style={styles.selectLabel}>Nom du repas</Text>
-                                        <TextInput
-                                                ref={nomRef}
-                                                style={styles.input}
-                                                value={data.nom}
-                                                onChangeText={e => handleChange("nom", e)}
-                                                // onFocus={() => setIsDescFocused(true)}
-                                                placeholder="Décrire nom du repas"
-                                                // onBlur={() => {
-                                                //         setIsDescFocused(false)
-                                                // }}
-                                                multiline
-                                        />
-                                </View> */}
-                                {/* <View style={styles.selectControl}>
-                                        <Text style={styles.selectLabel}>Description du repas</Text>
-                                        <TextInput
-                                                ref={descriptionrepasRef}
-                                                style={styles.input}
-                                                value={data.descriptionrepas}
-                                                onChangeText={e => handleChange("descriptionrepas", e)}
-                                                // onFocus={() => setIsDescFocused(true)}
-                                                placeholder="Décrire leur description"
-                                                // onBlur={() => {
-                                                //         setIsDescFocused(false)
-                                                // }}
-                                                multiline
-                                        />
-                                </View> */}
+
                                 <View style={styles.selectControl}>
                                         <Text style={styles.selectLabel}>Quantite</Text>
                                         <TextInput
@@ -614,7 +585,7 @@ export default function NewMenuScreen() {
                                                 value={data.quantite}
                                                 onChangeText={e => handleChange("quantite", e)}
                                                 //  onFocus={() => setIsAmountFocused(true)}
-                                                placeholder="Combien de pièces à mettre en stock ?"
+                                                placeholder="Precisez votre quantite"
                                                 //  onBlur={() => {
                                                 //            setIsAmountFocused(false)
                                                 //  }}
@@ -632,7 +603,7 @@ export default function NewMenuScreen() {
                                                 value={data.descriptionTaille}
                                                 onChangeText={e => handleChange("descriptionTaille", e)}
                                                 // onFocus={() => setIsDescFocused(true)}
-                                                placeholder="Décrire votre menu(facultatif)"
+                                                placeholder="Décrire la taille"
                                                 // onBlur={() => {
                                                 //         setIsDescFocused(false)
                                                 // }}
