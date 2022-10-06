@@ -22,7 +22,6 @@ export default function RootNavigator() {
                         {/* <Drawer.Screen name='inscription' component={InscriptionScreen} />
                         <Drawer.Screen name='InscriptionPartenaireScreen' component={InscriptionPartenaireScreen} /> */}
 
-                                
                                 <Drawer.Screen name='commande' component={CommandeEmiseScreen} />
                                 <Drawer.Screen name='HomeScreen' component={HomeScreen} />
                                 <Drawer.Screen name='EcommerceNavigator' component={EcommerceNavigator} />
