@@ -13,17 +13,21 @@ import * as ImagePicker from 'expo-image-picker';
 import { useFormErrorsHandle } from "../../hooks/useFormErrorsHandle";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import fetchApi from "../../helpers/fetchApi";
+import Loading from "../../components/app/Loading";
 
 export default function NewMenuScreen() {
         const [isOpen, setIsOpen] = useState(false)
         const [loadingForm, setLoadingForm] = useState(true)
         const [isLoading, setIsLoading] = useState(false)
 
+        const navigation = useNavigation()
+
         const repasModalizeRef = useRef(null)
         const categoriesModalizeRef = useRef(null)
         const sousCategoriesModalizeRef = useRef(null)
         const sousSousCategoriesModalizeRef = useRef(null)
         const unitesModalizeRef = useRef(null)
+        const detailModalizeRef = useRef(null)
 
         const [data, handleChange] = useForm({
                 repas: null,
@@ -110,6 +114,8 @@ export default function NewMenuScreen() {
         const [unites, setUnites] = useState([])
         const [loadingUnites, setLoadingUnites] = useState(true)
 
+        const [images, setImages] = useState([])
+
         useEffect(() => {
                 if (isOpen) {
                         const timer = setTimeout(() => {
@@ -131,7 +137,7 @@ export default function NewMenuScreen() {
                         } catch (error) {
                                 console.log(error)
                         } finally {
-                                // setFirstLoadingMenus(false)
+                                setLoadingRepas(false)
                         }
                 })()
         }, []))
@@ -146,7 +152,7 @@ export default function NewMenuScreen() {
                         } catch (error) {
                                 console.log(error)
                         } finally {
-                                // setFirstLoadingMenus(false)
+                                setLoadingCategories(false)
                         }
                 })()
         }, []))
@@ -161,7 +167,7 @@ export default function NewMenuScreen() {
                         } catch (error) {
                                 console.log(error)
                         } finally {
-                                // setFirstLoadingMenus(false)
+                                setLoadingSousCategorie(false)
                         }
                 })()
         }, []))
@@ -176,7 +182,7 @@ export default function NewMenuScreen() {
                         } catch (error) {
                                 console.log(error)
                         } finally {
-                                // setFirstLoadingMenus(false)
+                                setLoadingSousSousCategorie(false)
                         }
                 })()
         }, []))
@@ -187,17 +193,33 @@ export default function NewMenuScreen() {
                                 var url = "/resto/menu/unites"
                                 const unites = await fetchApi(url)
                                 setUnites(unites.result)
-                                console.log(unites.result)
+                                // console.log(unites.result)
                         } catch (error) {
                                 console.log(error)
                         } finally {
-                                // setFirstLoadingMenus(false)
+                                setLoadingUnites(false)
                         }
                 })()
         }, []))
 
+        const onImageSelect = async () => {
+                const image = await ImagePicker.launchImageLibraryAsync({
+                        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                        quality: 0.6
+                });
+                if (!image.cancelled) {
+                        setImages(t => [...t, image])
+                }
+        }
+
+        const onRemoveImage = index => {
+                const newImages = images.filter((_, i) => i != index)
+                setImages(newImages)
+        }
+
         const onSubmit = async () => {
                 try {
+                        setIsLoading(true)
                         if (!isValidate()) throw { errors: getErrors() }
                         const form = new FormData()
                         form.append("ID_CATEGORIE_MENU", data.category.ID_CATEGORIE_MENU)
@@ -209,186 +231,246 @@ export default function NewMenuScreen() {
                         form.append("DESCRIPTION_FOURNISSEUR", data.descriptionrepas)
                         form.append("QUANTITE", data.quantite)
                         form.append("DESCRIPTION", data.descriptionTaille)
-                        form.append("MONTANT", data.category.ID_CATEGORIE_PRODUIT)
-                        form.append("ID_UNITE", data.montant)
+                        form.append("MONTANT", data.montant)
+                        form.append("ID_UNITE", data.unity.ID_UNITE)
+
+                        if (images.length > 0) {
+                                await Promise.all(images.map(async (image, index) => {
+                                        const key = `IMAGE_${index + 1}`
+                                        // const manipResult = await manipulateAsync(
+                                        //           image.uri,
+                                        //           [
+                                        //                     { resize: { width: 500 } }
+                                        //           ],
+                                        //           { compress: 0.8, format: SaveFormat.JPEG }
+                                        // );
+                                        const manipResult = image
+                                        let localUri = manipResult.uri;
+                                        let filename = localUri.split('/').pop();
+                                        let match = /\.(\w+)$/.exec(filename);
+                                        let type = match ? `image/${match[1]}` : `image`;
+                                        form.append(key, {
+                                                uri: localUri, name: filename, type
+                                        })
+                                }))
+                        }
+                        // console.log(form)
+                        const newMenu = await fetchApi('/resto/menu/create', {
+                                method: "POST",
+                                body: form
+                        })
+                        navigation.navigate("NewMenuDetailScreen", { menus: newMenu })
                 } catch (error) {
                         console.log(error)
                 } finally {
-                        // setIsLoading(false)
+                        setIsLoading(false)
                 }
         }
 
         const RepasModalize = () => {
                 return (
-                        <View style={styles.modalContainer}>
-                                <View style={styles.modalHeader}>
-                                        <Text style={styles.modalTitle}>Les repas</Text>
-                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
-                                        </View>
-                                </View>
+                        (loadingForm || loadingRepas) ? <ActivityIndicator
+                                animating
+                                size={"small"}
+                                color='#777'
+                                style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
+                        /> :
 
-                                {repas.map((repa, index) => {
-                                        return (
-                                                <TouchableNativeFeedback onPress={() => {
-                                                        handleChange("repas", repa)
-                                                        repasModalizeRef.current.close()
-                                                }} key={index.toString()}>
-                                                        <View style={[styles.modalItem, repa.ID_REPAS == data.repas?.ID_REPAS && { backgroundColor: '#ddd' }]} >
-                                                                {/* <View style={styles.modalImageContainer}>
+                                <View style={styles.modalContainer}>
+                                        <View style={styles.modalHeader}>
+                                                <Text style={styles.modalTitle}>Les repas</Text>
+                                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                </View>
+                                        </View>
+
+                                        {repas.map((repa, index) => {
+                                                return (
+                                                        <TouchableNativeFeedback onPress={() => {
+                                                                handleChange("repas", repa)
+                                                                repasModalizeRef.current.close()
+                                                        }} key={index.toString()}>
+                                                                <View style={[styles.modalItem, repa.ID_REPAS == data.repas?.ID_REPAS && { backgroundColor: '#ddd' }]} >
+                                                                        {/* <View style={styles.modalImageContainer}>
                                                                 <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
                                                         </View> */}
-                                                                <Text style={styles.itemTitle}>{repa.DESCRIPTION}</Text>
-                                                        </View>
-                                                </TouchableNativeFeedback>
-                                        )
-                                })}
-                        </View>
+                                                                        <Text style={styles.itemTitle}>{repa.DESCRIPTION}</Text>
+                                                                </View>
+                                                        </TouchableNativeFeedback>
+                                                )
+                                        })}
+                                </View>
                 )
         }
 
         const CategoriesModalize = () => {
                 return (
-                        <View style={styles.modalContainer}>
-                                <View style={styles.modalHeader}>
-                                        <Text style={styles.modalTitle}>Les categories</Text>
-                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
+                        (loadingForm || loadingCategories) ? <ActivityIndicator
+                                animating
+                                size={"small"}
+                                color='#777'
+                                style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
+                        /> :
+                                <View style={styles.modalContainer}>
+                                        <View style={styles.modalHeader}>
+                                                <Text style={styles.modalTitle}>Les categories</Text>
+                                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                </View>
                                         </View>
-                                </View>
-                                {categories.map((categorie, index) => {
-                                        return (
-                                                <TouchableNativeFeedback onPress={() => {
-                                                        handleChange("category", categorie)
-                                                        categoriesModalizeRef.current.close()
-                                                }} key={index.toString()}>
-                                                        <View style={[styles.modalItem, categorie.ID_CATEGORIE_MENU == data.category?.ID_CATEGORIE_MENU && { backgroundColor: '#ddd' }]} >
-                                                                {/* <View style={styles.modalImageContainer}>
+                                        {categories.map((categorie, index) => {
+                                                return (
+                                                        <TouchableNativeFeedback onPress={() => {
+                                                                handleChange("category", categorie)
+                                                                categoriesModalizeRef.current.close()
+                                                        }} key={index.toString()}>
+                                                                <View style={[styles.modalItem, categorie.ID_CATEGORIE_MENU == data.category?.ID_CATEGORIE_MENU && { backgroundColor: '#ddd' }]} >
+                                                                        {/* <View style={styles.modalImageContainer}>
                                                                                         <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
                                                                                 </View> */}
-                                                                <Text style={styles.itemTitle}>{categorie.NOM}</Text>
-                                                        </View>
-                                                </TouchableNativeFeedback>
-                                        )
-                                })}
-                        </View>
+                                                                        <Text style={styles.itemTitle}>{categorie.NOM}</Text>
+                                                                </View>
+                                                        </TouchableNativeFeedback>
+                                                )
+                                        })}
+                                </View>
                 )
         }
 
         const SousCategoriesModalize = () => {
                 return (
-                        <View style={styles.modalContainer}>
-                                <View style={styles.modalHeader}>
-                                        <Text style={styles.modalTitle}>Les des sous categories</Text>
-                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
+                        (loadingForm || loadingSousCategorie) ? <ActivityIndicator
+                                animating
+                                size={"small"}
+                                color='#777'
+                                style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
+                        /> :
+                                <View style={styles.modalContainer}>
+                                        <View style={styles.modalHeader}>
+                                                <Text style={styles.modalTitle}>Les des sous categories</Text>
+                                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                </View>
                                         </View>
-                                </View>
-                                {sousCategorie.map((sousCateg, index) => {
-                                        return (
-                                                <TouchableNativeFeedback onPress={() => {
-                                                        handleChange("subcategory", sousCateg)
-                                                        sousCategoriesModalizeRef.current.close()
-                                                }} key={index.toString()}>
-                                                        <View style={[styles.modalItem, sousCateg.ID_SOUS_CATEGORIE_MENU == data.subcategory?.ID_SOUS_CATEGORIE_MENU && { backgroundColor: '#ddd' }]} >
-                                                                {/* <View style={styles.modalImageContainer}>
+                                        {sousCategorie.map((sousCateg, index) => {
+                                                return (
+                                                        <TouchableNativeFeedback onPress={() => {
+                                                                handleChange("subcategory", sousCateg)
+                                                                sousCategoriesModalizeRef.current.close()
+                                                        }} key={index.toString()}>
+                                                                <View style={[styles.modalItem, sousCateg.ID_SOUS_CATEGORIE_MENU == data.subcategory?.ID_SOUS_CATEGORIE_MENU && { backgroundColor: '#ddd' }]} >
+                                                                        {/* <View style={styles.modalImageContainer}>
                                                                                         <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
                                                                                 </View> */}
-                                                                <Text style={styles.itemTitle}>{sousCateg.NOM}</Text>
-                                                        </View>
-                                                </TouchableNativeFeedback>
-                                        )
-                                })}
-                        </View>
+                                                                        <Text style={styles.itemTitle}>{sousCateg.NOM}</Text>
+                                                                </View>
+                                                        </TouchableNativeFeedback>
+                                                )
+                                        })}
+                                </View>
                 )
         }
 
         const SousSousCategoriesModalize = () => {
                 return (
-                        <View style={styles.modalContainer}>
-                                <View style={styles.modalHeader}>
-                                        <Text style={styles.modalTitle}>Les des sous categories</Text>
-                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
+                        (loadingForm || loadingSousSousCategorie) ? <ActivityIndicator
+                                animating
+                                size={"small"}
+                                color='#777'
+                                style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
+                        /> :
+                                <View style={styles.modalContainer}>
+                                        <View style={styles.modalHeader}>
+                                                <Text style={styles.modalTitle}>Les des sous categories</Text>
+                                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                </View>
                                         </View>
-                                </View>
-                                {sousSousCategorie.map((soussousCateg, index) => {
-                                        return (
-                                                <TouchableNativeFeedback onPress={() => {
-                                                        handleChange("subSubcategory", soussousCateg)
-                                                        sousSousCategoriesModalizeRef.current.close()
-                                                }} key={index.toString()} >
-                                                        <View style={[styles.modalItem, soussousCateg.ID_SOUS_SOUS_CATEGORIE == data.subSubcategory?.ID_SOUS_SOUS_CATEGORIE && { backgroundColor: '#ddd' }]} >
-                                                                {/* <View style={styles.modalImageContainer}>
+                                        {sousSousCategorie.map((soussousCateg, index) => {
+                                                return (
+                                                        <TouchableNativeFeedback onPress={() => {
+                                                                handleChange("subSubcategory", soussousCateg)
+                                                                sousSousCategoriesModalizeRef.current.close()
+                                                        }} key={index.toString()} >
+                                                                <View style={[styles.modalItem, soussousCateg.ID_SOUS_SOUS_CATEGORIE == data.subSubcategory?.ID_SOUS_SOUS_CATEGORIE && { backgroundColor: '#ddd' }]} >
+                                                                        {/* <View style={styles.modalImageContainer}>
                                                                                         <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
                                                                                 </View> */}
-                                                                <Text style={styles.itemTitle}>{soussousCateg.DESCRIPTION}</Text>
-                                                        </View>
-                                                </TouchableNativeFeedback>
-                                        )
-                                })}
-                        </View>
+                                                                        <Text style={styles.itemTitle}>{soussousCateg.DESCRIPTION}</Text>
+                                                                </View>
+                                                        </TouchableNativeFeedback>
+                                                )
+                                        })}
+                                </View>
                 )
         }
 
         const UnitesModalize = () => {
                 return (
-                        <View style={styles.modalContainer}>
-                                <View style={styles.modalHeader}>
-                                        <Text style={styles.modalTitle}>Les des sous categories</Text>
-                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
-                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                        <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                </TouchableOpacity>
+                        (loadingForm || loadingUnites) ? <ActivityIndicator
+                                animating
+                                size={"small"}
+                                color='#777'
+                                style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
+                        /> :
+                                <View style={styles.modalContainer}>
+                                        <View style={styles.modalHeader}>
+                                                <Text style={styles.modalTitle}>Les des sous categories</Text>
+                                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                        <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        </TouchableOpacity>
+                                                </View>
                                         </View>
-                                </View>
-                                {unites.map((unite, index) => {
-                                        return (
-                                                <TouchableNativeFeedback
-                                                        onPress={() => {
-                                                                handleChange("unity", unite)
-                                                                unitesModalizeRef.current.close()
-                                                        }} key={index.toString()} >
-                                                        <View style={[styles.modalItem, unite.ID_UNITE == data.unity?.ID_UNITE && { backgroundColor: '#ddd' }]} >
-                                                                {/* <View style={styles.modalImageContainer}>
+                                        {unites.map((unite, index) => {
+                                                return (
+                                                        <TouchableNativeFeedback
+                                                                onPress={() => {
+                                                                        handleChange("unity", unite)
+                                                                        unitesModalizeRef.current.close()
+                                                                }} key={index.toString()} >
+                                                                <View style={[styles.modalItem, unite.ID_UNITE == data.unity?.ID_UNITE && { backgroundColor: '#ddd' }]} >
+                                                                        {/* <View style={styles.modalImageContainer}>
                                                         <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
                                                 </View> */}
-                                                                <Text style={styles.itemTitle}>{unite.UNITES_MESURES}</Text>
-                                                        </View>
-                                                </TouchableNativeFeedback>
-                                        )
-                                })}
+                                                                        <Text style={styles.itemTitle}>{unite.UNITES_MESURES}</Text>
+                                                                </View>
+                                                        </TouchableNativeFeedback>
+                                                )
+                                        })}
 
-                        </View>
+                                </View>
                 )
         }
+
 
         return (
                 <>
                         <ScrollView style={styles.container}>
+                                {isLoading && <Loading />}
                                 <Text style={styles.title}>Nouveau Menu</Text>
                                 <View style={styles.selectControl}>
                                         <Text style={styles.selectLabel}>Nom du repas</Text>
@@ -538,17 +620,20 @@ export default function NewMenuScreen() {
                                         />
                                 </View>
                                 <View style={styles.selectControl}>
-                                        <Text style={styles.selectLabel}>Images du menu</Text>
+                                        <Text style={styles.selectLabel}>Images du produit</Text>
                                         <View style={styles.images}>
-                                                {/* <TouchableWithoutFeedback >
-                                                        <Image style={[styles.addImager, index > 0 && { marginLeft: 10 }]} source={{ uri: image.uri }} />
-                                                </TouchableWithoutFeedback> */}
-
-                                                <TouchableWithoutFeedback >
-                                                        <View style={styles.addImager}>
+                                                {images.map((image, index) => {
+                                                        return (
+                                                                <TouchableWithoutFeedback onPress={() => onRemoveImage(index)} key={index}>
+                                                                        <Image style={[styles.addImager, index > 0 && { marginLeft: 10 }]} source={{ uri: image.uri }} />
+                                                                </TouchableWithoutFeedback>
+                                                        )
+                                                })}
+                                                {images.length < 3 ? <TouchableWithoutFeedback onPress={onImageSelect}>
+                                                        <View style={[styles.addImager, images.length > 0 && { marginLeft: 10 }]}>
                                                                 <Feather name="image" size={30} color="#777" />
                                                         </View>
-                                                </TouchableWithoutFeedback>
+                                                </TouchableWithoutFeedback> : null}
                                         </View>
                                 </View>
 
@@ -701,6 +786,16 @@ const styles = StyleSheet.create({
         addBtn: {
                 paddingVertical: 10,
                 minWidth: "90%",
+                alignSelf: "center",
+                backgroundColor: COLORS.ecommerceOrange,
+                borderRadius: 10,
+                paddingVertical: 15,
+                marginBottom: 10,
+                marginTop: 10
+        },
+        detailBouton: {
+                paddingVertical: 10,
+                minWidth: "100%",
                 alignSelf: "center",
                 backgroundColor: COLORS.ecommerceOrange,
                 borderRadius: 10,
