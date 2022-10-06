@@ -92,7 +92,7 @@ export default function InscriptionScreen() {
                         })
                         await AsyncStorage.setItem("user", JSON.stringify(res));
                         dispatch(setUserAction(res));
-                        navigation.navigate("partenaire",{partenaire:res})
+                        navigation.navigate("InscriptionPartenaireScreen",{partenaire:res})
                 }
                 catch (error) {
                         console.log(error)
