@@ -8,7 +8,8 @@ import Product from "../../components/ecommerce/main/Product";
 import { Entypo } from '@expo/vector-icons';
 import { COLORS } from "../../styles/COLORS";
 import { useRef } from "react";
-import ProductImages from "../../components/restaurant/details/ProductImages";
+import ProductImages from "../../components/restaurant/details/ProductImages"
+
 
 export default function NewMenuDetailScreen() {
         const route = useRoute()

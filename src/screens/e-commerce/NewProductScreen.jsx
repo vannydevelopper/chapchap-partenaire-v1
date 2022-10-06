@@ -407,7 +407,10 @@ export default function NewProductSreen() {
       quantiteDetail:"",
       quantite:""
     })
-  // console.log(dataDetail)
+  console.log(showColor)
+  console.log(showSize)
+
+
 
   //   const checkAmount = () => {
   //     handleChangeDetail("quantiteDetail",((parseInt(dataDetail.quantiteDetail)+total) <= data.quantite ?  parseInt(dataDetail.quantiteDetail):data.quantite-total ) )
@@ -515,12 +518,10 @@ export default function NewProductSreen() {
           <TouchableOpacity style={styles.addBtn} onPress={() => {
                     add(total,data.size.ID_TAILLE,data.size.TAILLE,dataDetail.quantiteDetail,data.color.ID_COULEUR,data.color.COULEUR)
                     
-                    
+                     
           detailsModalizeRef.current?.close()
-
-
                     
-                 }}  >
+                 }}  disabled={showColor==false||showSize==false} >
    
           <Text style={[styles.addBtnText]}>Ajouter</Text>
         </TouchableOpacity>

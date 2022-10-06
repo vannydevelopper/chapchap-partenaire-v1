@@ -7,6 +7,7 @@ import fetchApi from "../../helpers/fetchApi";
 import Menu from "../../components/restaurant/main/Menu";
 
 
+
 export default function RestaurantHomeScreen() {
         const { height } = useWindowDimensions()
         const navigation = useNavigation()

@@ -8,7 +8,7 @@ import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/nativ
 import fetchApi from '../../helpers/fetchApi';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {setUserAction} from "../../store/actions/userActions"
+import { setUserAction } from "../../store/actions/userActions"
 
 import { useToast } from 'native-base';
 import { COLORS } from '../../styles/COLORS';
@@ -22,9 +22,9 @@ import { useFormErrorsHandle } from '../../hooks/useFormErrorsHandle';
 import { useDispatch } from 'react-redux';
 
 export default function InscriptionPartenaireScreen() {
-    const route= useRoute()
- const  navigation=useNavigation()
- const dispatch = useDispatch()
+    const route = useRoute()
+    const navigation = useNavigation()
+    const dispatch = useDispatch()
     const [services, setService] = useState([])
     const [partenairetypes, setPartenairetype] = useState([])
     const [location, setLocation] = useState(null)
@@ -41,8 +41,8 @@ export default function InscriptionPartenaireScreen() {
     const [isLoading, setIsLoading] = useState(false)
     const [loading, setLoading] = useState(false);
     const toast = useToast()
-    const { partenaire}=route.params
-     console.log(partenaire.result.ID_USER)
+    const { partenaire } = route.params
+    console.log(partenaire.result.ID_USER)
     const [data, handleChange, setValue] = useForm({
         ServiceSelect: null,
         typepartenaireselect: null,
@@ -156,7 +156,7 @@ export default function InscriptionPartenaireScreen() {
         }
 
         const form = new FormData()
-        form.append('ID_USER',partenaire.result.ID_USER)
+        form.append('ID_USER', partenaire.result.ID_USER)
         form.append('ID_TYPE_PARTENAIRE', typepartenaireselect.ID_PARTENAIRE_TYPE)
         form.append('NOM_ORGANISATION', data.organisation)
         form.append('TELEPHONE', data.telephone)
@@ -165,9 +165,9 @@ export default function InscriptionPartenaireScreen() {
         form.append('ADRESSE_COMPLETE', data.adresse)
         form.append('LONGITUDE', location.coords.longitude)
         form.append('LATITUDE', location.coords.latitude)
-        form.append('ID_SERVICE', ServiceSelect.ID_SERVICE)
+        // form.append('ID_SERVICE', ServiceSelect.ID_SERVICE)
 
-        
+
         if (imagelogo) {
             const manipResult = await manipulateAsync(
                 imagelogo.uri,
@@ -222,7 +222,7 @@ export default function InscriptionPartenaireScreen() {
                     minWidth: 300
                 })
                 navigation.navigate("commande")
-                
+
             }
             catch (error) {
                 console.log(error)
@@ -323,25 +323,25 @@ export default function InscriptionPartenaireScreen() {
                             <Text style={styles.description}> Chap Chap</Text>
                         </View>
 
-                        <View>
+                        {/* <View>
                             <TouchableOpacity style={styles.modalCard}
-                            onPress={() => servicesModalizeRef.current.open()}
+                                onPress={() => servicesModalizeRef.current.open()}
                             >
                                 <Text style={styles.inputText}>
-                                {ServiceSelect != null ? ServiceSelect.NOM : "Choisir le service"}
+                                    {ServiceSelect != null ? ServiceSelect.NOM : "Choisir le service"}
                                 </Text>
-                                <AntDesign name="caretdown" size={20} color="back"/>
+                                <AntDesign name="caretdown" size={20} color="back" />
                             </TouchableOpacity>
-                        </View>
+                        </View> */}
 
-                        <View style={{marginTop:10}}>
+                        <View style={{ marginTop: 10 }}>
                             <TouchableOpacity style={styles.modalCard}
-                            onPress={() => partenairetypesModalizeRef.current.open()}
+                                onPress={() => partenairetypesModalizeRef.current.open()}
                             >
                                 <Text style={styles.inputText}>
-                                {typepartenaireselect != null ? typepartenaireselect.DESCRIPTION : "Choisir le type de partenaire"}
+                                    {typepartenaireselect != null ? typepartenaireselect.DESCRIPTION : "Choisir le type de partenaire"}
                                 </Text>
-                                <AntDesign name="caretdown" size={20} color="back"/>
+                                <AntDesign name="caretdown" size={20} color="back" />
                             </TouchableOpacity>
                         </View>
 
@@ -354,6 +354,18 @@ export default function InscriptionPartenaireScreen() {
                                 onChangeText={(newValue) => handleChange('organisation', newValue)}
                                 onBlur={() => checkFieldData('organisation')}
                                 error={hasError('organisation') ? getError('organisation') : ''}
+
+                            />
+                        </View>}
+                        {typepartenaireselect != null && typepartenaireselect.ID_PARTENAIRE_TYPE == 2 && <View style={styles.inputCard}>
+                            <OutlinedTextField
+                                label="Adresse Complete"
+                                fontSize={14}
+                                value={data.adresse}
+                                onChangeText={(newValue) => handleChange('adresse', newValue)}
+                                onBlur={() => checkFieldData('adresse')}
+                                error={hasError('adresse') ? getError('adresse') : ''}
+
 
                             />
                         </View>}
@@ -391,57 +403,40 @@ export default function InscriptionPartenaireScreen() {
                             />
                         </View>
 
-                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between",marginHorizontal:-5 }}>
 
                             <View>
-                                <View>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'center' }}>
-                                        <Text style={styles.image}>
-                                            Logo
+                                 <Text style={styles.image}>
+                                            logo
                                         </Text>
 
-                                    </View>
-                                </View>
-                                <TouchableOpacity onPress={onTakePictureSelect} >
+                                
+                                <TouchableOpacity onPress={onTakePictureSelect}>
                                     <View style={{ ...styles.addImage }}>
                                         {imagelogo ? <Image source={{ uri: imagelogo.uri }} style={{ width: '100%', height: '100%', borderRadius: 5 }} /> :
                                             <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
-                                                {/* <Image source={require('../../../assets/images/logo.png')} style={{ width: '30%', height: '30%' }} /> */}
+                                                {/* <Image source={require('../../../assets/images/person-icon.png')} style={{ width: '30%', height: '30%', marginTop: 10 }} /> */}
+                                                <Feather name="image" size={50} color="#777" />
                                             </View>}
                                     </View>
                                 </TouchableOpacity>
                             </View>
                             <View>
-                                <View>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'center' }}>
-                                        <Text style={styles.image}>
+                                 <Text style={styles.image}>
                                             Image
                                         </Text>
-
-                                    </View>
-                                </View>
                                 <TouchableOpacity onPress={onTakeimageSelect}>
                                     <View style={{ ...styles.addImage }}>
                                         {backgroundimage ? <Image source={{ uri: backgroundimage.uri }} style={{ width: '100%', height: '100%', borderRadius: 5 }} /> :
                                             <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
                                                 {/* <Image source={require('../../../assets/images/person-icon.png')} style={{ width: '30%', height: '30%', marginTop: 10 }} /> */}
+                                                <Feather name="image" size={50} color="#777" />
                                             </View>}
                                     </View>
                                 </TouchableOpacity>
                             </View>
                         </View>
-                        {typepartenaireselect != null && typepartenaireselect.ID_PARTENAIRE_TYPE == 2 && <View style={styles.inputCard}>
-                            <OutlinedTextField
-                                label="Adresse Complete"
-                                fontSize={14}
-                                value={data.adresse}
-                                onChangeText={(newValue) => handleChange('adresse', newValue)}
-                                onBlur={() => checkFieldData('adresse')}
-                                error={hasError('adresse') ? getError('adresse') : ''}
-
-
-                            />
-                        </View>}
+                       
                         <TouchableOpacity onPress={sendData} disabled={!isValidate()} >
 
                             <View style={[styles.button, !isValidate() && { opacity: 0.5 }]}>
@@ -560,8 +555,8 @@ const styles = StyleSheet.create({
 
     },
     addImage: {
-        width: 160,
-        height: 100,
+        width: 120,
+        height: 120,
         borderRadius: 5,
         margin: 10,
         marginHorizontal: 20,
@@ -569,7 +564,7 @@ const styles = StyleSheet.create({
         // alignItems: 'center',
         borderColor: '#777',
         backgroundColor: '#f1f1f1',
-        borderWidth: 1,
+        // borderWidth: 1,
         //alignSelf: 'center'
     },
     image: {
@@ -622,15 +617,35 @@ const styles = StyleSheet.create({
         fontSize: 16,
         textAlign: "center"
     },
-    modalCard:{
-        flexDirection:"row",
-        justifyContent:"space-between",
-        marginHorizontal:20,
-        backgroundColor:"#fff",
-        padding:13,
-        borderRadius:5,
-        borderWidth:1,
-        borderColor:"#ddd"
-    }
+    modalCard: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginHorizontal: 20,
+        backgroundColor: "#fff",
+        padding: 13,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: "#ddd"
+    },
+    selectControl: {
+        paddingHorizontal: 20,
+        marginTop: 10
+    },
+    selectLabel: {
+        fontWeight: "bold",
+        marginLeft: 5
+    },
+    images: {
+        flexDirection: "row"
+    },
+    addImager: {
+        width: 160,
+        height: 100,
+        backgroundColor: '#F1F1F1',
+        borderRadius: 8,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 5
+    },
 
 })
