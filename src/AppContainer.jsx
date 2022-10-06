@@ -12,30 +12,30 @@ import RootNavigator from "./routes/RootNavigator";
 const Stack = createStackNavigator()
 
 export default function AppContainer() {
-          const dispatch = useDispatch()
-          const user = useSelector(userSelector)
-          const [userLoading, setUserLoading] = useState(true)
-          const [showOnBoarding, setShowOnBoarding] = useState(false)
-          useEffect(() => {
-                    (async function () {
-                              const user = await AsyncStorage.getItem("user")
-                              await AsyncStorage.removeItem('user')
-                              const onboarding = JSON.parse(await AsyncStorage.getItem('onboarding'))
-                              setShowOnBoarding(!onboarding || !onboarding.finished)
-                              dispatch(setUserAction(JSON.parse(user)))
-                              setUserLoading(false)
-                    })()
-          }, [dispatch])
+    const dispatch = useDispatch()
+    const user = useSelector(userSelector)
+    const [userLoading, setUserLoading] = useState(true)
+    const [showOnBoarding, setShowOnBoarding] = useState(false)
+    useEffect(() => {
+        (async function () {
+            const user = await AsyncStorage.getItem("user")
+            // await AsyncStorage.removeItem('user')
+            const onboarding = JSON.parse(await AsyncStorage.getItem('onboarding'))
+            setShowOnBoarding(!onboarding || !onboarding.finished)
+            dispatch(setUserAction(JSON.parse(user)))
+            setUserLoading(false)
+        })()
+    }, [dispatch])
 
-          return (
-                    userLoading ?
-                              <View style={{ flex: 1, alignContent: 'center', alignItems: 'center', justifyContent: 'center' }}>
-                                        <ActivityIndicator color="#007BFF" animating={userLoading} size='large' />
-                              </View> :
-                              <>
-                                        {false ? <WelcomeNavigator showOnBoarding={showOnBoarding} /> :
-                                                  <RootNavigator />
-                                        }
-                              </>
-          )
+    return (
+        userLoading ?
+            <View style={{ flex: 1, alignContent: 'center', alignItems: 'center', justifyContent: 'center' }}>
+                <ActivityIndicator color="#007BFF" animating={userLoading} size='large' />
+            </View> :
+            <>
+                {!user ? <WelcomeNavigator showOnBoarding={showOnBoarding} /> :
+                    <RootNavigator />
+                }
+            </>
+    )
 }

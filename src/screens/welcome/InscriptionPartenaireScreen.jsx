@@ -2,19 +2,29 @@ import React, { useRef, useState, useEffect, useCallback } from 'react'
 import { ScrollView, StyleSheet, Text, View, Image, TouchableWithoutFeedback, Button, TouchableOpacity, ImageBackground, TouchableNativeFeedback, } from "react-native";
 import { TextField, FilledTextField, InputAdornment, OutlinedTextField } from 'rn-material-ui-textfield'
 import { useForm } from '../../hooks/useForm';
-import { Modalize } from 'react-native-modalize'; 
+import { Modalize } from 'react-native-modalize';
 import useFetch from "../../hooks/useFetch";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import fetchApi from '../../helpers/fetchApi';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { setUserAction } from "../../store/actions/userActions"
+
+import { useToast } from 'native-base';
 import { COLORS } from '../../styles/COLORS';
 // import {  useToast } from 'native-base';
+import { Feather, Entypo, AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
 import * as Location from 'expo-location'
+import Loading from '../../components/app/Loading';
+import { useFormErrorsHandle } from '../../hooks/useFormErrorsHandle';
+import { useDispatch } from 'react-redux';
 
 export default function InscriptionPartenaireScreen() {
-
+    const route = useRoute()
+    const navigation = useNavigation()
+    const dispatch = useDispatch()
     const [services, setService] = useState([])
     const [partenairetypes, setPartenairetype] = useState([])
     const [location, setLocation] = useState(null)
@@ -23,15 +33,57 @@ export default function InscriptionPartenaireScreen() {
     const serviceRef = useRef(null)
     const [ServiceSelect, setServiceSelect] = useState(null)
     const [typepartenaireselect, setTypepartenaireselect] = useState(null)
-    const [organisation, SetOrganisation] = useState("")
-    const [email, SetEmail] = useState("")
-    const [telephone, setTelephone] = useState("")
-    const [nif, SetNif] = useState("")
+
     const [backgroundimage, SetBackgroundimage] = useState("")
     const [imagelogo, SetImagelogo] = useState("")
-    const [adresse, SetAdress] = useState("")
+
     // const toast = useToast()
     const [isLoading, setIsLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const toast = useToast()
+    const { partenaire } = route.params
+    console.log(partenaire.result.ID_USER)
+    const [data, handleChange, setValue] = useForm({
+        ServiceSelect: null,
+        typepartenaireselect: null,
+        organisation: "",
+        email: "",
+        telephone: "",
+        nif: "",
+        // backgroundimage: "",
+        // imagelogo: "",
+        adresse: "",
+
+    })
+    const { errors, setError, getErrors, setErrors, checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
+
+
+        email: {
+            required: true,
+            email: true
+        },
+        telephone: {
+            required: true,
+
+        },
+        // imagelogo: {
+        //     required: true
+        // }
+
+    }, {
+
+        email: {
+            required: "L'email est obligatoire",
+            email: "Email invalide"
+        },
+        telephone: {
+            required: "Telephone est obligatoire"
+        },
+        // imagelogo:{
+        //     required: "Logo est obligatoire"
+        // }
+
+    })
     const askLocationPermission = async () => {
         let {
             status: locationStatus,
@@ -93,7 +145,7 @@ export default function InscriptionPartenaireScreen() {
 
 
     const sendData = async () => {
-        setIsLoading(true)
+        setLoading(true)
         if (!location) {
             let { status: locationStatus } = await Location.requestForegroundPermissionsAsync();
             if (locationStatus !== 'granted') {
@@ -104,16 +156,16 @@ export default function InscriptionPartenaireScreen() {
         }
 
         const form = new FormData()
-        form.append('ID_USER', typepartenaireselect.ID_PARTENAIRE_TYPE)
+        form.append('ID_USER', partenaire.result.ID_USER)
         form.append('ID_TYPE_PARTENAIRE', typepartenaireselect.ID_PARTENAIRE_TYPE)
-        form.append('NOM_ORGANISATION', organisation)
-        form.append('TELEPHONE', telephone)
-        form.append('NIF', nif)
-        form.append('EMAIL', email)
-        form.append('ADRESSE_COMPLETE', adresse)
+        form.append('NOM_ORGANISATION', data.organisation)
+        form.append('TELEPHONE', data.telephone)
+        form.append('NIF', data.nif)
+        form.append('EMAIL', data.email)
+        form.append('ADRESSE_COMPLETE', data.adresse)
         form.append('LONGITUDE', location.coords.longitude)
         form.append('LATITUDE', location.coords.latitude)
-
+        // form.append('ID_SERVICE', ServiceSelect.ID_SERVICE)
 
 
         if (imagelogo) {
@@ -150,37 +202,41 @@ export default function InscriptionPartenaireScreen() {
                 uri: localUri, name: filename, type
             })
             console.log(form)
-
             try {
                 const data = await fetchApi("/partenaire/Ajouter", {
                     method: "POST",
                     body: form
 
                 })
+                console.log(data)
+                await AsyncStorage.setItem("user", JSON.stringify(data));
+                dispatch(setUserAction(data));
                 //navigation.navigate("Home")
-                setIsLoading(false)
-                // toast.show({
-                //     title: "L'enregistrement est faite avec succès",
-                //     placement: "bottom",
-                //     status: 'success',
-                //     duration: 6000,
-                //     width: '90%',
-                //     minWidth: 300
-                // })
+                setLoading(false)
+                toast.show({
+                    title: "L'enregistrement est faite avec succès",
+                    placement: "bottom",
+                    status: 'success',
+                    duration: 6000,
+                    width: '90%',
+                    minWidth: 300
+                })
+                navigation.navigate("commande")
+
             }
             catch (error) {
                 console.log(error)
-                // toast.show({
-                //     title: "La connexion a echoue",
-                //     placement: "bottom",
-                //     status: 'success',
-                //     duration: 6000,
-                //     width: '90%',
-                //     minWidth: 300
-                // })
-                setIsLoading(false)
+                toast.show({
+                    title: "La connexion a echoue",
+                    placement: "bottom",
+                    status: 'success',
+                    duration: 6000,
+                    width: '90%',
+                    minWidth: 300
+                })
+                setLoading(false)
             }
-            setIsLoading(false)
+            setLoading(false)
 
         }
 
@@ -208,7 +264,7 @@ export default function InscriptionPartenaireScreen() {
                     headers: { "Content-Type": "application/json" },
                 })
                 setService(response.result)
-                console.log(response.result)
+                //console.log(response.result)
 
             } catch (error) {
                 console.log(error)
@@ -226,7 +282,7 @@ export default function InscriptionPartenaireScreen() {
                     headers: { "Content-Type": "application/json" },
                 })
                 setPartenairetype(partenaire.result)
-                console.log(partenaire.result)
+                //console.log(partenaire.result)
 
             } catch (error) {
                 console.log(error)
@@ -254,6 +310,7 @@ export default function InscriptionPartenaireScreen() {
 
     return (
         <>
+            {loading && <Loading />}
 
             <ImageBackground source={require('../../../assets/images/g52.png')} style={styles.container}>
                 <View style={{ backgroundColor: "#fff" }}>
@@ -266,35 +323,49 @@ export default function InscriptionPartenaireScreen() {
                             <Text style={styles.description}> Chap Chap</Text>
                         </View>
 
-                        <TouchableNativeFeedback
-                            accessibilityRole='button'
-                            background={TouchableNativeFeedback.Ripple('#c9c5c5')}
-
-                            onPress={() => servicesModalizeRef.current.open()}>
-                            <View style={styles.CardModal} >
-                                <Text style={styles.openModalizeLabel} numberOfLines={1}>
+                        {/* <View>
+                            <TouchableOpacity style={styles.modalCard}
+                                onPress={() => servicesModalizeRef.current.open()}
+                            >
+                                <Text style={styles.inputText}>
                                     {ServiceSelect != null ? ServiceSelect.NOM : "Choisir le service"}
                                 </Text>
-                            </View>
+                                <AntDesign name="caretdown" size={20} color="back" />
+                            </TouchableOpacity>
+                        </View> */}
 
-                        </TouchableNativeFeedback>
-                        <TouchableNativeFeedback
-                            accessibilityRole='button'
-                            background={TouchableNativeFeedback.Ripple('#c9c5c5')}
-                            onPress={() => partenairetypesModalizeRef.current.open()}>
-                            <View style={styles.CardModal}>
-                                <Text style={styles.openModalizeLabel} numberOfLines={1}>
+                        <View style={{ marginTop: 10 }}>
+                            <TouchableOpacity style={styles.modalCard}
+                                onPress={() => partenairetypesModalizeRef.current.open()}
+                            >
+                                <Text style={styles.inputText}>
                                     {typepartenaireselect != null ? typepartenaireselect.DESCRIPTION : "Choisir le type de partenaire"}
                                 </Text>
-                            </View>
-                        </TouchableNativeFeedback>
+                                <AntDesign name="caretdown" size={20} color="back" />
+                            </TouchableOpacity>
+                        </View>
+
 
                         {typepartenaireselect != null && typepartenaireselect.ID_PARTENAIRE_TYPE == 2 && <View style={styles.inputCard}>
                             <OutlinedTextField
                                 label="Nom organisation"
                                 fontSize={14}
-                                onChangeText={(organisation) => SetOrganisation(organisation)}
-                                value={organisation}
+                                value={data.organisation}
+                                onChangeText={(newValue) => handleChange('organisation', newValue)}
+                                onBlur={() => checkFieldData('organisation')}
+                                error={hasError('organisation') ? getError('organisation') : ''}
+
+                            />
+                        </View>}
+                        {typepartenaireselect != null && typepartenaireselect.ID_PARTENAIRE_TYPE == 2 && <View style={styles.inputCard}>
+                            <OutlinedTextField
+                                label="Adresse Complete"
+                                fontSize={14}
+                                value={data.adresse}
+                                onChangeText={(newValue) => handleChange('adresse', newValue)}
+                                onBlur={() => checkFieldData('adresse')}
+                                error={hasError('adresse') ? getError('adresse') : ''}
+
 
                             />
                         </View>}
@@ -302,8 +373,10 @@ export default function InscriptionPartenaireScreen() {
                             <OutlinedTextField
                                 label="Adresse email"
                                 fontSize={14}
-                                onChangeText={(email) => SetEmail(email)}
-                                value={email}
+                                value={data.email}
+                                onChangeText={(newValue) => handleChange('email', newValue)}
+                                onBlur={() => checkFieldData('email')}
+                                error={hasError('email') ? getError('email') : ''}
 
                             />
                         </View>
@@ -311,9 +384,10 @@ export default function InscriptionPartenaireScreen() {
                             <OutlinedTextField
                                 label="Telephone"
                                 fontSize={14}
-                                onChangeText={(telephone) => setTelephone(telephone)}
-                                value={telephone}
-
+                                value={data.telephone}
+                                onChangeText={(newValue) => handleChange('telephone', newValue)}
+                                onBlur={() => checkFieldData('telephone')}
+                                error={hasError('telephone') ? getError('telephone') : ''}
                             />
                         </View>
 
@@ -321,56 +395,54 @@ export default function InscriptionPartenaireScreen() {
                             <OutlinedTextField
                                 label="Nif"
                                 fontSize={14}
-                                onChangeText={(nif) => SetNif(nif)}
-                                value={nif}
+                                value={data.nif}
+                                onChangeText={(newValue) => handleChange('nif', newValue)}
+                                onBlur={() => checkFieldData('nif')}
+                                error={hasError('nif') ? getError('nif') : ''}
 
                             />
                         </View>
-                        <View>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'center' }}>
-                                <Text style={styles.image}>
-                                    Logo et Backgroundimage
-                                </Text>
 
-                            </View>
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between",marginHorizontal:-5 }}>
 
                             <View>
-                                <TouchableOpacity onPress={onTakePictureSelect} >
+                                 <Text style={styles.image}>
+                                            logo
+                                        </Text>
+
+                                
+                                <TouchableOpacity onPress={onTakePictureSelect}>
                                     <View style={{ ...styles.addImage }}>
                                         {imagelogo ? <Image source={{ uri: imagelogo.uri }} style={{ width: '100%', height: '100%', borderRadius: 5 }} /> :
-                                            <Image source={require('../../../assets/images/person-icon.png')} style={{ width: '60%', height: '60%' }} />}
+                                            <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
+                                                {/* <Image source={require('../../../assets/images/person-icon.png')} style={{ width: '30%', height: '30%', marginTop: 10 }} /> */}
+                                                <Feather name="image" size={50} color="#777" />
+                                            </View>}
                                     </View>
                                 </TouchableOpacity>
                             </View>
                             <View>
-                                <TouchableOpacity onPress={onTakeimageSelect} >
+                                 <Text style={styles.image}>
+                                            Image
+                                        </Text>
+                                <TouchableOpacity onPress={onTakeimageSelect}>
                                     <View style={{ ...styles.addImage }}>
                                         {backgroundimage ? <Image source={{ uri: backgroundimage.uri }} style={{ width: '100%', height: '100%', borderRadius: 5 }} /> :
-                                            <Image source={require('../../../assets/images/person-icon.png')} style={{ width: '60%', height: '60%' }} />}
+                                            <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
+                                                {/* <Image source={require('../../../assets/images/person-icon.png')} style={{ width: '30%', height: '30%', marginTop: 10 }} /> */}
+                                                <Feather name="image" size={50} color="#777" />
+                                            </View>}
                                     </View>
                                 </TouchableOpacity>
                             </View>
                         </View>
-                        <View style={styles.inputCard}>
-                            <OutlinedTextField
-                                label="Adresse Complete"
-                                fontSize={14}
-                                onChangeText={(adresse) => SetAdress(adresse)}
-                                value={adresse}
+                       
+                        <TouchableOpacity onPress={sendData} disabled={!isValidate()} >
 
+                            <View style={[styles.button, !isValidate() && { opacity: 0.5 }]}>
+                                <Text style={styles.buttonText} >Enregistrer</Text>
+                            </View>
 
-                            />
-                        </View>
-                        <TouchableOpacity style={styles.ButtonCard}>
-                            <Button
-
-                                title="Enregistrer" 
-                                onPress={sendData}
-                                
-                            />
-                            
 
                         </TouchableOpacity>
 
@@ -451,10 +523,25 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: "bold"
     },
+    button: {
+        marginTop: 10,
+        borderRadius: 8,
+        paddingVertical: 14,
+        paddingHorizontal: 10,
+        backgroundColor: COLORS.primaryPicker,
+        marginHorizontal: 20
+    },
     description: {
         fontSize: 18,
         fontWeight: "bold",
         color: "#1D8585"
+    },
+    buttonText: {
+        color: "#fff",
+        fontWeight: "bold",
+        // textTransform:"uppercase",
+        fontSize: 16,
+        textAlign: "center"
     },
     inputCard: {
         marginHorizontal: 20,
@@ -468,15 +555,16 @@ const styles = StyleSheet.create({
 
     },
     addImage: {
-        width: 160,
-        height: 100,
+        width: 120,
+        height: 120,
         borderRadius: 5,
         margin: 10,
         marginHorizontal: 20,
         // justifyContent: 'center',
         // alignItems: 'center',
         borderColor: '#777',
-        borderWidth: 1,
+        backgroundColor: '#f1f1f1',
+        // borderWidth: 1,
         //alignSelf: 'center'
     },
     image: {
@@ -513,6 +601,51 @@ const styles = StyleSheet.create({
     addImageContainer: {
         flex: 1,
         // backgroundColor: 'blue'
+    },
+    button: {
+        marginTop: 10,
+        borderRadius: 8,
+        paddingVertical: 14,
+        paddingHorizontal: 10,
+        backgroundColor: "#1D8585",
+        marginHorizontal: 20
+    },
+    buttonText: {
+        color: "#fff",
+        fontWeight: "bold",
+        // textTransform:"uppercase",
+        fontSize: 16,
+        textAlign: "center"
+    },
+    modalCard: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginHorizontal: 20,
+        backgroundColor: "#fff",
+        padding: 13,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: "#ddd"
+    },
+    selectControl: {
+        paddingHorizontal: 20,
+        marginTop: 10
+    },
+    selectLabel: {
+        fontWeight: "bold",
+        marginLeft: 5
+    },
+    images: {
+        flexDirection: "row"
+    },
+    addImager: {
+        width: 160,
+        height: 100,
+        backgroundColor: '#F1F1F1',
+        borderRadius: 8,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 5
     },
 
 })
