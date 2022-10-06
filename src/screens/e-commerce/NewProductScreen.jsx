@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TextInput, TouchableNativeFeedback, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { ActivityIndicator, Image, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableNativeFeedback, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Modalize } from "react-native-modalize";
 import { Portal } from "react-native-portalize";
@@ -7,7 +7,7 @@ import fetchApi from "../../helpers/fetchApi";
 import useFetch from "../../hooks/useFetch";
 import { useForm } from "../../hooks/useForm";
 import { COLORS } from "../../styles/COLORS";
-import { SimpleLineIcons, AntDesign } from '@expo/vector-icons';
+import { SimpleLineIcons, AntDesign, Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useFormErrorsHandle } from "../../hooks/useFormErrorsHandle";
@@ -399,7 +399,14 @@ export default function NewProductSreen() {
                     <>
                               <ScrollView style={styles.container}>
                                         {isLoading && <Loading />}
-                                        <Text style={styles.title}>Nouveau produit</Text>
+                                        <View style={styles.header}>
+                                                  <Text style={styles.title}>Nouveau produit</Text>
+                                                  <TouchableNativeFeedback useForeground onPress={() => navigation.goBack()}>
+                                                            <View style={styles.cancelBtn}>
+                                                                      <Ionicons name="close" size={30} color="#777" />
+                                                            </View>
+                                                  </TouchableNativeFeedback>
+                                        </View>
                                         <View style={styles.selectControl}>
                                                   <Text style={styles.selectLabel}>Categorie</Text>
                                                   <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
@@ -409,6 +416,7 @@ export default function NewProductSreen() {
                                                             <Text style={styles.selectedLabel} >
                                                                       {data.category ? data.category.NOM : "Aucune catégorie selectionné"}
                                                             </Text>
+                                                            <Ionicons name="caret-down" size={24} color="#777" />
                                                   </TouchableOpacity>
                                         </View>
                                         <View style={styles.selectControl}>
@@ -420,6 +428,7 @@ export default function NewProductSreen() {
                                                             <Text style={styles.selectedLabel} >
                                                                       {data.subCategory ? data.subCategory.NOM_SOUS_CATEGORIE : "Aucun sous-catégorie selectionné"}
                                                             </Text>
+                                                            <Ionicons name="caret-down" size={24} color="#777" />
                                                   </TouchableOpacity>
                                         </View>
                                         <View style={styles.selectControl}>
@@ -428,9 +437,10 @@ export default function NewProductSreen() {
                                                             setIsOpen(true)
                                                             produitsModalizeRef.current?.open()
                                                   }}>
-                                                            <Text style={styles.selectedLabel} >
+                                                            <Text style={styles.selectedLabel}>
                                                                       {data.produit ? data.produit.NOM_PRODUIT : "Aucun produit selectionné"}
                                                             </Text>
+                                                            <Ionicons name="caret-down" size={24} color="#777" />
                                                   </TouchableOpacity>
                                         </View>
                                         <View style={styles.selectControl}>
@@ -583,26 +593,55 @@ const styles = StyleSheet.create({
           container: {
                     flex: 1
           },
+          header: {
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    paddingHorizontal: 10,
+                    marginTop: StatusBar.currentHeight,
+                    paddingVertical: 10
+          },
           title: {
+                    color: COLORS.ecommercePrimaryColor,
                     fontWeight: "bold",
-                    fontSize: 18,
-                    textAlign: "center",
-                    marginVertical: 40
+                    fontSize: 22,
+                    paddingLeft: 10,
+                    paddingRight: 50,
+                    lineHeight: 33
+          },
+          cancelBtn: {
+                    width: 60,
+                    height: 60,
+                    borderRadius: 100,
+                    borderColor: '#ddd',
+                    // borderWidth: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    // backgroundColor: '#ddd',
+                    overflow: "hidden"
           },
           selectControl: {
                     paddingHorizontal: 20,
                     marginTop: 10
           },
           selectLabel: {
-                    fontWeight: "bold",
-                    marginLeft: 5
+                    fontWeight: "200",
+                    marginLeft: 2,
+                    marginBottom: 2
           },
           selectedLabelContainer: {
                     borderWidth: 1,
                     borderColor: '#ddd',
                     padding: 10,
                     borderRadius: 5,
-                    marginTop: 2
+                    marginTop: 2,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between"
+          },
+          selectedLabel: {
+                    color: '#777',
+                    fontWeight: "bold"
           },
           modalTitle: {
                     fontWeight: "bold",
