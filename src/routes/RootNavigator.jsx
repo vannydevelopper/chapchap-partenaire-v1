@@ -19,8 +19,8 @@ export default function RootNavigator() {
                                 },
                         }}>
                         <Drawer.Navigator screenOptions={{ headerShown: false }} drawerContent={props => <DrawerContent {...props} />}>
-                        <Drawer.Screen name='inscription' component={InscriptionScreen} />
-                        <Drawer.Screen name='InscriptionPartenaireScreen' component={InscriptionPartenaireScreen} />
+                        {/* <Drawer.Screen name='inscription' component={InscriptionScreen} />
+                        <Drawer.Screen name='InscriptionPartenaireScreen' component={InscriptionPartenaireScreen} /> */}
 
                                 
                                 <Drawer.Screen name='commande' component={CommandeEmiseScreen} />
