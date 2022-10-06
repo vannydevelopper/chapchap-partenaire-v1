@@ -31,7 +31,7 @@ export default function NewMenuDetailScreen() {
                                         </TouchableOpacity>
                                         <View style={{ flexDirection: "row", alignItems: "center" }}>
                                                 <TouchableOpacity style={{ marginRight: 20 }}>
-                                                        <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        <Entypo name="dots-three-vertical" size={24} color="black" />
                                                 </TouchableOpacity>
                                         </View>
                                 </View>

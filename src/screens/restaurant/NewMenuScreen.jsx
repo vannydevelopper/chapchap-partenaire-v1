@@ -27,33 +27,26 @@ export default function NewMenuScreen() {
         const sousCategoriesModalizeRef = useRef(null)
         const sousSousCategoriesModalizeRef = useRef(null)
         const unitesModalizeRef = useRef(null)
-        const detailModalizeRef = useRef(null)
+        const typesModalizeRef = useRef(null)
 
         const [data, handleChange] = useForm({
+                typess:null,
                 repas: null,
                 category: null,
                 subcategory: null,
                 subSubcategory: null,
                 unity: null,
-                nom: "",
-                descriptionrepas: "",
                 quantite: "",
                 descriptionTaille: "",
                 montant: ""
         })
+        // console.log(data.typess)
         const { errors, setError, getErrors, setErrors, checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
                 repas: {
                         required: true,
                 },
                 category: {
                         required: true,
-                },
-                nom: {
-                        required: true,
-                        length: [2, 100]
-                },
-                descriptionrepas: {
-                        length: [1, 3000]
                 },
                 descriptionTaille: {
                         length: [1, 3000]
@@ -73,13 +66,6 @@ export default function NewMenuScreen() {
                 category: {
                         required: "Veuillez choisir la catégorie",
                 },
-                nom: {
-                        required: "Le nom du produit est obligatoire",
-                        length: "Le nom du produit ne peut pas dépasser 100 caractères"
-                },
-                descriptionrepas: {
-                        length: "La description du produit ne peut pas dépasser 3000 caractères"
-                },
                 descriptionTaille: {
                         length: "La description du produit ne peut pas dépasser 3000 caractères"
                 },
@@ -98,6 +84,9 @@ export default function NewMenuScreen() {
         const quantiteRef = useRef(null)
         const descriptionTailleRef = useRef(null)
         const amountRef = useRef(null)
+
+        const [types, setTypes] = useState([])
+        const [loadingTypes, setLoadingTypes] = useState(true)
 
         const [repas, setRepas] = useState([])
         const [loadingRepas, setLoadingRepas] = useState(true)
@@ -130,10 +119,10 @@ export default function NewMenuScreen() {
         useFocusEffect(useCallback(() => {
                 (async () => {
                         try {
-                                var url = "/resto/menu/repas"
-                                const repa = await fetchApi(url)
-                                setRepas(repa.result)
-                                // console.log(repa.result)
+                                var url = "/resto/menu/types"
+                                const type = await fetchApi(url)
+                                setTypes(type.result)
+                                // console.log(type.result)
                         } catch (error) {
                                 console.log(error)
                         } finally {
@@ -141,6 +130,21 @@ export default function NewMenuScreen() {
                         }
                 })()
         }, []))
+
+        useFocusEffect(useCallback(() => {
+                (async () => {
+                        try {
+                                // var url = `/resto/menu/repas/${data.typess.ID_TYPE_REPAS}`
+                                const type = await fetchApi(`/resto/menu/repas/${data.typess.ID_TYPE_REPAS}`)
+                                setRepas(type.result)
+                                // console.log(repa.result)
+                        } catch (error) {
+                                console.log(error)
+                        } finally {
+                                setLoadingRepas(false)
+                        }
+                })()
+        }, [data]))
 
         useFocusEffect(useCallback(() => {
                 (async () => {
@@ -222,17 +226,16 @@ export default function NewMenuScreen() {
                         setIsLoading(true)
                         if (!isValidate()) throw { errors: getErrors() }
                         const form = new FormData()
+                        form.append("DESCRIPTION", data.repas.ID_REPAS)
                         form.append("ID_CATEGORIE_MENU", data.category.ID_CATEGORIE_MENU)
                         form.append("ID_SOUS_CATEGORIE_MENU", data.subcategory.ID_SOUS_CATEGORIE_MENU)
-                        form.append("ID_SOUS_SOUS_CATEGORIE", data.subSubcategory.ID_SOUS_SOUS_CATEGORIE)
-                        form.append("ID_REPAS", data.repas.ID_REPAS)
-                        // form.append("ID_PARTENAIRE", data.category.ID_CATEGORIE_PRODUIT)
-                        form.append("DESCRIPTION_REPAS", data.nom)
-                        form.append("DESCRIPTION_FOURNISSEUR", data.descriptionrepas)
+                        if(data.subSubcategory != null){
+                                form.append("ID_SOUS_SOUS_CATEGORIE", data.subSubcategory.ID_SOUS_SOUS_CATEGORIE)
+                        }
                         form.append("QUANTITE", data.quantite)
-                        form.append("DESCRIPTION", data.descriptionTaille)
-                        form.append("MONTANT", data.montant)
+                        form.append("DESCRIPTION_TAILLE", data.descriptionTaille)
                         form.append("ID_UNITE", data.unity.ID_UNITE)
+                        form.append("MONTANT", data.montant)
 
                         if (images.length > 0) {
                                 await Promise.all(images.map(async (image, index) => {
@@ -254,7 +257,7 @@ export default function NewMenuScreen() {
                                         })
                                 }))
                         }
-                        // console.log(form)
+                        console.log(form)
                         const newMenu = await fetchApi('/resto/menu/create', {
                                 method: "POST",
                                 body: form
@@ -265,6 +268,41 @@ export default function NewMenuScreen() {
                 } finally {
                         setIsLoading(false)
                 }
+        }
+
+        const TypesModalize = () => {
+                return (
+                        <View style={styles.modalContainer}>
+                                <View style={styles.modalHeader}>
+                                        <Text style={styles.modalTitle}>Les types de repas</Text>
+                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                        <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                </TouchableOpacity>
+                                                <TouchableOpacity style={{ paddingHorizontal: 5 }}>
+                                                        <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                </TouchableOpacity>
+                                        </View>
+                                </View>
+                                {types.map((type, index) => {
+                                        return (
+                                                <TouchableNativeFeedback
+                                                        onPress={() => {
+                                                                handleChange("typess", type)
+                                                                typesModalizeRef.current.close()
+                                                        }} key={index.toString()}>
+                                                        <View style={styles.modalItem}>
+                                                                {/* <View style={styles.modalImageContainer}>
+                                                                <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
+                                                        </View> */}
+                                                                <Text style={styles.itemTitle}>{type.DESCRIPTION}</Text>
+                                                        </View>
+                                                </TouchableNativeFeedback>
+                                        )
+                                })}
+
+                        </View>
+                )
         }
 
         const RepasModalize = () => {
@@ -304,6 +342,7 @@ export default function NewMenuScreen() {
                                                         </TouchableNativeFeedback>
                                                 )
                                         })}
+
                                 </View>
                 )
         }
@@ -473,6 +512,19 @@ export default function NewMenuScreen() {
                                 {isLoading && <Loading />}
                                 <Text style={styles.title}>Nouveau Menu</Text>
                                 <View style={styles.selectControl}>
+                                        <Text style={styles.selectLabel}>Types de repas</Text>
+                                        <TouchableOpacity style={styles.selectedLabelContainer}
+                                                onPress={() => {
+                                                        setIsOpen(true)
+                                                        typesModalizeRef.current?.open()
+                                                }}>
+                                                <Text style={styles.selectedLabel} >
+                                                {data.typess ? data.typess.DESCRIPTION : "Aucun types de repas selectionné"}
+                                                        
+                                                </Text>
+                                        </TouchableOpacity>
+                                </View>
+                                <View style={styles.selectControl}>
                                         <Text style={styles.selectLabel}>Nom du repas</Text>
                                         <TouchableOpacity style={styles.selectedLabelContainer}
                                                 onPress={() => {
@@ -524,7 +576,7 @@ export default function NewMenuScreen() {
                                                 </Text>
                                         </TouchableOpacity>
                                 </View>
-                                <View style={styles.selectControl}>
+                                {/* <View style={styles.selectControl}>
                                         <Text style={styles.selectLabel}>Nom du repas</Text>
                                         <TextInput
                                                 ref={nomRef}
@@ -538,8 +590,8 @@ export default function NewMenuScreen() {
                                                 // }}
                                                 multiline
                                         />
-                                </View>
-                                <View style={styles.selectControl}>
+                                </View> */}
+                                {/* <View style={styles.selectControl}>
                                         <Text style={styles.selectLabel}>Description du repas</Text>
                                         <TextInput
                                                 ref={descriptionrepasRef}
@@ -553,7 +605,7 @@ export default function NewMenuScreen() {
                                                 // }}
                                                 multiline
                                         />
-                                </View>
+                                </View> */}
                                 <View style={styles.selectControl}>
                                         <Text style={styles.selectLabel}>Quantite</Text>
                                         <TextInput
@@ -642,6 +694,26 @@ export default function NewMenuScreen() {
                                 </TouchableOpacity>
 
                         </ScrollView>
+                        <Modalize
+                                ref={typesModalizeRef}
+                                adjustToContentHeight
+                                handlePosition='inside'
+                                modalStyle={{
+                                        borderTopRightRadius: 25,
+                                        borderTopLeftRadius: 25,
+                                        paddingVertical: 20
+                                }}
+                                handleStyle={{ marginTop: 10 }}
+                                scrollViewProps={{
+                                        keyboardShouldPersistTaps: "handled"
+                                }}
+                                onClosed={() => {
+                                        setIsOpen(false)
+                                        setLoadingForm(true)
+                                }}
+                        >
+                                <TypesModalize />
+                        </Modalize>
                         <Modalize
                                 ref={repasModalizeRef}
                                 adjustToContentHeight
