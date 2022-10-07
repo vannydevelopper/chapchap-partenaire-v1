@@ -293,14 +293,6 @@ export default function InscriptionScreen() {
                                                                 <Text style={styles.buttonText}>S'inscrire</Text>
                                                         </View>
                                                 </TouchableWithoutFeedback>
-
-
-                                                <TouchableOpacity onPress={() => navigation.navigate("Connexion")}>
-                                                        <View style={styles.cardButton}>
-                                                                <Text style={{ fontSize: 14, fontWeight: "bold", color: "#1D8585", textDecorationLine: "underline" }}>Plus tard</Text>
-                                                        </View>
-                                                </TouchableOpacity>
-
                                         </View>
                                 </ScrollView>
                         </ImageBackground>

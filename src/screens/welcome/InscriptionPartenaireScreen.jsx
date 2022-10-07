@@ -10,7 +10,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setUserAction } from "../../store/actions/userActions"
 
-import { useToast } from 'native-base';
 import { COLORS } from '../../styles/COLORS';
 // import {  useToast } from 'native-base';
 import { Feather, Entypo, AntDesign } from '@expo/vector-icons';
@@ -40,7 +39,6 @@ export default function InscriptionPartenaireScreen() {
     // const toast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const [loading, setLoading] = useState(false);
-    const toast = useToast()
     const { partenaire } = route.params
     console.log(partenaire.result.ID_USER)
     const [data, handleChange, setValue] = useForm({
