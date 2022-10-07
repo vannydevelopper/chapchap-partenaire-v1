@@ -329,199 +329,199 @@ export default function NewProductSreen() {
         </View>
     )
   }
-<<<<<<< HEAD
-          return (
-                    <>
-                              <ScrollView style={styles.container}>
-                                        {isLoading && <Loading />}
-                                        <View style={styles.header}>
-                                                  <Text style={styles.title}>Nouveau produit</Text>
-                                                  <TouchableNativeFeedback useForeground onPress={() => navigation.goBack()}>
-                                                            <View style={styles.cancelBtn}>
-                                                                      <Ionicons name="close" size={30} color="#777" />
-                                                            </View>
-                                                  </TouchableNativeFeedback>
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Categorie</Text>
-                                                  <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
-                                                            setIsOpen(true)
-                                                            categoriesModalizeRef.current?.open()
-                                                  }}>
-                                                            <Text style={styles.selectedLabel} >
-                                                                      {data.category ? data.category.NOM : "Aucune catégorie selectionné"}
-                                                            </Text>
-                                                            <Ionicons name="caret-down" size={24} color="#777" />
-                                                  </TouchableOpacity>
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Sous catégorie</Text>
-                                                  <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
-                                                            setIsOpen(true)
-                                                            subCategoriesModalizeRef.current?.open()
-                                                  }}>
-                                                            <Text style={styles.selectedLabel} >
-                                                                      {data.subCategory ? data.subCategory.NOM_SOUS_CATEGORIE : "Aucun sous-catégorie selectionné"}
-                                                            </Text>
-                                                            <Ionicons name="caret-down" size={24} color="#777" />
-                                                  </TouchableOpacity>
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Produit</Text>
-                                                  <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
-                                                            setIsOpen(true)
-                                                            produitsModalizeRef.current?.open()
-                                                  }}>
-                                                            <Text style={styles.selectedLabel}>
-                                                                      {data.produit ? data.produit.NOM_PRODUIT : "Aucun produit selectionné"}
-                                                            </Text>
-                                                            <Ionicons name="caret-down" size={24} color="#777" />
-                                                  </TouchableOpacity>
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Nom du produit</Text>
-                                                  <TextInput
-                                                            style={[styles.input, isFocused && { borderColor: COLORS.primary }]}
-                                                            value={data.nom}
-                                                            onChangeText={e => handleChange("nom", e)}
-                                                            onFocus={() => setIsFocused(true)}
-                                                            placeholder="Ecrire votre propre nom du produit"
-                                                            onBlur={() => {
-                                                                      setIsFocused(false)
-                                                            }}
-                                                  />
-                                        </View>                                     
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Description du produit</Text>
-                                                  <TextInput
-                                                            ref={descriptionRef}
-                                                            style={[styles.input, isDescFocused && { borderColor: COLORS.primary }, { height: 80 }]}
-                                                            value={data.description}
-                                                            onChangeText={e => handleChange("description", e)}
-                                                            onFocus={() => setIsDescFocused(true)}
-                                                            placeholder="Décrire votre produit(facultatif)"
-                                                            onBlur={() => {
-                                                                      setIsDescFocused(false)
-                                                            }}
-                                                            multiline
-                                                  />
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Quantité</Text>
-                                                  <TextInput
-                                                            ref={amountRef}
-                                                            style={[styles.input, isAmountFocused && { borderColor: COLORS.primary }]}
-                                                            value={data.quantite}
-                                                            onChangeText={e => handleChange("quantite", e)}
-                                                            onFocus={() => setIsAmountFocused(true)}
-                                                            placeholder="Combien de pièces à mettre en stock ?"
-                                                            onBlur={() => {
-                                                                      setIsAmountFocused(false)
-                                                            }}
-                                                            keyboardType="decimal-pad"
-                                                            returnKeyType="next"
-                                                            onSubmitEditing={() => priceRef.current.focus()}
-                                                            blurOnSubmit={false}
-                                                  />
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Prix unitaire</Text>
-                                                  <TextInput
-                                                            ref={priceRef}
-                                                            style={[styles.input, isPriceFocused && { borderColor: COLORS.primary }]}
-                                                            value={data.montant}
-                                                            onChangeText={e => handleChange("montant", e)}
-                                                            onFocus={() => setIsPriceFocused(true)}
-                                                            placeholder="Prix pour chaque pièce ?"
-                                                            onBlur={() => {
-                                                                      setIsPriceFocused(false)
-                                                            }}
-                                                            keyboardType="decimal-pad"
-                                                  />
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Images du produit</Text>
-                                                  <View style={styles.images}>
-                                                            {images.map((image, index) => {
-                                                                      return (
-                                                                                <TouchableWithoutFeedback onPress={() => onRemoveImage(index)} key={index}>
-                                                                                          <Image style={[styles.addImager, index > 0 && { marginLeft: 10 }]} source={{ uri: image.uri }} />
-                                                                                </TouchableWithoutFeedback>
-                                                                      )
-                                                            })}
-                                                            {images.length < 3 ? <TouchableWithoutFeedback onPress={onImageSelect}>
-                                                                      <View style={[styles.addImager, images.length > 0 && { marginLeft: 10 }]}>
-                                                                                <Feather name="image" size={30} color="#777" />
-                                                                      </View>
-                                                            </TouchableWithoutFeedback> : null}
-                                                  </View>
-                                        </View>
-                                        <TouchableOpacity style={[styles.addBtn, (!isValidate() || images.length == 0) && { opacity: 0.5 }]} onPress={onSubmit} disabled={!isValidate() || images.length == 0}>
-                                                  <Text style={[styles.addBtnText]}>Publier le produit</Text>
-                                        </TouchableOpacity>
-                              </ScrollView>
-                              <Modalize
-                                        ref={produitsModalizeRef}
-                                        adjustToContentHeight
-                                        handlePosition='inside'
-                                        modalStyle={{
-                                                  borderTopRightRadius: 25,
-                                                  borderTopLeftRadius: 25,
-                                                  paddingVertical: 20
-                                        }}
-                                        handleStyle={{ marginTop: 10 }}
-                                        scrollViewProps={{
-                                                  keyboardShouldPersistTaps: "handled"
-                                        }}
-                                        onClosed={() => {
-                                                  setIsOpen(false)
-                                                  setLoadingForm(true)
-                                        }}
-                              >
-                                        <ProduitsModalize />
-                              </Modalize>
-                              <Modalize
-                                        ref={categoriesModalizeRef}
-                                        adjustToContentHeight
-                                        handlePosition='inside'
-                                        modalStyle={{
-                                                  borderTopRightRadius: 25,
-                                                  borderTopLeftRadius: 25,
-                                                  paddingVertical: 20
-                                        }}
-                                        handleStyle={{ marginTop: 10 }}
-                                        scrollViewProps={{
-                                                  keyboardShouldPersistTaps: "handled"
-                                        }}
-                                        onClosed={() => {
-                                                  setIsOpen(false)
-                                                  setLoadingForm(true)
-                                        }}
-                              >
-                                        <CategoriesModalize />
-                              </Modalize>
-                              <Modalize
-                                        ref={subCategoriesModalizeRef}
-                                        adjustToContentHeight
-                                        handlePosition='inside'
-                                        modalStyle={{
-                                                  borderTopRightRadius: 25,
-                                                  borderTopLeftRadius: 25,
-                                                  paddingVertical: 20
-                                        }}
-                                        handleStyle={{ marginTop: 10 }}
-                                        scrollViewProps={{
-                                                  keyboardShouldPersistTaps: "handled"
-                                        }}
-                                        onClosed={() => {
-                                                  setIsOpen(false)
-                                                  setLoadingForm(true)
-                                        }}
-                              >
-                                        <SubCategoriesModalize />
-                              </Modalize>
-                    </>
-=======
+// <<<<<<< HEAD
+//           return (
+//                     <>
+//                               <ScrollView style={styles.container}>
+//                                         {isLoading && <Loading />}
+//                                         <View style={styles.header}>
+//                                                   <Text style={styles.title}>Nouveau produit</Text>
+//                                                   <TouchableNativeFeedback useForeground onPress={() => navigation.goBack()}>
+//                                                             <View style={styles.cancelBtn}>
+//                                                                       <Ionicons name="close" size={30} color="#777" />
+//                                                             </View>
+//                                                   </TouchableNativeFeedback>
+//                                         </View>
+//                                         <View style={styles.selectControl}>
+//                                                   <Text style={styles.selectLabel}>Categorie</Text>
+//                                                   <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
+//                                                             setIsOpen(true)
+//                                                             categoriesModalizeRef.current?.open()
+//                                                   }}>
+//                                                             <Text style={styles.selectedLabel} >
+//                                                                       {data.category ? data.category.NOM : "Aucune catégorie selectionné"}
+//                                                             </Text>
+//                                                             <Ionicons name="caret-down" size={24} color="#777" />
+//                                                   </TouchableOpacity>
+//                                         </View>
+//                                         <View style={styles.selectControl}>
+//                                                   <Text style={styles.selectLabel}>Sous catégorie</Text>
+//                                                   <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
+//                                                             setIsOpen(true)
+//                                                             subCategoriesModalizeRef.current?.open()
+//                                                   }}>
+//                                                             <Text style={styles.selectedLabel} >
+//                                                                       {data.subCategory ? data.subCategory.NOM_SOUS_CATEGORIE : "Aucun sous-catégorie selectionné"}
+//                                                             </Text>
+//                                                             <Ionicons name="caret-down" size={24} color="#777" />
+//                                                   </TouchableOpacity>
+//                                         </View>
+//                                         <View style={styles.selectControl}>
+//                                                   <Text style={styles.selectLabel}>Produit</Text>
+//                                                   <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
+//                                                             setIsOpen(true)
+//                                                             produitsModalizeRef.current?.open()
+//                                                   }}>
+//                                                             <Text style={styles.selectedLabel}>
+//                                                                       {data.produit ? data.produit.NOM_PRODUIT : "Aucun produit selectionné"}
+//                                                             </Text>
+//                                                             <Ionicons name="caret-down" size={24} color="#777" />
+//                                                   </TouchableOpacity>
+//                                         </View>
+//                                         <View style={styles.selectControl}>
+//                                                   <Text style={styles.selectLabel}>Nom du produit</Text>
+//                                                   <TextInput
+//                                                             style={[styles.input, isFocused && { borderColor: COLORS.primary }]}
+//                                                             value={data.nom}
+//                                                             onChangeText={e => handleChange("nom", e)}
+//                                                             onFocus={() => setIsFocused(true)}
+//                                                             placeholder="Ecrire votre propre nom du produit"
+//                                                             onBlur={() => {
+//                                                                       setIsFocused(false)
+//                                                             }}
+//                                                   />
+//                                         </View>                                     
+//                                         <View style={styles.selectControl}>
+//                                                   <Text style={styles.selectLabel}>Description du produit</Text>
+//                                                   <TextInput
+//                                                             ref={descriptionRef}
+//                                                             style={[styles.input, isDescFocused && { borderColor: COLORS.primary }, { height: 80 }]}
+//                                                             value={data.description}
+//                                                             onChangeText={e => handleChange("description", e)}
+//                                                             onFocus={() => setIsDescFocused(true)}
+//                                                             placeholder="Décrire votre produit(facultatif)"
+//                                                             onBlur={() => {
+//                                                                       setIsDescFocused(false)
+//                                                             }}
+//                                                             multiline
+//                                                   />
+//                                         </View>
+//                                         <View style={styles.selectControl}>
+//                                                   <Text style={styles.selectLabel}>Quantité</Text>
+//                                                   <TextInput
+//                                                             ref={amountRef}
+//                                                             style={[styles.input, isAmountFocused && { borderColor: COLORS.primary }]}
+//                                                             value={data.quantite}
+//                                                             onChangeText={e => handleChange("quantite", e)}
+//                                                             onFocus={() => setIsAmountFocused(true)}
+//                                                             placeholder="Combien de pièces à mettre en stock ?"
+//                                                             onBlur={() => {
+//                                                                       setIsAmountFocused(false)
+//                                                             }}
+//                                                             keyboardType="decimal-pad"
+//                                                             returnKeyType="next"
+//                                                             onSubmitEditing={() => priceRef.current.focus()}
+//                                                             blurOnSubmit={false}
+//                                                   />
+//                                         </View>
+//                                         <View style={styles.selectControl}>
+//                                                   <Text style={styles.selectLabel}>Prix unitaire</Text>
+//                                                   <TextInput
+//                                                             ref={priceRef}
+//                                                             style={[styles.input, isPriceFocused && { borderColor: COLORS.primary }]}
+//                                                             value={data.montant}
+//                                                             onChangeText={e => handleChange("montant", e)}
+//                                                             onFocus={() => setIsPriceFocused(true)}
+//                                                             placeholder="Prix pour chaque pièce ?"
+//                                                             onBlur={() => {
+//                                                                       setIsPriceFocused(false)
+//                                                             }}
+//                                                             keyboardType="decimal-pad"
+//                                                   />
+//                                         </View>
+//                                         <View style={styles.selectControl}>
+//                                                   <Text style={styles.selectLabel}>Images du produit</Text>
+//                                                   <View style={styles.images}>
+//                                                             {images.map((image, index) => {
+//                                                                       return (
+//                                                                                 <TouchableWithoutFeedback onPress={() => onRemoveImage(index)} key={index}>
+//                                                                                           <Image style={[styles.addImager, index > 0 && { marginLeft: 10 }]} source={{ uri: image.uri }} />
+//                                                                                 </TouchableWithoutFeedback>
+//                                                                       )
+//                                                             })}
+//                                                             {images.length < 3 ? <TouchableWithoutFeedback onPress={onImageSelect}>
+//                                                                       <View style={[styles.addImager, images.length > 0 && { marginLeft: 10 }]}>
+//                                                                                 <Feather name="image" size={30} color="#777" />
+//                                                                       </View>
+//                                                             </TouchableWithoutFeedback> : null}
+//                                                   </View>
+//                                         </View>
+//                                         <TouchableOpacity style={[styles.addBtn, (!isValidate() || images.length == 0) && { opacity: 0.5 }]} onPress={onSubmit} disabled={!isValidate() || images.length == 0}>
+//                                                   <Text style={[styles.addBtnText]}>Publier le produit</Text>
+//                                         </TouchableOpacity>
+//                               </ScrollView>
+//                               <Modalize
+//                                         ref={produitsModalizeRef}
+//                                         adjustToContentHeight
+//                                         handlePosition='inside'
+//                                         modalStyle={{
+//                                                   borderTopRightRadius: 25,
+//                                                   borderTopLeftRadius: 25,
+//                                                   paddingVertical: 20
+//                                         }}
+//                                         handleStyle={{ marginTop: 10 }}
+//                                         scrollViewProps={{
+//                                                   keyboardShouldPersistTaps: "handled"
+//                                         }}
+//                                         onClosed={() => {
+//                                                   setIsOpen(false)
+//                                                   setLoadingForm(true)
+//                                         }}
+//                               >
+//                                         <ProduitsModalize />
+//                               </Modalize>
+//                               <Modalize
+//                                         ref={categoriesModalizeRef}
+//                                         adjustToContentHeight
+//                                         handlePosition='inside'
+//                                         modalStyle={{
+//                                                   borderTopRightRadius: 25,
+//                                                   borderTopLeftRadius: 25,
+//                                                   paddingVertical: 20
+//                                         }}
+//                                         handleStyle={{ marginTop: 10 }}
+//                                         scrollViewProps={{
+//                                                   keyboardShouldPersistTaps: "handled"
+//                                         }}
+//                                         onClosed={() => {
+//                                                   setIsOpen(false)
+//                                                   setLoadingForm(true)
+//                                         }}
+//                               >
+//                                         <CategoriesModalize />
+//                               </Modalize>
+//                               <Modalize
+//                                         ref={subCategoriesModalizeRef}
+//                                         adjustToContentHeight
+//                                         handlePosition='inside'
+//                                         modalStyle={{
+//                                                   borderTopRightRadius: 25,
+//                                                   borderTopLeftRadius: 25,
+//                                                   paddingVertical: 20
+//                                         }}
+//                                         handleStyle={{ marginTop: 10 }}
+//                                         scrollViewProps={{
+//                                                   keyboardShouldPersistTaps: "handled"
+//                                         }}
+//                                         onClosed={() => {
+//                                                   setIsOpen(false)
+//                                                   setLoadingForm(true)
+//                                         }}
+//                               >
+//                                         <SubCategoriesModalize />
+//                               </Modalize>
+//                     </>
+// =======
 
   const SubCategoriesModalize = () => {
     return (
