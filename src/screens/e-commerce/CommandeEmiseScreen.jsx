@@ -56,18 +56,24 @@ export default function CommandeEmiseScreen() {
 
                 {commandes.map((commande, index) => {
 
-                    return (
+                 return (
                         <View style={{
                             flexDirection: "row",
                             justifyContent: "space-between",
                         }} key={index}>
                             <View style={styles.cardAchat}>
-                                <Ionicons name="shirt-sharp" size={70} color="black" />
+                                <Image source={{ uri: commande.IMAGE_1 }} style={styles.productImage} />
                             </View>
 
                             <View style={{ marginTop: 20, marginHorizontal: 0 }}>
-                                <Text style={styles.textRobe}>{commande.NOM}</Text>
-                                <Text style={styles.date}> {moment(commande.DATE_COMMANDE).format('DD-MM-YYYY  HH:mm:ss')}   {commande.QUANTITE} piecs</Text>
+
+                                <Text style={styles.textRobe}>
+                                    Commande : {commande.CODE_UNIQUE} 
+                                </Text>
+                                <Text style={styles.date}>
+                                    {moment(commande.DATE_COMMANDE).format('DD-M-YYYY HH:mm')}   {commande.NOM} produit{commande.ITEMS > 1 && 's'}
+                                </Text>
+
                                 <View style={{ flexDirection: "row", marginTop: 15 }}>
                                     <View style={styles.cardOK}><Entypo name="check" size={6} color="white" /></View>
                                     <View style={{ marginLeft: 7 }}>
@@ -150,6 +156,12 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     }
     ,
+    productImage: {
+        width: "100%",
+        height: "100%",
+        resizeMode: "contain",
+        borderRadius: 10
+    },
 
     montant: {
         color: "#EE7526",
