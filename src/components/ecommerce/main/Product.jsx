@@ -21,7 +21,7 @@ export default function Product({ product, index, totalLength, fixMargins = fals
           const navigation =useNavigation()
           const detail = async (detail) => {
             const details=detail
-            navigation.navigate("ProductDetail")   
+            navigation.navigate("ProductDetailScreen")   
             } 
         
           return (
