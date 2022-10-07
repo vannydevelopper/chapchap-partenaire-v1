@@ -2,6 +2,9 @@ import React from 'react'
 import { Image, StyleSheet, Text, useWindowDimensions, View } from 'react-native'
 import { MaterialIcons, AntDesign, Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../../styles/COLORS';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { TouchableNativeFeedback } from 'react-native-web';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Product({ product, index, totalLength, fixMargins = false }) {
           const { width } = useWindowDimensions()
@@ -15,7 +18,14 @@ export default function Product({ product, index, totalLength, fixMargins = fals
                     marginLeft: index > 0 ? PRODUCT_MARGIN : (fixMargins ? PRODUCT_MARGIN : 0),
                     marginRight: index == totalLength - 1 ? PRODUCT_MARGIN : (fixMargins ? 0 : 0)
           }
+          const navigation =useNavigation()
+          const detail = async (detail) => {
+            const details=detail
+            navigation.navigate("ProductDetailScreen")   
+            } 
+        
           return (
+        
                     <View key={index} style={[styles.product, additionStyles]}>
                               <View style={styles.productHeader}>
                                         <Text numberOfLines={2} style={styles.productName}> {product.produit_partenaire.NOM}</Text>
@@ -24,7 +34,11 @@ export default function Product({ product, index, totalLength, fixMargins = fals
                                         </Text>
                               </View>
                               <View style={styles.imageCard}>
+                                
+                              
+                              <TouchableOpacity onPress={() => detail(product)}>
                                         <Image source={{ uri: product.produit_partenaire.IMAGE_1 }} style={styles.image} />
+                              </TouchableOpacity>
                               </View>
                               {product.produit_partenaire.PRIX ? <Text style={styles.price}>{product.produit_partenaire.PRIX.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Fbu</Text> : null}
                               <View style={styles.details}>

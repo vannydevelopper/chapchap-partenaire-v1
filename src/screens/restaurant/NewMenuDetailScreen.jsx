@@ -8,7 +8,8 @@ import Product from "../../components/ecommerce/main/Product";
 import { Entypo } from '@expo/vector-icons';
 import { COLORS } from "../../styles/COLORS";
 import { useRef } from "react";
-import ProductImages from "../../components/restaurant/details/ProductImages";
+import ProductImages from "../../components/restaurant/details/ProductImages"
+
 
 export default function NewMenuDetailScreen() {
         const route = useRoute()
@@ -31,7 +32,7 @@ export default function NewMenuDetailScreen() {
                                         </TouchableOpacity>
                                         <View style={{ flexDirection: "row", alignItems: "center" }}>
                                                 <TouchableOpacity style={{ marginRight: 20 }}>
-                                                        <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                        <Entypo name="dots-three-vertical" size={24} color="black" />
                                                 </TouchableOpacity>
                                         </View>
                                 </View>

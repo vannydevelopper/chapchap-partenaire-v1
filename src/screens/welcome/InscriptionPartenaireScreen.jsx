@@ -165,7 +165,7 @@ export default function InscriptionPartenaireScreen() {
         form.append('ADRESSE_COMPLETE', data.adresse)
         form.append('LONGITUDE', location.coords.longitude)
         form.append('LATITUDE', location.coords.latitude)
-        form.append('ID_SERVICE', ServiceSelect.ID_SERVICE)
+        // form.append('ID_SERVICE', ServiceSelect.ID_SERVICE)
 
 
         if (imagelogo) {
@@ -323,7 +323,7 @@ export default function InscriptionPartenaireScreen() {
                             <Text style={styles.description}> Chap Chap</Text>
                         </View>
 
-                        <View>
+                        {/* <View>
                             <TouchableOpacity style={styles.modalCard}
                                 onPress={() => servicesModalizeRef.current.open()}
                             >
@@ -332,7 +332,7 @@ export default function InscriptionPartenaireScreen() {
                                 </Text>
                                 <AntDesign name="caretdown" size={20} color="back" />
                             </TouchableOpacity>
-                        </View>
+                        </View> */}
 
                         <View style={{ marginTop: 10 }}>
                             <TouchableOpacity style={styles.modalCard}
@@ -354,6 +354,18 @@ export default function InscriptionPartenaireScreen() {
                                 onChangeText={(newValue) => handleChange('organisation', newValue)}
                                 onBlur={() => checkFieldData('organisation')}
                                 error={hasError('organisation') ? getError('organisation') : ''}
+
+                            />
+                        </View>}
+                        {typepartenaireselect != null && typepartenaireselect.ID_PARTENAIRE_TYPE == 2 && <View style={styles.inputCard}>
+                            <OutlinedTextField
+                                label="Adresse Complete"
+                                fontSize={14}
+                                value={data.adresse}
+                                onChangeText={(newValue) => handleChange('adresse', newValue)}
+                                onBlur={() => checkFieldData('adresse')}
+                                error={hasError('adresse') ? getError('adresse') : ''}
+
 
                             />
                         </View>}
@@ -391,61 +403,40 @@ export default function InscriptionPartenaireScreen() {
                             />
                         </View>
 
-                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between",marginHorizontal:-5 }}>
 
                             <View>
-                                <View>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'center' }}>
-                                        <Text style={styles.image}>
+                                 <Text style={styles.image}>
                                             logo
                                         </Text>
 
-                                    </View>
-                                </View>
+                                
                                 <TouchableOpacity onPress={onTakePictureSelect}>
                                     <View style={{ ...styles.addImage }}>
                                         {imagelogo ? <Image source={{ uri: imagelogo.uri }} style={{ width: '100%', height: '100%', borderRadius: 5 }} /> :
                                             <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
                                                 {/* <Image source={require('../../../assets/images/person-icon.png')} style={{ width: '30%', height: '30%', marginTop: 10 }} /> */}
-                                                <Feather name="image" size={30} color="#777" />
+                                                <Feather name="image" size={50} color="#777" />
                                             </View>}
                                     </View>
                                 </TouchableOpacity>
                             </View>
-
-                            
                             <View>
-                                <View>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'center' }}>
-                                        <Text style={styles.image}>
+                                 <Text style={styles.image}>
                                             Image
                                         </Text>
-
-                                    </View>
-                                </View>
                                 <TouchableOpacity onPress={onTakeimageSelect}>
                                     <View style={{ ...styles.addImage }}>
                                         {backgroundimage ? <Image source={{ uri: backgroundimage.uri }} style={{ width: '100%', height: '100%', borderRadius: 5 }} /> :
                                             <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
                                                 {/* <Image source={require('../../../assets/images/person-icon.png')} style={{ width: '30%', height: '30%', marginTop: 10 }} /> */}
-                                                <Feather name="image" size={30} color="#777" />
+                                                <Feather name="image" size={50} color="#777" />
                                             </View>}
                                     </View>
                                 </TouchableOpacity>
                             </View>
                         </View>
-                        {typepartenaireselect != null && typepartenaireselect.ID_PARTENAIRE_TYPE == 2 && <View style={styles.inputCard}>
-                            <OutlinedTextField
-                                label="Adresse Complete"
-                                fontSize={14}
-                                value={data.adresse}
-                                onChangeText={(newValue) => handleChange('adresse', newValue)}
-                                onBlur={() => checkFieldData('adresse')}
-                                error={hasError('adresse') ? getError('adresse') : ''}
-
-
-                            />
-                        </View>}
+                       
                         <TouchableOpacity onPress={sendData} disabled={!isValidate()} >
 
                             <View style={[styles.button, !isValidate() && { opacity: 0.5 }]}>
@@ -564,8 +555,8 @@ const styles = StyleSheet.create({
 
     },
     addImage: {
-        width: 160,
-        height: 100,
+        width: 120,
+        height: 120,
         borderRadius: 5,
         margin: 10,
         marginHorizontal: 20,
