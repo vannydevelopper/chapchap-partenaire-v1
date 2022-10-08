@@ -92,6 +92,7 @@ export default function InscriptionScreen() {
                         })
                         // await AsyncStorage.setItem("user", JSON.stringify(res));
                         // dispatch(setUserAction(res));
+                        console.log(res)
                         navigation.navigate("InscriptionPartenaireScreen",{partenaire:res})
                 }
                 catch (error) {

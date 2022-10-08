@@ -42,7 +42,7 @@ export default function InscriptionPartenaireScreen() {
     const [loading, setLoading] = useState(false);
     const toast = useToast()
     const { partenaire } = route.params
-    console.log(partenaire.result.ID_USER)
+    console.log(partenaire.result.ID_PARTENAIRE)
     const [data, handleChange, setValue] = useForm({
         ServiceSelect: null,
         typepartenaireselect: null,
@@ -156,7 +156,7 @@ export default function InscriptionPartenaireScreen() {
         }
 
         const form = new FormData()
-        form.append('ID_USER', partenaire.result.ID_USER)
+        form.append('ID_PARTENAIRE', partenaire.result.ID_PARTENAIRE)
         form.append('ID_TYPE_PARTENAIRE', typepartenaireselect.ID_PARTENAIRE_TYPE)
         form.append('NOM_ORGANISATION', data.organisation)
         form.append('TELEPHONE', data.telephone)
@@ -221,7 +221,7 @@ export default function InscriptionPartenaireScreen() {
                     width: '90%',
                     minWidth: 300
                 })
-                navigation.navigate("commande")
+               // navigation.navigate("commande")
 
             }
             catch (error) {
