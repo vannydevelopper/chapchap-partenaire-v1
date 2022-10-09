@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { Text, View, useWindowDimensions, ImageBackground, StatusBar, StyleSheet, Image, TextInput, ScrollView, TouchableOpacity, FlatList, TouchableNativeFeedback } from "react-native";
-import { EvilIcons, MaterialIcons, AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome, SimpleLineIcons } from '@expo/vector-icons';
+import { EvilIcons, MaterialIcons, AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome, SimpleLineIcons, Octicons, Feather } from '@expo/vector-icons';
 import fetchApi from "../../helpers/fetchApi";
 import { DrawerActions, useFocusEffect, useNavigation } from "@react-navigation/native";
 import { COLORS } from "../../styles/COLORS";
@@ -19,7 +19,7 @@ export default function EcommerceHomeScreen() {
           useFocusEffect(useCallback(() => {
                     (async () => {
                               try {
-                                        var url = "/products"
+                                        var url = "/partenaire/produit"
                                         const produits = await fetchApi(url)
                                         setProducts(produits.result)
                               } catch (error) {
@@ -40,10 +40,13 @@ export default function EcommerceHomeScreen() {
                                                   <View style={[styles.menuOpenerLine, { width: 15 }]} />
                                                   <View style={[styles.menuOpenerLine, { width: 25 }]} />
                                         </TouchableOpacity>
+                                        <View style={{ marginTop: 25 }}>
+                                                  <Octicons name="bell" size={24} color={COLORS.ecommercePrimaryColor} />
+                                        </View>
                               </View>
                               <ScrollView style={styles.cardOrginal}>
-                                        <Text style={styles.titlePrincipal}>Vos produits</Text>
-                                        <View style={{ flexDirection: "row", alignItems: "center", alignContent: "center", justifyContent: "space-between", marginBottom: 25, paddingHorizontal: 10 }}>
+                                        <Text style={[styles.titlePrincipal, products.length == 0 && { textAlign: "center" }]}>Vos produits</Text>
+                                        {products.length > 0 && <View style={{ flexDirection: "row", alignItems: "center", alignContent: "center", justifyContent: "space-between", marginBottom: 25, paddingHorizontal: 10 }}>
                                                   <View style={styles.searchSection}>
                                                             <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
                                                             <TextInput
@@ -54,7 +57,7 @@ export default function EcommerceHomeScreen() {
                                                   <View style={styles.cardRecherche}>
                                                             <SimpleLineIcons name="equalizer" size={24} color="white" style={{ fontWeight: 'bold', transform: [{ rotate: '-90deg' }] }} />
                                                   </View>
-                                        </View>
+                                        </View>}
                                         {/* {(loadingCategories || firstLoadingProducts) ? <CategoriesSkeletons /> :
                                         <View>
                                                   <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 10, backgroundColor: '#fff', paddingBottom: 10 }}>
@@ -78,19 +81,26 @@ export default function EcommerceHomeScreen() {
                                                   selectedItemSousCategories={selectedItemSousCategories}
                                                   selectedsousCategories={selectedsousCategories}
                                         />)} */}
-                                        {firstLoadingProducts ? <HomeProductsSkeletons wrap /> :<View style={styles.products}>
-                                                  {products.map((product, index) => {
-                                                            return (
-                                                                      <Product
-                                                                                product={product}
-                                                                                index={index}
-                                                                                totalLength={products.length}
-                                                                                key={index}
-                                                                                fixMargins
-                                                                      />
-                                                            )
-                                                  })}
-                                        </View>}
+                                        {firstLoadingProducts ? <HomeProductsSkeletons wrap /> :
+                                                  products.length == 0 ? <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 100 }}>
+                                                            <Feather name="check-square" size={24} color="#777" />
+                                                            <Text style={{ color: '#777', paddingHorizontal: 50, textAlign: "center", marginTop: 10  }}>
+                                                                      Votre stock est vide. Cliquez sur le bouton en dessous pour ajouter un nouveau produit
+                                                            </Text>
+                                                            </View> : <View style={styles.products}>
+                                                            {products.map((product, index) => {
+                                                                      return (
+                                                                                <Product
+                                                                                          product={product}
+                                                                                          index={index}
+                                                                                          totalLength={products.length}
+                                                                                          key={index}
+                                                                                          fixMargins
+                                                                                />
+                                                                      )
+                                                            })}
+                                                  </View>
+                                        }
                               </ScrollView>
                               <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewProductSreen')}>
                                         <Text style={styles.addBtnText}>Nouveau produit</Text>

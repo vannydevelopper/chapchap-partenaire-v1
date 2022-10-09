@@ -28,13 +28,12 @@ export default function NewProductSreen() {
 
           const [taille, setsTaille] = useState([])
           let total = 0
-
-
           const produitsModalizeRef = useRef(null)
           const categoriesModalizeRef = useRef(null)
           const subCategoriesModalizeRef = useRef()
           const sizeModalizeRef = useRef(null)
           const detailsModalizeRef = useRef(null)
+
 
           const [data, handleChange] = useForm({
                     produit: null,
@@ -523,10 +522,9 @@ export default function NewProductSreen() {
                                                             detailsModalizeRef.current?.close()
 
                                                   }} disabled={showColor == false || showSize == false} >
-
                                                             <Text style={[styles.addBtnText]}>Ajouter</Text>
-                                                  </TouchableOpacity>
-                                        </View>
+                                                  </TouchableOpacity >
+                                        </View >
                     )
           }
           const SizesModalize = () => {
@@ -568,16 +566,24 @@ export default function NewProductSreen() {
                     <>
                               <ScrollView style={styles.container}>
                                         {isLoading && <Loading />}
-                                        <Text style={styles.title}>Nouveau produit</Text>
+                                        <View style={styles.header}>
+                                                  <Text style={styles.title}>Nouveau produit</Text>
+                                                  <TouchableNativeFeedback useForeground onPress={() => navigation.goBack()}>
+                                                            <View style={styles.cancelBtn}>
+                                                                      <Ionicons name="close" size={30} color="#777" />
+                                                            </View>
+                                                  </TouchableNativeFeedback>
+                                        </View>
                                         <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Categorie</Text>
+                                                  <Text style={styles.selectLabel}>Catégorie</Text>
                                                   <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
                                                             setIsOpen(true)
                                                             categoriesModalizeRef.current?.open()
                                                   }}>
                                                             <Text style={styles.selectedLabel} >
-                                                                      {data.category ? data.category.NOM : "Aucune catégorie selectionné"}
+                                                                      {data.category ? data.category.NOM : "Aucune catégorie selectionnée"}
                                                             </Text>
+                                                            <Ionicons name="caret-down" size={24} color="#777" />
                                                   </TouchableOpacity>
                                         </View>
                                         <View style={styles.selectControl}>
@@ -589,6 +595,7 @@ export default function NewProductSreen() {
                                                             <Text style={styles.selectedLabel} >
                                                                       {data.subCategory ? data.subCategory.NOM_SOUS_CATEGORIE : "Aucun sous-catégorie selectionné"}
                                                             </Text>
+                                                            <Ionicons name="caret-down" size={24} color="#777" />
                                                   </TouchableOpacity>
                                         </View>
                                         <View style={styles.selectControl}>
@@ -597,12 +604,12 @@ export default function NewProductSreen() {
                                                             setIsOpen(true)
                                                             produitsModalizeRef.current?.open()
                                                   }}>
-                                                            <Text style={styles.selectedLabel} >
+                                                            <Text style={styles.selectedLabel}>
                                                                       {data.produit ? data.produit.NOM_PRODUIT : "Aucun produit selectionné"}
                                                             </Text>
+                                                            <Ionicons name="caret-down" size={24} color="#777" />
                                                   </TouchableOpacity>
                                         </View>
-
                                         <View style={styles.selectControl}>
                                                   <Text style={styles.selectLabel}>Nom du produit</Text>
                                                   <TextInput
@@ -649,44 +656,6 @@ export default function NewProductSreen() {
                                                             blurOnSubmit={false}
                                                   />
                                         </View>
-                                        {taille &&
-
-                                                  taille.map((t, index) => {
-                                                            total = total + parseInt(t.quantite)
-                                                            return (
-
-                                                                      <View key={index} style={styles.product}>
-                                                                                <View style={{ paddingHorizontal: 10, marginTop: 5 }}>
-                                                                                          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                                                                                                    <Text style={styles.quantite}>Couleur</Text>
-                                                                                                    <Text style={styles.quantite}>{t.color}</Text>
-
-                                                                                          </View>
-                                                                                          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                                                                                                    <Text style={styles.quantite}>Quantite</Text>
-                                                                                                    <Text style={styles.quantite}>{t.quantite}</Text>
-                                                                                          </View>
-                                                                                          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                                                                                                    <Text style={styles.quantite}>Size</Text>
-                                                                                                    <Text style={styles.quantite}>{t.size}</Text>
-
-
-                                                                                          </View>
-                                                                                </View>
-                                                                      </View>
-                                                            )
-                                                  }
-                                                  )
-
-                                        }
-                                        {data.quantite > 0 && total <= data.quantite - 1 && <TouchableOpacity style={styles.addBtn} onPress={() => {
-                                                  setIsOpen(true)
-                                                  console.log(total)
-                                                  detailsModalizeRef.current?.open()
-                                        }}>
-
-                                                  <Text style={[styles.addBtnText]}>Detailler les quantites</Text>
-                                        </TouchableOpacity>}
                                         <View style={styles.selectControl}>
                                                   <Text style={styles.selectLabel}>Prix unitaire</Text>
                                                   <TextInput
@@ -702,7 +671,6 @@ export default function NewProductSreen() {
                                                             keyboardType="decimal-pad"
                                                   />
                                         </View>
-
                                         <View style={styles.selectControl}>
                                                   <Text style={styles.selectLabel}>Images du produit</Text>
                                                   <View style={styles.images}>
@@ -824,17 +792,18 @@ export default function NewProductSreen() {
                               >
                                         <DetailsModalize />
                               </Modalize>
-                              {/* <DeclareModal  sizes={sizes} selectedSize={selectedSize} onSizeSelect={onSizeSelect} onClose={() => setshowVaccins(false)} /> */}
-
-
-
                     </>
           )
 }
-
 const styles = StyleSheet.create({
           container: {
                     flex: 1
+          },
+          header: {
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    paddingHorizontal: 20
           },
           title: {
                     fontWeight: "bold",
@@ -876,7 +845,10 @@ const styles = StyleSheet.create({
                     borderColor: '#ddd',
                     padding: 10,
                     borderRadius: 5,
-                    marginTop: 2
+                    marginTop: 2,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between"
           },
           modalTitle: {
                     fontWeight: "bold",

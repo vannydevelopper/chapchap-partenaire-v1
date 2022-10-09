@@ -83,10 +83,9 @@ export default function ConnexionScreen() {
                                         <ScrollView keyboardShouldPersistTaps="handled">
                                                   <View>
                                                             <View style={styles.cardTitle}>
-                                                                      <Text style={styles.Title}>Compte client</Text>
+                                                                      <Text style={styles.Title}>Compte partenaire</Text>
                                                                       <Text style={styles.description}> Chap Chap</Text>
                                                             </View>
-
                                                             <View style={styles.inputCard}>
                                                                       <View>
                                                                                 <OutlinedTextField

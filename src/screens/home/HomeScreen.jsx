@@ -6,7 +6,7 @@ import {
           useWindowDimensions,
           TouchableOpacity
 } from "react-native";
-import { Feather, FontAwesome, EvilIcons, AntDesign } from '@expo/vector-icons';
+import { Feather, FontAwesome, EvilIcons, AntDesign, Octicons } from '@expo/vector-icons';
 import { StatusBar } from "expo-status-bar";
 import Animated from "react-native-reanimated";
 import Carousel from "../../components/app/Carousel";
@@ -18,24 +18,24 @@ export default function HomeScreen() {
           const navigation = useNavigation()
           return (
                     <>
-                    <StatusBar backgroundColor='#fff' barStyle='dark-content' />
-                    <View style={styles.imgBackground}>
-                              <View style={styles.cardHeader}>
-                                        <TouchableOpacity style={styles.menuOpener} onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
-                                                  <View style={styles.menuOpenerLine} />
-                                                  <View style={[styles.menuOpenerLine, { width: 15 }]} />
-                                                  <View style={[styles.menuOpenerLine, { width: 25 }]} />
-                                        </TouchableOpacity>
-                                        <View style={styles.imageContainer}>
-                                                  <Image source={require('../../../assets/images/chapchap.png')} style={styles.logo} />
+                              <StatusBar backgroundColor='#fff' barStyle='dark-content' />
+                              <View style={styles.imgBackground}>
+                                        <View style={styles.cardHeader}>
+                                                  <TouchableOpacity style={styles.menuOpener} onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
+                                                            <View style={styles.menuOpenerLine} />
+                                                            <View style={[styles.menuOpenerLine, { width: 15 }]} />
+                                                            <View style={[styles.menuOpenerLine, { width: 25 }]} />
+                                                  </TouchableOpacity>
+                                                  <View style={styles.imageContainer}>
+                                                            <Image source={require('../../../assets/images/chapchap.png')} style={styles.logo} />
+                                                  </View>
+                                                  <View style={{ marginTop: 25 }}>
+                                                            <Octicons name="bell" size={24} color={COLORS.primary} />
+                                                  </View>
                                         </View>
-                                        <View style={{ marginTop: 25 }}>
-                                                  <AntDesign name="search1" size={24} color={COLORS.primary}  />
-                                        </View>
+                                        <Carousel />
+                                        <ServicesCategories />
                               </View>
-                              <Carousel />
-                              <ServicesCategories />
-                    </View>
                     </>
           )
 }
