@@ -170,11 +170,12 @@ export default function ProductDetailScreen() {
 const styles = StyleSheet.create({
           product: {
                     maxWidth: 900,
-                    maxHeight: 80,
+                    maxHeight: 100,
                     backgroundColor: '#F1F1F1',
                     borderRadius: 10,
                     marginVertical: 10,
                     marginHorizontal: 10,
+                    paddingVertical: 10
           },
           cardHeader: {
                     flexDirection: 'row',
@@ -284,6 +285,7 @@ const styles = StyleSheet.create({
                     color: '#777',
                     fontSize: 12,
                     lineHeight: 22,
+                    textAlign: "center"
           },
           valeur: {
                     color: '#777',

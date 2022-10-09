@@ -27,11 +27,11 @@ export default function Menu({ product, index, totalLength, fixMargins = false }
                                         <Image source={{ uri: product.IMAGE }} style={styles.image} />
                               </View>
                               {product.MONTANT ? <Text style={styles.price}>{product.MONTANT.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Fbu</Text> : null}
-                              <View style={styles.details}>
+                              {/* <View style={styles.details}>
                                         <View style={styles.detail}>
                                                   <Text style={styles.detailLabel}>Quantité total</Text>
                                                   <Text style={styles.detailValue}>{product.QUANTITE}</Text>
-                                        </View>
+                                        </View> */}
                                         {/* <View style={styles.detail}>
                                                   <Text style={styles.detailLabel}>Vendus</Text>
                                                   <Text style={styles.detailValue}>23</Text>
@@ -40,7 +40,7 @@ export default function Menu({ product, index, totalLength, fixMargins = false }
                                                   <Text style={styles.detailLabel}>Restante</Text>
                                                   <Text style={[styles.detailValue, { fontSize: 18 }]}>werr</Text>
                                         </View> */}
-                              </View>
+                              {/* </View> */}
                     </View>
           )
 }

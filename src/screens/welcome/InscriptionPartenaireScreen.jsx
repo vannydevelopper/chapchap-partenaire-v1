@@ -88,7 +88,7 @@ export default function InscriptionPartenaireScreen() {
                               form.append('ADRESSE_COMPLETE', data.adresse)
                               // form.append('LONGITUDE', location.coords.longitude)
                               // form.append('LATITUDE', location.coords)
-                              form.append('ID_SERVICE', service.id_service)
+                              form.append('ID_SERVICE', selectedTypePartenaire.ID_PARTENAIRE_TYPE)
 
                               if (logoImage) {
                                         const manipResult = await manipulateAsync(
@@ -170,6 +170,9 @@ export default function InscriptionPartenaireScreen() {
                                                   headers: { "Content-Type": "application/json" },
                                         })
                                         setPartenairetype(partenaire.result)
+                                        if(service.id_service == 2) {
+                                                  setSelectedTypePartenaire(partenaire.result.find(s => s.ID_PARTENAIRE_TYPE == 2 ))
+                                        }
                               } catch (error) {
                                         console.log(error)
                               }
@@ -222,8 +225,9 @@ export default function InscriptionPartenaireScreen() {
                                                             <View style={{ marginTop: 10 }}>
                                                                       <TouchableOpacity style={styles.modalCard}
                                                                                 onPress={() => partenairetypesModalizeRef.current.open()}
+                                                                                disabled={service.id_service == 2}
                                                                       >
-                                                                                <View>
+                                                                                <View style={[ service.id_service == 2 && { opacity: 0.5} ]}>
                                                                                           <Text style={[styles.inputText, { fontSize: 13 }]}>
                                                                                                     Le type de partenaire
                                                                                           </Text>
@@ -238,7 +242,7 @@ export default function InscriptionPartenaireScreen() {
 
                                                             {selectedTypePartenaire != null && selectedTypePartenaire.ID_PARTENAIRE_TYPE == 2 && <View style={styles.inputCard}>
                                                                       <OutlinedTextField
-                                                                                label="Nom de l'organisation"
+                                                                                label={service.id_service == 2 ? "Nom du restaurant" :"Nom de l'organisation"}
                                                                                 fontSize={14}
                                                                                 value={data.organisation}
                                                                                 onChangeText={(newValue) => handleChange('organisation', newValue)}
@@ -313,7 +317,9 @@ export default function InscriptionPartenaireScreen() {
                                                                                 <View style={[styles.addImageItem]}>
                                                                                           <View style={{ flexDirection: "row", alignItems: "center"}}>
                                                                                                     <Feather name="image" size={24} color="#777" />
-                                                                                                    <Text style={styles.addImageLabel}>Logo de votre boutique</Text>
+                                                                                                    <Text style={styles.addImageLabel}>
+                                                                                                              {service.id_service == 2 ? "Logo de votre restaurant": "Logo de votre boutique"}
+                                                                                                    </Text>
                                                                                           </View>
                                                                                 {logoImage &&  <Image source={{ uri: logoImage.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
                                                                                </View>

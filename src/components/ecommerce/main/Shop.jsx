@@ -18,7 +18,7 @@ export default function Shop({ product, index, totalLength }) {
           return (
                     <View key={index} style={[styles.shop, additionStyles]}>
                               <View style={styles.imageCard}>
-                                        <Image source={{ uri: product.produit_partenaire.IMAGE_1 }} style={styles.image} />
+                                        <Image source={{ uri: product.LOGO }} style={styles.image} />
                               </View>
                                         <Text numberOfLines={2} style={styles.shopName}>
                                         {product.produit.NOM}

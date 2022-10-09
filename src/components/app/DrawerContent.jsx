@@ -49,7 +49,7 @@ export default function DrawerContent({ state, navigation, descriptors }) {
 
                               }
                     })()
-          }, []))
+          }, [showServiceCommands]))
           return (
                     <View style={styles.drawerContent}>
                               <TouchableNativeFeedback>
