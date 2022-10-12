@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Image, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableNativeFeedback, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { TextField, FilledTextField, InputAdornment, OutlinedTextField } from 'rn-material-ui-textfield'
@@ -12,11 +12,13 @@ import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useFormErrorsHandle } from "../../hooks/useFormErrorsHandle";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import fetchApi from "../../helpers/fetchApi";
 
 
 
 export default function ProduitFormulaireScreen() {
+        const navigation = useNavigation()
         const couleurModalizeRef = useRef(null)
         const tailleModalizeRef = useRef(null)
         const ajoutDetailsModalizeRef = useRef(null)
@@ -32,6 +34,10 @@ export default function ProduitFormulaireScreen() {
         const [showAUtresTaille, setShowAUtresTaille] = useState(false)
         const [showAUtresCouleur, setShowAUtresCouleur] = useState(false)
 
+        const [categories, setCategories] = useState([])
+        const [souscategories, setSouscategories] = useState([])
+
+
         const [data, handleChange, setValue] = useForm({
                 TailleSelect: null,
                 selectedCouleur: null,
@@ -41,7 +47,7 @@ export default function ProduitFormulaireScreen() {
                 quantite: "",
                 logoImage: "",
                 autresTaille: "",
-                autresCouleur:""
+                autresCouleur: ""
         })
         const { checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
                 quantite: {
@@ -54,6 +60,37 @@ export default function ProduitFormulaireScreen() {
                 },
         })
 
+        useEffect(() => {
+                (async () => {
+                        try {
+                                const catego = await fetchApi("/produit/categorie")
+                                setCategories(catego.result)
+                                console.log(catego.result)
+                        } catch (error) {
+                                console.log(error)
+                        } finally {
+
+                        }
+                })()
+        }, [])
+
+        useEffect(() => {
+                (async () => {
+                        try {
+                                const sousCatego = await fetchApi(`/produit/sous_categorie/${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
+                                setSouscategories(sousCatego.result)
+                                console.log(sousCatego.result)
+
+                        }
+                        catch (error) {
+                                console.log(error)
+                        } finally {
+
+                        }
+                })()
+        }, [CategorieSelect])
+
+
         const onCouleurSelect = () => {
                 // setServiceSelect(service)
                 couleurModalizeRef.current.close()
@@ -64,13 +101,13 @@ export default function ProduitFormulaireScreen() {
                 tailleModalizeRef.current.close()
         }
 
-        const onCategorieSelect = () => {
-                // setServiceSelect(service)
+        const onCategorieSelect = (categorie) => {
+                setCategorieSelect(categorie)
                 categoriesModalizeRef.current.close()
         }
 
-        const onSousCategorieSelect = () => {
-                // setServiceSelect(service)
+        const onSousCategorieSelect = (souscategorie) => {
+                setselectedSousCategorie(souscategorie)
                 SousCategoriesModalizeRef.current.close()
         }
 
@@ -92,6 +129,8 @@ export default function ProduitFormulaireScreen() {
                 }
                 setLogoImage(photo)
         }
+
+
         return (
                 <>
                         <View style={styles.container}>
@@ -107,6 +146,9 @@ export default function ProduitFormulaireScreen() {
                                         <View style={{ marginTop: 25 }}>
                                                 <Octicons name="bell" size={24} color={COLORS.primary} />
                                         </View>
+                                        <TouchableOpacity style={{ marginTop: 25 }} onPress={() => navigation.goBack()}>
+                                                <Octicons name="bell" size={24} color={COLORS.primary} />
+                                        </TouchableOpacity>
                                 </View>
                                 <Text style={styles.title}>Nouveau produit</Text>
                                 <ScrollView keyboardShouldPersistTaps="handled" style={{ marginBottom: 20 }}>
@@ -136,9 +178,9 @@ export default function ProduitFormulaireScreen() {
                                                                         <Text style={[styles.inputText, { fontSize: 13 }]}>
                                                                                 Categorie
                                                                         </Text>
-                                                                        <Text style={[styles.inputText, { color: '#000' }]}>
-                                                                                hhhsggss
-                                                                        </Text>
+                                                                        {CategorieSelect && <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                {CategorieSelect.NOM}
+                                                                        </Text>}
                                                                 </View>
                                                                 <AntDesign name="caretdown" size={20} color="#777" />
                                                         </TouchableOpacity>
@@ -153,9 +195,9 @@ export default function ProduitFormulaireScreen() {
                                                                         <Text style={[styles.inputText, { fontSize: 13 }]}>
                                                                                 Sous Categorie
                                                                         </Text>
-                                                                        <Text style={[styles.inputText, { color: '#000' }]}>
-                                                                                hhhsggss
-                                                                        </Text>
+                                                                        {selectedSousCategorie && <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                {selectedSousCategorie.NOM}
+                                                                        </Text>}
                                                                 </View>
                                                                 <AntDesign name="caretdown" size={20} color="#777" />
                                                         </TouchableOpacity>
@@ -326,7 +368,7 @@ export default function ProduitFormulaireScreen() {
                                                                 <Text>Vert Citron</Text>
                                                         </View>
                                                 </TouchableOpacity>
-                                                 {showAUtresCouleur && <View style={{ marginHorizontal: 20, marginTop: 10 }}>
+                                                {showAUtresCouleur && <View style={{ marginHorizontal: 20, marginTop: 10 }}>
                                                         <OutlinedTextField
                                                                 label={"Autres Couleurs"}
                                                                 fontSize={14}
@@ -357,14 +399,17 @@ export default function ProduitFormulaireScreen() {
                                                 <Text style={{ fontSize: 17, fontWeight: "bold" }}>Categories</Text>
                                         </View>
                                         <View>
-
-                                                <TouchableOpacity onPress={() => onCategorieSelect()}>
-                                                        <View style={styles.modalItemModel2} >
-                                                                <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" />
-                                                                <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />
-                                                                <Text>Categorie</Text>
-                                                        </View>
-                                                </TouchableOpacity>
+                                                {categories.map((categorie, index) => {
+                                                        return (
+                                                                <TouchableOpacity key={index} onPress={() => onCategorieSelect(categorie)}>
+                                                                        <View style={styles.modalItemModel2} >
+                                                                                {CategorieSelect?.ID_CATEGORIE_PRODUIT == categorie.ID_CATEGORIE_PRODUIT ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                                                        <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                                                                <Text>{categorie.NOM}</Text>
+                                                                        </View>
+                                                                </TouchableOpacity>
+                                                        )
+                                                })}
 
                                         </View>
                                 </>
@@ -376,14 +421,19 @@ export default function ProduitFormulaireScreen() {
                                                 <Text style={{ fontSize: 17, fontWeight: "bold" }}>Sous Categories</Text>
                                         </View>
                                         <View>
+                                                {souscategories.map((souscategorie, index) => {
+                                                        return (
+                                                                <TouchableOpacity key={index} onPress={() => onSousCategorieSelect(souscategorie)}>
+                                                                        <View style={styles.modalItemModel2} >
+                                                                                {selectedSousCategorie?.ID_PRODUIT_SOUS_CATEGORIE == souscategorie.ID_PRODUIT_SOUS_CATEGORIE ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" />:
+                                                                                <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                                                                <Text>{souscategorie.NOM}</Text>
+                                                                        </View>
+                                                                </TouchableOpacity>
+                                                        )
+                                                })}
 
-                                                <TouchableOpacity onPress={() => onSousCategorieSelect()}>
-                                                        <View style={styles.modalItemModel2} >
-                                                                <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" />
-                                                                <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />
-                                                                <Text>Sous categories</Text>
-                                                        </View>
-                                                </TouchableOpacity>
+
 
                                         </View>
                                 </>
@@ -505,5 +555,5 @@ const styles = StyleSheet.create({
                 marginBottom: 10,
                 marginHorizontal: 20
         },
-       
+
 })

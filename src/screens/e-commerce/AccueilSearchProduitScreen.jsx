@@ -1,14 +1,30 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { Text, View, useWindowDimensions, ImageBackground, StatusBar, StyleSheet, Image, TextInput, ScrollView, TouchableOpacity, FlatList, TouchableNativeFeedback } from "react-native";
 import { DrawerActions, useFocusEffect, useNavigation, useNavigationBuilder, useRoute } from '@react-navigation/native';
 import { useDispatch } from "react-redux";
 import { COLORS } from '../../styles/COLORS';
 import { Feather, Entypo, AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons, MaterialIcons, Octicons, Ionicons } from '@expo/vector-icons';
+import fetchApi from "../../helpers/fetchApi";
 
 export default function AccueilSearchProduitScreen() {
         const navigation = useNavigation()
         const dispatch = useDispatch()
+
+        const [allProduits, setAllProduits] = useState([])
+
+        useFocusEffect(useCallback(() => {
+                (async () => {
+                        try {
+                                const produi = await fetchApi("/produit")
+                                setAllProduits(produi.result)
+                                // console.log(produi.result)
+                        }
+                        catch (error) {
+                                console.log(error)
+                        }
+                })()
+        }, []))
         return (
                 <>
                         <StatusBar backgroundColor='#fff' barStyle='dark-content' />
@@ -35,7 +51,7 @@ export default function AccueilSearchProduitScreen() {
                                                         <Text style={styles.title2} >Le nouveau produit</Text>
                                                         <Ionicons name="ios-search-sharp" size={24} color="black" />
                                                 </View>
-                                                <TouchableNativeFeedback onPress={()=>navigation.navigate("ProduitFormulaireScreen")}>
+                                                <TouchableNativeFeedback onPress={() => navigation.navigate("ProduitFormulaireScreen")}>
                                                         <View style={styles.cardComplet}>
 
                                                                 <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -53,58 +69,27 @@ export default function AccueilSearchProduitScreen() {
                                                                 </View>
                                                         </View>
                                                 </TouchableNativeFeedback>
-                                                <View style={styles.cardComplet}>
-                                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                                <View style={styles.cardIcon1}>
-                                                                        <MaterialIcons name="home" size={24} color="black" />
-                                                                </View>
-                                                                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", flex: 1, marginLeft: 5 }}>
-                                                                        <View>
-                                                                                <Text style={{ fontWeight: "bold" }}>Pentalon</Text>
+
+                                                {allProduits.map((produit, index) => {
+                                                        return (
+                                                                <TouchableOpacity style={styles.cardComplet} key={index}>
+                                                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                                                <View style={styles.cardIcon1}>
+                                                                                        {/* <MaterialIcons name="home" size={24} color="black" /> */}
+                                                                                        <Image source={{uri: produit.produit.IMAGE_1}} style={styles.image}/>
+                                                                                </View>
+                                                                                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", flex: 1, marginLeft: 5 }}>
+                                                                                        <View>
+                                                                                                <Text style={{ fontWeight: "bold" }}>{produit.produit.NOM}</Text>
+                                                                                                <Text>{produit.produit.NOM_CATEGORIE}</Text>
+                                                                                        </View>
+                                                                                        <AntDesign name="right" size={24} color="black" />
+                                                                                </View>
                                                                         </View>
-                                                                        <AntDesign name="right" size={24} color="black" />
-                                                                </View>
-                                                        </View>
-                                                </View>
-                                                <View style={styles.cardComplet}>
-                                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                                <View style={styles.cardIcon1}>
-                                                                        <MaterialIcons name="home" size={24} color="black" />
-                                                                </View>
-                                                                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", flex: 1, marginLeft: 5 }}>
-                                                                        <View>
-                                                                                <Text style={{ fontWeight: "bold" }}>Robe</Text>
-                                                                        </View>
-                                                                        <AntDesign name="right" size={24} color="black" />
-                                                                </View>
-                                                        </View>
-                                                </View>
-                                                <View style={styles.cardComplet}>
-                                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                                <View style={styles.cardIcon1}>
-                                                                        <MaterialIcons name="home" size={24} color="black" />
-                                                                </View>
-                                                                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", flex: 1, marginLeft: 5 }}>
-                                                                        <View>
-                                                                                <Text style={{ fontWeight: "bold" }}>Trico</Text>
-                                                                        </View>
-                                                                        <AntDesign name="right" size={24} color="black" />
-                                                                </View>
-                                                        </View>
-                                                </View>
-                                                <View style={styles.cardComplet}>
-                                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                                <View style={styles.cardIcon1}>
-                                                                        <MaterialIcons name="home" size={24} color="black" />
-                                                                </View>
-                                                                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", flex: 1, marginLeft: 5 }}>
-                                                                        <View>
-                                                                                <Text style={{ fontWeight: "bold" }}>Chemises</Text>
-                                                                        </View>
-                                                                        <AntDesign name="right" size={24} color="black" />
-                                                                </View>
-                                                        </View>
-                                                </View>
+                                                                </TouchableOpacity>
+                                                        )
+                                                })}
+
                                         </ScrollView>
                                 </View>
 
@@ -188,5 +173,11 @@ const styles = StyleSheet.create({
                 borderRadius: 10,
                 justifyContent: "center",
                 alignItems: "center"
-        }
+        },
+        image: {
+                height: "90%",
+                width: "90%",
+                resizeMode: 'contain',
+                borderRadius:10
+      },
 })
