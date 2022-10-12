@@ -5,6 +5,7 @@ import ProduitFormulaireScreen from "../screens/e-commerce/ProduitFormulaireScre
 import ServiceNotFoundScreen from "../screens/e-commerce/ServiceNotFoundScreen";
 import HomeScreen from "../screens/home/HomeScreen";
 import InscriptionPartenaireScreen from "../screens/welcome/InscriptionPartenaireScreen";
+import { Host } from "react-native-portalize";
 
 export default function HomeNavigator() {
           const Stack = createStackNavigator()
