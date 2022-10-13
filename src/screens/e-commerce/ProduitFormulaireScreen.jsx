@@ -171,7 +171,7 @@ export default function ProduitFormulaireScreen() {
                         data.selectedCouleur
                 ajoutDetailsModalizeRef.current.close()
         }
-        console.log(data.quantite)
+        // console.log(data.quantite)
 
         return (
                 <>
