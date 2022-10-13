@@ -51,6 +51,9 @@ export default function ProduitFormulaireScreen() {
                 autresTaille: "",
                 autresCouleur: ""
         })
+
+        // console.log(data.CategorieSelect.ID_CATEGORIE_PRODUIT)
+
         const { checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
                 quantite: {
                         required: true,
@@ -162,6 +165,13 @@ export default function ProduitFormulaireScreen() {
                 setLogoImage(photo)
         }
 
+        const Ajouter_detail = (quantite, TailleSelect, selectedCouleur) => {
+                        data.quantite,
+                        data.TailleSelect,
+                        data.selectedCouleur
+                ajoutDetailsModalizeRef.current.close()
+        }
+        console.log(data.quantite)
 
         return (
                 <>
@@ -292,7 +302,7 @@ export default function ProduitFormulaireScreen() {
                                                                                                 <Text style={[styles.inputText, { fontSize: 13 }]}>
                                                                                                         Taille
                                                                                                 </Text>
-                                                                                               {TailleSelect && <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                                {TailleSelect && <Text style={[styles.inputText, { color: '#000' }]}>
                                                                                                         {TailleSelect.TAILLE}
                                                                                                 </Text>}
                                                                                         </View>
@@ -317,7 +327,7 @@ export default function ProduitFormulaireScreen() {
                                                                                 </TouchableOpacity>
                                                                         </View>
 
-                                                                        <TouchableOpacity>
+                                                                        <TouchableOpacity onPress={() => Ajouter_detail(data.quantite, TailleSelect, selectedCouleur)}>
                                                                                 <View style={styles.buttonModal}>
                                                                                         <Text style={styles.buttonText} >Ajouter</Text>
                                                                                 </View>
@@ -348,8 +358,8 @@ export default function ProduitFormulaireScreen() {
                                                         return (
                                                                 <TouchableOpacity key={index} onPress={() => onTaillesSelect(taille)}>
                                                                         <View style={styles.modalItemModel2} >
-                                                                                {TailleSelect?.ID_TAILLE == taille.ID_TAILLE ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" />:
-                                                                                <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                                                                {TailleSelect?.ID_TAILLE == taille.ID_TAILLE ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                                                        <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
                                                                                 <Text>{taille.TAILLE}</Text>
                                                                         </View>
 

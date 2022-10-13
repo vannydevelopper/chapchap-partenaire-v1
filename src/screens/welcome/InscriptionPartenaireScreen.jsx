@@ -51,6 +51,8 @@ export default function InscriptionPartenaireScreen() {
                     adresse: "",
           })
 
+          console.log(data.typepartenaireselect)
+
           const isValid = useCallback(() => {
                     const basicValidation = selectedTypePartenaire !=null && data.email != "" && data.telephone != "" && logoImage != null
                     if(selectedTypePartenaire && selectedTypePartenaire?.ID_PARTENAIRE_TYPE == 2) {
