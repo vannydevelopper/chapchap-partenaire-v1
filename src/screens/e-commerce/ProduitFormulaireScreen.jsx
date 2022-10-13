@@ -266,6 +266,11 @@ export default function ProduitFormulaireScreen() {
                                                                 </View>
                                                         </TouchableWithoutFeedback>
                                                 </View>
+                                                <TouchableOpacity>
+                                                        <View style={styles.button}>
+                                                                <Text style={styles.buttonText} > Enregistre</Text>
+                                                        </View>
+                                                </TouchableOpacity>
                                         </View>
                                 </ScrollView>
                         </View>
