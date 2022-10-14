@@ -57,7 +57,7 @@ export default function ProduitFormulaireScreen() {
                 autresCouleur: ""
         })
 
-        console.log(detailData)
+        // console.log(detailData)
 
         const { checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
                 quantite: {
@@ -182,26 +182,26 @@ export default function ProduitFormulaireScreen() {
                 }
                 setLogoImage(photo)
         }
-        
+
         const Ajouter_detail = () => {
                 var taille = TailleSelect
                 var coul = selectedCouleur
-                if(showAUtresTaille) {
+                if (showAUtresTaille) {
                         taille = {
                                 ID_TAILLE: 'autre',
                                 TAILLE: autreTailles
                         }
                 }
-                if(showAUtresCouleur){
+                if (showAUtresCouleur) {
                         coul = {
-                                ID_COULEUR:'autre',
-                                COULEUR:autreCouleurs
+                                ID_COULEUR: 'autre',
+                                COULEUR: autreCouleurs
                         }
                 }
                 setDetailData(t => [...t, {
                         quantite: data.quantite,
                         TailleSelect: taille,
-                        selectedCouleur:coul
+                        selectedCouleur: coul
                 }])
                 ajoutDetailsModalizeRef.current.close()
         }
@@ -214,6 +214,46 @@ export default function ProduitFormulaireScreen() {
         const autreCouleurInput = (autresCouleur) => {
                 setAutreCouleurs(autresCouleur)
                 couleurModalizeRef.current.close()
+        }
+
+        const SendData = async () => {
+                try {
+                        const form = new FormData()
+                        form.append('ID_CATEGORIE_PRODUIT', CategorieSelect.ID_CATEGORIE_PRODUIT)
+                        form.append('ID_PRODUIT_SOUS_CATEGORIE', selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE)
+                        form.append('NOM', data.produit)
+                        form.append('DETAIL', detailData)
+                        if (logoImage) {
+                                const manipResult = await manipulateAsync(
+                                        logoImage.uri,
+                                        [
+                                                { resize: { width: 500 } }
+                                        ],
+                                        { compress: 0.8, format: SaveFormat.JPEG }
+                                );
+                                let localUri = manipResult.uri;
+                                let filename = localUri.split('/').pop();
+                                let match = /\.(\w+)$/.exec(filename);
+                                let type = match ? `image/${match[1]}` : `image`;
+                                form.append('IMAGE_1', {
+                                        uri: localUri, name: filename, type
+                                })
+
+                        }
+                        console.log(form)
+                        const res = await fetchApi("/produit/stock/create", {
+                                method: "POST",
+                                body: form
+                        })
+                }
+
+                catch (error) {
+                        console.log(error)
+                }
+                finally {
+
+                }
+
         }
 
 
@@ -321,9 +361,9 @@ export default function ProduitFormulaireScreen() {
                                                                 </View>
                                                         </TouchableWithoutFeedback>
                                                 </View>
-                                                <TouchableOpacity>
+                                                <TouchableOpacity onPress={SendData}>
                                                         <View style={styles.button}>
-                                                                <Text style={styles.buttonText} > Enregistre</Text>
+                                                                <Text style={styles.buttonText} > Enregistrer</Text>
                                                         </View>
                                                 </TouchableOpacity>
                                         </View>
