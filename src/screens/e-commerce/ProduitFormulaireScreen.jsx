@@ -39,6 +39,11 @@ export default function ProduitFormulaireScreen() {
         const [couleurs, setCouleur] = useState([])
         const [tailles, setTaille] = useState([])
 
+        const [detailData, setDetailData] = useState([])
+        const [autreTailles, setAutreTailles] = useState("")
+        const [autreCouleurs, setAutreCouleurs] = useState("")
+
+        // console.log(detailData)
 
         const [data, handleChange, setValue] = useForm({
                 TailleSelect: null,
@@ -52,7 +57,7 @@ export default function ProduitFormulaireScreen() {
                 autresCouleur: ""
         })
 
-        // console.log(data.CategorieSelect.ID_CATEGORIE_PRODUIT)
+        console.log(detailData)
 
         const { checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
                 quantite: {
@@ -82,7 +87,9 @@ export default function ProduitFormulaireScreen() {
         useEffect(() => {
                 (async () => {
                         try {
-                                const sousCatego = await fetchApi(`/produit/sous_categorie/${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
+                                if (CategorieSelect != null) {
+                                        var sousCatego = await fetchApi(`/produit/sous_categorie/${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
+                                }
                                 setSouscategories(sousCatego.result)
                                 // console.log(sousCatego.result)
 
@@ -98,7 +105,28 @@ export default function ProduitFormulaireScreen() {
         useEffect(() => {
                 (async () => {
                         try {
-                                const couleur = await fetchApi(`/produit/couleur?=${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
+                                var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
+                                if (selectedSousCategorie != null) {
+                                        var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE}`)
+                                }
+                                setTaille(taille.result)
+                                // console.log(taille.result)
+                        }
+                        catch (error) {
+                                console.log(error)
+                        } finally {
+
+                        }
+                })()
+        }, [CategorieSelect, selectedSousCategorie])
+
+        useEffect(() => {
+                (async () => {
+                        try {
+                                var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
+                                if (selectedSousCategorie != null) {
+                                        var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE}`)
+                                }
                                 setCouleur(couleur.result)
                                 // console.log(couleur.result)
                         }
@@ -111,28 +139,15 @@ export default function ProduitFormulaireScreen() {
                 })()
         }, [CategorieSelect, selectedSousCategorie])
 
-        useEffect(() => {
-                (async () => {
-                        try {
-                                const taille = await fetchApi(`/produit/taille?=${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
-                                setTaille(taille.result)
-                                // console.log(taille.result)
-                        }
-                        catch (error) {
-                                console.log(error)
-                        } finally {
-
-                        }
-                })()
-        }, [CategorieSelect, selectedSousCategorie])
-
         const onCouleurSelect = (couleur) => {
                 setselectedCouleur(couleur)
+                setShowAUtresCouleur(false)
                 couleurModalizeRef.current.close()
         }
 
         const onTaillesSelect = (taille) => {
                 setTailleSelect(taille)
+                setShowAUtresTaille(false)
                 tailleModalizeRef.current.close()
         }
 
@@ -148,10 +163,13 @@ export default function ProduitFormulaireScreen() {
 
         const AutresTypesTaille = () => {
                 setShowAUtresTaille(true)
+                setTailleSelect(null)
         }
 
         const AutresTypesCouleurs = () => {
                 setShowAUtresCouleur(true)
+                setselectedCouleur(false)
+
         }
 
         const onImagesSelect = async () => {
@@ -164,14 +182,40 @@ export default function ProduitFormulaireScreen() {
                 }
                 setLogoImage(photo)
         }
-
-        const Ajouter_detail = (quantite, TailleSelect, selectedCouleur) => {
-                        data.quantite,
-                        data.TailleSelect,
-                        data.selectedCouleur
+        
+        const Ajouter_detail = () => {
+                var taille = TailleSelect
+                var coul = selectedCouleur
+                if(showAUtresTaille) {
+                        taille = {
+                                ID_TAILLE: 'autre',
+                                TAILLE: autreTailles
+                        }
+                }
+                if(showAUtresCouleur){
+                        coul = {
+                                ID_COULEUR:'autre',
+                                COULEUR:autreCouleurs
+                        }
+                }
+                setDetailData(t => [...t, {
+                        quantite: data.quantite,
+                        TailleSelect: taille,
+                        selectedCouleur:coul
+                }])
                 ajoutDetailsModalizeRef.current.close()
         }
-        // console.log(data.quantite)
+
+        const ajoutTailleInput = (autresTaille) => {
+                setAutreTailles(autresTaille)
+                tailleModalizeRef.current.close()
+        }
+
+        const autreCouleurInput = (autresCouleur) => {
+                setAutreCouleurs(autresCouleur)
+                couleurModalizeRef.current.close()
+        }
+
 
         return (
                 <>
@@ -211,7 +255,7 @@ export default function ProduitFormulaireScreen() {
                                                         />
                                                 </View>
 
-                                                <View>
+                                                {data.produit && <View>
                                                         <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: 20 }}
                                                                 onPress={() => categoriesModalizeRef.current.open()}
                                                         // disabled={service.id_service == 2}
@@ -226,9 +270,9 @@ export default function ProduitFormulaireScreen() {
                                                                 </View>
                                                                 <AntDesign name="caretdown" size={20} color="#777" />
                                                         </TouchableOpacity>
-                                                </View>
+                                                </View>}
 
-                                                <View>
+                                                {data.produit && CategorieSelect != null && <View>
                                                         <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: 20, marginTop: 10 }}
                                                                 onPress={() => SousCategoriesModalizeRef.current.open()}
                                                         // disabled={service.id_service == 2}
@@ -243,16 +287,27 @@ export default function ProduitFormulaireScreen() {
                                                                 </View>
                                                                 <AntDesign name="caretdown" size={20} color="#777" />
                                                         </TouchableOpacity>
-                                                </View>
+                                                </View>}
 
                                                 <TouchableOpacity
                                                         onPress={() => ajoutDetailsModalizeRef.current.open()}
-                                                // disabled={service.id_service == 2}
                                                 >
                                                         <View style={styles.button}>
                                                                 <Text style={styles.buttonText} >Ajout de details </Text>
                                                         </View>
                                                 </TouchableOpacity>
+                                                {detailData.map((detail, index) => {
+                                                        return (
+                                                                <View key={index} style={{ marginHorizontal: 20, marginTop: 10, borderBottomWidth: 1, borderBottomColor: "#ddd" }}>
+                                                                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                                                                                <Text style={{ fontSize: 13, fontWeight: "bold" }}>Quantite {detail.quantite}</Text>
+                                                                                <Text style={{ fontSize: 13, fontWeight: "bold" }}>Taille {detail.TailleSelect.TAILLE}</Text>
+                                                                                <Text style={{ fontSize: 13, fontWeight: "bold" }}>Couleur {detail.selectedCouleur.COULEUR}</Text>
+                                                                        </View>
+                                                                </View>
+                                                        )
+                                                })}
+
                                                 <View style={[styles.addImageContainer, { marginVertical: 30 }]}>
                                                         <TouchableWithoutFeedback onPress={onImagesSelect}>
                                                                 <View style={styles.addImageItem}>
@@ -301,15 +356,15 @@ export default function ProduitFormulaireScreen() {
                                                                         <View>
                                                                                 <TouchableOpacity style={styles.modalCard}
                                                                                         onPress={() => tailleModalizeRef.current.open()}
-                                                                                // disabled={service.id_service == 2}
                                                                                 >
                                                                                         <View >
                                                                                                 <Text style={[styles.inputText, { fontSize: 13 }]}>
                                                                                                         Taille
                                                                                                 </Text>
-                                                                                                {TailleSelect && <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                                {TailleSelect ? <Text style={[styles.inputText, { color: '#000' }]}>
                                                                                                         {TailleSelect.TAILLE}
-                                                                                                </Text>}
+                                                                                                </Text> :
+                                                                                                        <Text style={[styles.inputText, { color: '#000' }]}>{autreTailles}</Text>}
                                                                                         </View>
                                                                                         <AntDesign name="caretdown" size={20} color="#777" />
                                                                                 </TouchableOpacity>
@@ -318,21 +373,21 @@ export default function ProduitFormulaireScreen() {
                                                                         <View style={{ marginTop: 10 }}>
                                                                                 <TouchableOpacity style={styles.modalCard}
                                                                                         onPress={() => couleurModalizeRef.current.open()}
-                                                                                // disabled={service.id_service == 2}
                                                                                 >
                                                                                         <View >
                                                                                                 <Text style={[styles.inputText, { fontSize: 13 }]}>
                                                                                                         Couleur
                                                                                                 </Text>
-                                                                                                {selectedCouleur && <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                                {selectedCouleur ? <Text style={[styles.inputText, { color: '#000' }]}>
                                                                                                         {selectedCouleur.COULEUR}
-                                                                                                </Text>}
+                                                                                                </Text> :
+                                                                                                        <Text style={[styles.inputText, { color: '#000' }]}>{autreCouleurs}</Text>}
                                                                                         </View>
                                                                                         <AntDesign name="caretdown" size={20} color="#777" />
                                                                                 </TouchableOpacity>
                                                                         </View>
 
-                                                                        <TouchableOpacity onPress={() => Ajouter_detail(data.quantite, TailleSelect, selectedCouleur)}>
+                                                                        <TouchableOpacity onPress={Ajouter_detail}>
                                                                                 <View style={styles.buttonModal}>
                                                                                         <Text style={styles.buttonText} >Ajouter</Text>
                                                                                 </View>
@@ -354,8 +409,8 @@ export default function ProduitFormulaireScreen() {
                                         </View>
                                         <View>
                                                 <TouchableOpacity style={styles.modalAutres} onPress={AutresTypesTaille}>
-                                                        <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" />
-                                                        <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />
+                                                        {showAUtresTaille ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                                <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
                                                         <Text style={{ fontSize: 15, fontWeight: "bold" }}>Autres</Text>
                                                 </TouchableOpacity>
 
@@ -388,7 +443,7 @@ export default function ProduitFormulaireScreen() {
                                                         />
                                                 </View>}
 
-                                                {showAUtresTaille && <TouchableOpacity>
+                                                {showAUtresTaille && <TouchableOpacity onPress={() => ajoutTailleInput(data.autresTaille)}>
                                                         <View style={styles.buttonModalSecond}>
                                                                 <Text style={styles.buttonText} >Ajouter</Text>
                                                         </View>
@@ -408,8 +463,8 @@ export default function ProduitFormulaireScreen() {
                                         </View>
                                         <View>
                                                 <TouchableOpacity style={styles.modalAutres} onPress={AutresTypesCouleurs}>
-                                                        <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" />
-                                                        <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />
+                                                        {showAUtresCouleur ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                                <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
                                                         <Text style={{ fontSize: 15, fontWeight: "bold" }}>Autres</Text>
                                                 </TouchableOpacity>
 
@@ -440,7 +495,7 @@ export default function ProduitFormulaireScreen() {
                                                         />
                                                 </View>}
 
-                                                {showAUtresCouleur && <TouchableOpacity>
+                                                {showAUtresCouleur && <TouchableOpacity onPress={() => autreCouleurInput(data.autresCouleur)}>
                                                         <View style={styles.buttonModalSecond}>
                                                                 <Text style={styles.buttonText} >Ajouter</Text>
                                                         </View>
