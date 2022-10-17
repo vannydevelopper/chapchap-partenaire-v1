@@ -12,13 +12,16 @@ import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useFormErrorsHandle } from "../../hooks/useFormErrorsHandle";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import fetchApi from "../../helpers/fetchApi";
+import Loading from "../../components/app/Loading"
 
 
 
 export default function ProduitFormulaireScreen() {
         const navigation = useNavigation()
+        const route = useRoute()
+        const { product } = route.params
         const couleurModalizeRef = useRef(null)
         const tailleModalizeRef = useRef(null)
         const ajoutDetailsModalizeRef = useRef(null)
@@ -42,6 +45,8 @@ export default function ProduitFormulaireScreen() {
         const [detailData, setDetailData] = useState([])
         const [autreTailles, setAutreTailles] = useState("")
         const [autreCouleurs, setAutreCouleurs] = useState("")
+
+        const [loading, setLoading] = useState(false);
 
         // console.log(detailData)
 
@@ -89,8 +94,8 @@ export default function ProduitFormulaireScreen() {
                         try {
                                 if (CategorieSelect != null) {
                                         var sousCatego = await fetchApi(`/produit/sous_categorie/${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
+                                        setSouscategories(sousCatego.result)
                                 }
-                                setSouscategories(sousCatego.result)
                                 // console.log(sousCatego.result)
 
                         }
@@ -108,8 +113,8 @@ export default function ProduitFormulaireScreen() {
                                 var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
                                 if (selectedSousCategorie != null) {
                                         var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE}`)
+                                        setTaille(taille.result)
                                 }
-                                setTaille(taille.result)
                                 // console.log(taille.result)
                         }
                         catch (error) {
@@ -126,8 +131,9 @@ export default function ProduitFormulaireScreen() {
                                 var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
                                 if (selectedSousCategorie != null) {
                                         var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE}`)
+                                        setCouleur(couleur.result)
                                 }
-                                setCouleur(couleur.result)
+
                                 // console.log(couleur.result)
                         }
                         catch (error) {
@@ -215,43 +221,49 @@ export default function ProduitFormulaireScreen() {
                 setAutreCouleurs(autresCouleur)
                 couleurModalizeRef.current.close()
         }
-
         const SendData = async () => {
+                setLoading(true)
                 try {
                         const form = new FormData()
-                        form.append('ID_CATEGORIE_PRODUIT', CategorieSelect.ID_CATEGORIE_PRODUIT)
-                        form.append('ID_PRODUIT_SOUS_CATEGORIE', selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE)
-                        form.append('NOM', data.produit)
-                        form.append('DETAIL', detailData)
-                        if (logoImage) {
-                                const manipResult = await manipulateAsync(
-                                        logoImage.uri,
-                                        [
-                                                { resize: { width: 500 } }
-                                        ],
-                                        { compress: 0.8, format: SaveFormat.JPEG }
-                                );
-                                let localUri = manipResult.uri;
-                                let filename = localUri.split('/').pop();
-                                let match = /\.(\w+)$/.exec(filename);
-                                let type = match ? `image/${match[1]}` : `image`;
-                                form.append('IMAGE_1', {
-                                        uri: localUri, name: filename, type
-                                })
+                        if (product) {
+                                form.append('PRODUIT', JSON.stringify(product))
+                        } else {
+                                form.append('ID_CATEGORIE_PRODUIT', CategorieSelect.ID_CATEGORIE_PRODUIT)
+                                form.append('ID_PRODUIT_SOUS_CATEGORIE', selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE)
+                                form.append('NOM', data.produit)
+                                if (logoImage) {
+                                        const manipResult = await manipulateAsync(
+                                                logoImage.uri,
+                                                [
+                                                        { resize: { width: 500 } }
+                                                ],
+                                                { compress: 0.8, format: SaveFormat.JPEG }
+                                        );
+                                        let localUri = manipResult.uri;
+                                        let filename = localUri.split('/').pop();
+                                        let match = /\.(\w+)$/.exec(filename);
+                                        let type = match ? `image/${match[1]}` : `image`;
+                                        form.append('IMAGE_1', {
+                                                uri: localUri, name: filename, type
+                                        })
 
+                                }
                         }
-                        console.log(form)
+                        form.append('DETAIL', JSON.stringify(detailData))
+
+                        // console.log(form)
                         const res = await fetchApi("/produit/stock/create", {
                                 method: "POST",
                                 body: form
                         })
+                        navigation.navigate("AccueilSearchProduitScreen")
                 }
 
                 catch (error) {
                         console.log(error)
                 }
                 finally {
-
+                        setLoading(false);
                 }
 
         }
@@ -259,6 +271,7 @@ export default function ProduitFormulaireScreen() {
 
         return (
                 <>
+                        { loading && <Loading/>}
                         <View style={styles.container}>
                                 <View style={styles.cardHeader}>
                                         <TouchableOpacity style={styles.menuOpener} onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
@@ -272,62 +285,107 @@ export default function ProduitFormulaireScreen() {
                                         <View style={{ marginTop: 25 }}>
                                                 <Octicons name="bell" size={24} color={COLORS.primary} />
                                         </View>
-                                        <TouchableOpacity style={{ marginTop: 25 }} onPress={() => navigation.goBack()}>
+                                        {/* <TouchableOpacity style={{ marginTop: 25 }} onPress={() => navigation.goBack()}>
                                                 <Octicons name="bell" size={24} color={COLORS.primary} />
-                                        </TouchableOpacity>
+                                        </TouchableOpacity> */}
                                 </View>
                                 <Text style={styles.title}>Nouveau produit</Text>
                                 <ScrollView keyboardShouldPersistTaps="handled" style={{ marginBottom: 20 }}>
                                         <View>
 
-                                                <View style={styles.inputCard}>
-                                                        <OutlinedTextField
-                                                                label={"Nom du produit"}
-                                                                fontSize={14}
-                                                                value={data.produit}
-                                                                onChangeText={(newValue) => handleChange('produit', newValue)}
-                                                                onBlur={() => checkFieldData('produit')}
-                                                                error={hasError('produit') ? getError('produit') : ''}
-                                                                lineWidth={0.5}
-                                                                activeLineWidth={0.5}
-                                                                baseColor={COLORS.smallBrown}
-                                                                tintColor={COLORS.primary}
-                                                        />
-                                                </View>
-
-                                                {data.produit && <View>
-                                                        <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: 20 }}
-                                                                onPress={() => categoriesModalizeRef.current.open()}
-                                                        // disabled={service.id_service == 2}
-                                                        >
-                                                                <View >
-                                                                        <Text style={[styles.inputText, { fontSize: 13 }]}>
-                                                                                Categorie
-                                                                        </Text>
-                                                                        {CategorieSelect && <Text style={[styles.inputText, { color: '#000' }]}>
-                                                                                {CategorieSelect.NOM}
-                                                                        </Text>}
+                                                {product == false ?
+                                                        <View>
+                                                                <View style={styles.inputCard}>
+                                                                        <OutlinedTextField
+                                                                                label={"Nom du produit"}
+                                                                                fontSize={14}
+                                                                                value={data.produit}
+                                                                                onChangeText={(newValue) => handleChange('produit', newValue)}
+                                                                                onBlur={() => checkFieldData('produit')}
+                                                                                error={hasError('produit') ? getError('produit') : ''}
+                                                                                lineWidth={0.5}
+                                                                                activeLineWidth={0.5}
+                                                                                baseColor={COLORS.smallBrown}
+                                                                                tintColor={COLORS.primary}
+                                                                        />
                                                                 </View>
-                                                                <AntDesign name="caretdown" size={20} color="#777" />
-                                                        </TouchableOpacity>
-                                                </View>}
-
-                                                {data.produit && CategorieSelect != null && <View>
-                                                        <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: 20, marginTop: 10 }}
-                                                                onPress={() => SousCategoriesModalizeRef.current.open()}
-                                                        // disabled={service.id_service == 2}
-                                                        >
-                                                                <View >
-                                                                        <Text style={[styles.inputText, { fontSize: 13 }]}>
-                                                                                Sous Categorie
-                                                                        </Text>
-                                                                        {selectedSousCategorie && <Text style={[styles.inputText, { color: '#000' }]}>
-                                                                                {selectedSousCategorie.NOM}
-                                                                        </Text>}
+                                                                <View>
+                                                                        <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: 20 }}
+                                                                                onPress={() => categoriesModalizeRef.current.open()}
+                                                                        // disabled={service.id_service == 2}
+                                                                        >
+                                                                                <View >
+                                                                                        <Text style={[styles.inputText, { fontSize: 13 }]}>
+                                                                                                Categorie
+                                                                                        </Text>
+                                                                                        {CategorieSelect && <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                                {CategorieSelect.NOM}
+                                                                                        </Text>}
+                                                                                </View>
+                                                                                <AntDesign name="caretdown" size={20} color="#777" />
+                                                                        </TouchableOpacity>
                                                                 </View>
-                                                                <AntDesign name="caretdown" size={20} color="#777" />
-                                                        </TouchableOpacity>
-                                                </View>}
+                                                                <View>
+                                                                        <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: 20, marginTop: 10 }}
+                                                                                onPress={() => SousCategoriesModalizeRef.current.open()}
+                                                                        // disabled={service.id_service == 2}
+                                                                        >
+                                                                                <View >
+                                                                                        <Text style={[styles.inputText, { fontSize: 13 }]}>
+                                                                                                Sous Categorie
+                                                                                        </Text>
+                                                                                        {selectedSousCategorie && <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                                {selectedSousCategorie.NOM}
+                                                                                        </Text>}
+                                                                                </View>
+                                                                                <AntDesign name="caretdown" size={20} color="#777" />
+                                                                        </TouchableOpacity>
+                                                                </View>
+                                                        </View>
+                                                        :
+                                                        <View>
+                                                                <View style={{ marginBottom: 10 }}>
+                                                                        <View style={{ ...styles.modalCard, marginHorizontal: 20 }}>
+                                                                                <View >
+                                                                                        <Text style={[styles.inputText, { fontSize: 13 }]}>
+                                                                                                Produit
+                                                                                        </Text>
+                                                                                        <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                                {product.produit.NOM}
+                                                                                        </Text>
+                                                                                </View>
+                                                                        </View>
+                                                                </View>
+                                                                <View style={{ marginBottom: 10 }}>
+                                                                        <View style={{ ...styles.modalCard, marginHorizontal: 20 }}>
+                                                                                <View >
+                                                                                        <Text style={[styles.inputText, { fontSize: 13 }]}>
+                                                                                                Categorie
+                                                                                        </Text>
+                                                                                        <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                                {product.produit.NOM_CATEGORIE}
+                                                                                        </Text>
+                                                                                </View>
+                                                                                {/* <AntDesign name="caretdown" size={20} color="#777" /> */}
+                                                                        </View>
+                                                                </View>
+                                                                <View>
+                                                                        <View style={{ ...styles.modalCard, marginHorizontal: 20 }}>
+                                                                                <View >
+                                                                                        <Text style={[styles.inputText, { fontSize: 13 }]}>
+                                                                                                Sous Categorie
+                                                                                        </Text>
+                                                                                        <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                                {product.produit.NOM_SOUS_CATEGORIE}
+                                                                                        </Text>
+                                                                                </View>
+                                                                                {/* <AntDesign name="caretdown" size={20} color="#777" /> */}
+                                                                        </View>
+                                                                </View>
+
+                                                        </View>
+                                                }
+
 
                                                 <TouchableOpacity
                                                         onPress={() => ajoutDetailsModalizeRef.current.open()}
@@ -348,7 +406,7 @@ export default function ProduitFormulaireScreen() {
                                                         )
                                                 })}
 
-                                                <View style={[styles.addImageContainer, { marginVertical: 30 }]}>
+                                                {product == false ? <View style={[styles.addImageContainer, { marginVertical: 30 }]}>
                                                         <TouchableWithoutFeedback onPress={onImagesSelect}>
                                                                 <View style={styles.addImageItem}>
                                                                         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -360,7 +418,25 @@ export default function ProduitFormulaireScreen() {
                                                                         {logoImage && <Image source={{ uri: logoImage.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
                                                                 </View>
                                                         </TouchableWithoutFeedback>
-                                                </View>
+                                                </View> :
+                                                        <View style={[styles.addImageContainer, { marginVertical: 30 }]}>
+                                                                <TouchableWithoutFeedback onPress={onImagesSelect}>
+                                                                        <View style={styles.addImageItem}>
+                                                                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                                                        <Feather name="image" size={24} color="#777" />
+                                                                                        <Text style={styles.addImageLabel}>
+                                                                                                Images
+                                                                                        </Text>
+                                                                                </View>
+                                                                                {product.produit.IMAGE_1 ?
+                                                                                        <Image source={{ uri: product.produit.IMAGE_1.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />:
+                                                                                <Text>null</Text>
+                                                                                }
+                                                                        </View>
+                                                                </TouchableWithoutFeedback>
+                                                        </View>
+
+                                                }
                                                 <TouchableOpacity onPress={SendData}>
                                                         <View style={styles.button}>
                                                                 <Text style={styles.buttonText} > Enregistrer</Text>

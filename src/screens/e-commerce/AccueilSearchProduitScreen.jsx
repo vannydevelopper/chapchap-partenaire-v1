@@ -18,7 +18,7 @@ export default function AccueilSearchProduitScreen() {
                         try {
                                 const produi = await fetchApi("/produit")
                                 setAllProduits(produi.result)
-                                console.log(produi.result)
+                                // console.log(produi.result)
                         }
                         catch (error) {
                                 console.log(error)
@@ -51,7 +51,7 @@ export default function AccueilSearchProduitScreen() {
                                                         <Text style={styles.title2} >Le nouveau produit</Text>
                                                         <Ionicons name="ios-search-sharp" size={24} color="black" />
                                                 </View>
-                                                <TouchableNativeFeedback onPress={() => navigation.navigate("ProduitFormulaireScreen")}>
+                                                <TouchableNativeFeedback onPress={() => navigation.navigate("ProduitFormulaireScreen", {product:false})}>
                                                         <View style={styles.cardComplet}>
 
                                                                 <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -72,7 +72,7 @@ export default function AccueilSearchProduitScreen() {
 
                                                 {allProduits.map((produit, index) => {
                                                         return (
-                                                                <TouchableOpacity style={styles.cardComplet} key={index}>
+                                                                <TouchableOpacity style={styles.cardComplet} key={index} onPress={()=>navigation.navigate("ProduitFormulaireScreen",{product:produit})}>
                                                                         <View style={{ flexDirection: "row", alignItems: "center" }}>
                                                                                 <View style={styles.cardIcon1}>
                                                                                         {/* <MaterialIcons name="home" size={24} color="black" /> */}

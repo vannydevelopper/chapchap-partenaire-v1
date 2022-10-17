@@ -53,6 +53,7 @@ export default function ServicesCategories() {
           const modalizeRef = useRef(null)
           const navigation = useNavigation()
           const [loading, setLoading] = useState(false)
+          const [services, setServices] = useState([])
 
           const search = async (service) => {
                     setLoading(true)
@@ -71,6 +72,22 @@ export default function ServicesCategories() {
                               setLoading(false)
                     }
           }
+
+        //   useEffect(()=>{
+        //         (async () =>{
+        //                 try{
+        //                         const travail = await fetchApi("/service/partenaire")
+        //                         setServices(travail)
+        //                         console.log(travail)
+        //                 }catch(error){
+        //                         console.log(error)
+        //                 }finally{
+
+        //                 }
+        //         })
+                
+        //   },[])
+
           useEffect(() => {
                     modalizeRef.current?.open()
           }, [modalizeRef])
