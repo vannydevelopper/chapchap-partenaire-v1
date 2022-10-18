@@ -256,7 +256,7 @@ export default function ProduitFormulaireScreen() {
                                 method: "POST",
                                 body: form
                         })
-                        navigation.navigate("AccueilSearchProduitScreen")
+                        navigation.navigate("EcommerceHomeScreen")
                 }
 
                 catch (error) {

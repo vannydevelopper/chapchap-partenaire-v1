@@ -2,7 +2,7 @@ import React, { useCallback, useState, useEffect } from "react";
 import { Text, View, useWindowDimensions, ImageBackground, StatusBar, StyleSheet, Image, TextInput, ScrollView, TouchableOpacity, FlatList, TouchableNativeFeedback } from "react-native";
 import { EvilIcons, MaterialIcons, AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome, SimpleLineIcons, Octicons, Feather } from '@expo/vector-icons';
 import fetchApi from "../../helpers/fetchApi";
-import { DrawerActions, useFocusEffect, useNavigation } from "@react-navigation/native";
+import { DrawerActions, useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import { COLORS } from "../../styles/COLORS";
 import SubCategories from "../../components/ecommerce/home/SubCategories";
 import HomeProducts from "../../components/ecommerce/home/HomeProducts";
@@ -31,6 +31,7 @@ export default function EcommerceHomeScreen() {
           }, []))
 
           const navigation = useNavigation()
+          const route = useRoute()
 
           return (
                     <View style={styles.container}>

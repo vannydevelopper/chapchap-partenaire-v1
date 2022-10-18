@@ -7,6 +7,7 @@ import HomeScreen from "../screens/home/HomeScreen";
 import InscriptionPartenaireScreen from "../screens/welcome/InscriptionPartenaireScreen";
 import { Host } from "react-native-portalize";
 import EcommerceHomeScreen from "../screens/e-commerce/EcommerceHomeScreen";
+import HomeAllServiceScreen from "../screens/home/HomeAllServiceScreen";
 
 export default function HomeNavigator() {
           const Stack = createStackNavigator()
@@ -14,6 +15,7 @@ export default function HomeNavigator() {
                     <Stack.Navigator screenOptions={{ headerShown: false }}>
                               <Stack.Screen name='HomeScreen' component={HomeScreen} />
                               <Stack.Screen name="EcommerceHomeScreen" component={EcommerceHomeScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
+                              <Stack.Screen name="HomeAllServiceScreen" component={HomeAllServiceScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
                               <Stack.Screen name="ServiceNotFoundScreen" component={ServiceNotFoundScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }} />
                               <Stack.Screen name="InscriptionPartenaireScreen" component={InscriptionPartenaireScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }} />
                               <Stack.Screen name="AccueilSearchProduitScreen" component={AccueilSearchProduitScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>

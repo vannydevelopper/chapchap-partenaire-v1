@@ -126,7 +126,7 @@ export default function InscriptionPartenaireScreen() {
                                                   uri: localUri, name: filename, type
                                         })
                               }
-                        //       console.log(form)
+                              console.log(form)
                               const res = await fetchApi("/partenaire/Ajouter", {
                                         method: "POST",
                                         body: form

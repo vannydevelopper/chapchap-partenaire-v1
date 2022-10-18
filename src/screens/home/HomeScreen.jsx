@@ -12,10 +12,12 @@ import Animated from "react-native-reanimated";
 import Carousel from "../../components/app/Carousel";
 import ServicesCategories from "../../components/app/ServicesCategories";
 import { COLORS } from "../../styles/COLORS";
-import { DrawerActions, useNavigation } from "@react-navigation/native";
+import { DrawerActions, useNavigation, useRoute } from "@react-navigation/native";
+import SericePartenaire from "../../components/app/SericePartenaire";
 
 export default function HomeScreen() {
           const navigation = useNavigation()
+          const route = useRoute()
           return (
                     <>
                               <StatusBar backgroundColor='#fff' barStyle='dark-content' />
@@ -34,7 +36,8 @@ export default function HomeScreen() {
                                                   </View>
                                         </View>
                                         <Carousel />
-                                        <ServicesCategories />
+                                        {/* <ServicesCategories /> */}
+                                        <SericePartenaire/>
                               </View>
                     </>
           )

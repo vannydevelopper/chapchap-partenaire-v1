@@ -52,7 +52,6 @@ export default function ServicesCategories() {
           const modalizeRef = useRef(null)
           const navigation = useNavigation()
           const [loading, setLoading] = useState(false)
-          const [services, setServices] = useState([])
 
           const search = async (service) => {
                     setLoading(true)
@@ -71,20 +70,6 @@ export default function ServicesCategories() {
                               setLoading(false)
                     }
           }
-
-          useEffect(()=>{
-            (async()=>{
-              try{
-                const partenaire = await fetchApi("/service/partenaire")
-                setServices(partenaire)
-                console.log(partenaire)
-              }catch(error){
-                console.log(error)
-              } finally{
-
-              }
-            })()
-          },[])
 
 
           useEffect(() => {
