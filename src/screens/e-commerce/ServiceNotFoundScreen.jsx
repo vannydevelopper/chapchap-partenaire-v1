@@ -13,8 +13,8 @@ export default function ServiceNotFoundScreen() {
           const { service } = route.params
 
           const onRequestPress = () => {
-                  //   navigation.navigate(service.noRegisteredDirection, { service })
-                navigation.navigate("AccueilSearchProduitScreen")
+                    navigation.navigate(service.noRegisteredDirection, { service})
+                // navigation.navigate("AccueilSearchProduitScreen")
           }
           return (
                     <>

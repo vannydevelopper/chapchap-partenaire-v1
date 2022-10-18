@@ -102,7 +102,7 @@ export default function EcommerceHomeScreen() {
                                                   </View>
                                         }
                               </ScrollView>
-                              <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewProductSreen')}>
+                              <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('AccueilSearchProduitScreen')}>
                                         <Text style={styles.addBtnText}>Nouveau produit</Text>
                               </TouchableOpacity>
                     </View>

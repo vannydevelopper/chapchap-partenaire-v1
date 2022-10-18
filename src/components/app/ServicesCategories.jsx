@@ -6,7 +6,6 @@ import { COLORS } from '../../styles/COLORS'
 import fetchApi from "../../helpers/fetchApi";
 import Loading from './Loading'
 
-
 const SERVICES = [{
           id_service: 1,
           title: "Achat de produits",
@@ -73,20 +72,20 @@ export default function ServicesCategories() {
                     }
           }
 
-        //   useEffect(()=>{
-        //         (async () =>{
-        //                 try{
-        //                         const travail = await fetchApi("/service/partenaire")
-        //                         setServices(travail)
-        //                         console.log(travail)
-        //                 }catch(error){
-        //                         console.log(error)
-        //                 }finally{
+          useEffect(()=>{
+            (async()=>{
+              try{
+                const partenaire = await fetchApi("/service/partenaire")
+                setServices(partenaire)
+                console.log(partenaire)
+              }catch(error){
+                console.log(error)
+              } finally{
 
-        //                 }
-        //         })
-                
-        //   },[])
+              }
+            })()
+          },[])
+
 
           useEffect(() => {
                     modalizeRef.current?.open()
@@ -107,6 +106,7 @@ export default function ServicesCategories() {
                                         <Text style={styles.title}>Catégories de service</Text>
                                         <View style={styles.services}>
                                                   {SERVICES.map((service, index) => {
+
                                                             return (
                                                                       <View style={[styles.serviceContainer, { width: SERVICE_WIDTH, height: SERVICE_WIDTH }]} key={index.toString()}>
                                                                                 {/* <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} useForeground onPress={() => navigation.navigate(service.route)}> */}

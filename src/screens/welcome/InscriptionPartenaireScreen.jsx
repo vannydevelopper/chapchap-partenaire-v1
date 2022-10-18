@@ -126,11 +126,13 @@ export default function InscriptionPartenaireScreen() {
                                                   uri: localUri, name: filename, type
                                         })
                               }
+                        //       console.log(form)
                               const res = await fetchApi("/partenaire/Ajouter", {
                                         method: "POST",
                                         body: form
                               })
-                              navigation.navigate('HomeScreen')
+                        //       navigation.navigate('HomeScreen')
+                              navigation.navigate("EcommerceHomeScreen")
                     }
                     catch (error) {
                               console.log(error)
