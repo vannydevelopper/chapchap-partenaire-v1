@@ -1,31 +1,41 @@
-import { useNavigation } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { ImageBackground, ScrollView, StyleSheet, Text, TouchableNativeFeedback, useWindowDimensions, View, Image, TouchableOpacity } from "react-native";
 import fetchApi from "../../helpers/fetchApi";
 import { COLORS } from "../../styles/COLORS";
+import { Modalize } from 'react-native-modalize'
+import Loading from './Loading'
 
 export default function SericePartenaire() {
         const { width, height } = useWindowDimensions()
         const SERVICE_MARGIN = 40
         const SERVICE_WIDTH = (width / 2)
         const navigation = useNavigation()
+        const modalizeRef = useRef(null)
 
         const [services, setServices] = useState([])
+        const [loading, setLoading] = useState(false)
 
-        useEffect(() => {
+
+        useFocusEffect(useCallback(() => {
                 (async () => {
+                        setLoading(true)
                         try {
                                 const partenaire = await fetchApi("/service/partenaire")
                                 setServices(partenaire.result)
                                 // console.log(partenaire.result)
-                        }
-                        catch (error) {
+                        } catch (error) {
                                 console.log(error)
                         } finally {
-
+                                setLoading(false)
                         }
                 })()
-        }, [])
+        }, []))
+
+
+        useEffect(() => {
+                modalizeRef.current?.open()
+        }, [modalizeRef])
 
         const searchProduit = (service) => {
                 navigation.navigate("EcommerceHomeScreen", { partenaire: service })
@@ -33,9 +43,10 @@ export default function SericePartenaire() {
 
         return (
                 <>
-                        <ScrollView>
+                        {loading && <Loading />}
+                        <View>
                                 <View style={{ flex: 1 }}>
-                                        <Text style={styles.title}>Catégories de service</Text>
+                                        <Text style={styles.title}>Vos services</Text>
                                         <View style={styles.services}>
                                                 {services.map((service, index) => {
                                                         return (
@@ -55,16 +66,26 @@ export default function SericePartenaire() {
                                                         )
                                                 })}
 
+                                                <View style={[styles.serviceContainer, { width: SERVICE_WIDTH, height: SERVICE_WIDTH }]}>
+                                                        <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} onPress={() => navigation.navigate("HomeAllServiceScreen")}>
+                                                                <View style={[styles.service]}>
+                                                                        <ImageBackground style={[styles.serviceBackgound]} borderRadius={10} resizeMode='cover' imageStyle={{ opacity: 0.8 }}>
+                                                                                <View style={{ position: 'absolute', width: "100%", height: "100%", backgroundColor: "rgba(0, 0, 0, 0.3)", borderRadius: 10 }} />
+                                                                                <View style={styles.serviceIcon}>
+                                                                                        {/* <Image source={{ uri: service.produit.LOGO }} style={styles.serviceIconImage} /> */}
+                                                                                        <Text>hhhh</Text>
+                                                                                </View>
+                                                                                <Text style={styles.serviceName}>Demander le service</Text>
+                                                                        </ImageBackground>
+                                                                </View>
+                                                        </TouchableNativeFeedback>
+                                                </View>
+
                                         </View>
                                 </View>
-                        </ScrollView>
-                        <TouchableOpacity onPress={()=>navigation.navigate("HomeAllServiceScreen")}>
-                                <View style={styles.addBtn}>
-                                        <Text style={[styles.addBtnText]}>
-                                                Demander le service
-                                        </Text>
-                                </View>
-                        </TouchableOpacity>
+
+                        </View>
+
                 </>
         )
 }
@@ -135,5 +156,11 @@ const styles = StyleSheet.create({
         addBtnText: {
                 color: '#FFF',
                 fontWeight: "bold",
+        },
+        servicesContainer: {
+                elevation: 10,
+                shadowColor: '#000',
+                borderTopRightRadius: 30,
+                borderTopLeftRadius: 30,
         },
 })

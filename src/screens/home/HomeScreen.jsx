@@ -35,9 +35,11 @@ export default function HomeScreen() {
                                                             <Octicons name="bell" size={24} color={COLORS.primary} />
                                                   </View>
                                         </View>
+                                        <ScrollView>
                                         <Carousel />
                                         {/* <ServicesCategories /> */}
                                         <SericePartenaire/>
+                                        </ScrollView>
                               </View>
                     </>
           )
