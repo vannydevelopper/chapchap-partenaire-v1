@@ -19,7 +19,7 @@ export default function EcommerceHomeScreen() {
           useFocusEffect(useCallback(() => {
                     (async () => {
                               try {
-                                        var url = "/partenaire/produit"
+                                        var url = `/partenaire/produit/${partenaire.produit.ID_PARTENAIRE_SERVICE}`
                                         const produits = await fetchApi(url)
                                         setProducts(produits.result)
                               } catch (error) {
@@ -32,6 +32,7 @@ export default function EcommerceHomeScreen() {
 
           const navigation = useNavigation()
           const route = useRoute()
+          const {partenaire} = route.params
 
           return (
                     <View style={styles.container}>
@@ -103,7 +104,7 @@ export default function EcommerceHomeScreen() {
                                                   </View>
                                         }
                               </ScrollView>
-                              <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('AccueilSearchProduitScreen')}>
+                              <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('AccueilSearchProduitScreen', {partenaire:partenaire.produit.ID_PARTENAIRE_SERVICE} )}>
                                         <Text style={styles.addBtnText}>Nouveau produit</Text>
                               </TouchableOpacity>
                     </View>

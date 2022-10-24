@@ -24,7 +24,6 @@ export default function SericePartenaire() {
                         try {
                                 const partenaire = await fetchApi("/service/partenaire")
                                 setServices(partenaire.result)
-                                // console.log(partenaire.result)
                         } catch (error) {
                                 console.log(error)
                         } finally {
@@ -60,7 +59,7 @@ export default function SericePartenaire() {
 
                                                                                                         <Image source={{ uri: service.produit.LOGO }} style={styles.serviceIconImage} />
                                                                                                 </View>
-                                                                                                <Text style={styles.serviceName}>{service.produit.NOM_SERVICE}</Text>
+                                                                                                <Text style={styles.serviceName}>{service.produit.NOM_ORGANISATION}</Text>
                                                                                         </ImageBackground>
                                                                                 </View>
                                                                         </TouchableNativeFeedback>

@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 
 export default function Product({ product, index, totalLength, fixMargins = false }) {
         const { width } = useWindowDimensions()
+        // console.log(product)
         const MAX_WIDTH = 200
         const PRODUCT_MARGIN = 10
         const SERVICE_WIDTH = (width / 2)
@@ -55,7 +56,7 @@ export default function Product({ product, index, totalLength, fixMargins = fals
                                         </View>
                                         <View style={{ flexDirection: "row" }}>
                                                 <Text style={styles.serviceName1}>Restante</Text>
-                                                <Text style={{ fontWeight: "bold",color:"#777", marginLeft: 5 }}>20</Text>
+                                                <Text style={{ fontWeight: "bold",color:"#777", marginLeft: 5 }}>{product.stock.QUANTITE_RESTANTE}</Text>
                                         </View>
                                 </ImageBackground>
                         </View>

@@ -13,6 +13,10 @@ export default function AccueilSearchProduitScreen() {
 
         const [allProduits, setAllProduits] = useState([])
 
+        const route = useRoute()
+        const {partenaire} = route.params
+        // console.log(partenaire)
+
         useFocusEffect(useCallback(() => {
                 (async () => {
                         try {
@@ -51,7 +55,7 @@ export default function AccueilSearchProduitScreen() {
                                                         <Text style={styles.title2} >Le nouveau produit</Text>
                                                         <Ionicons name="ios-search-sharp" size={24} color="black" />
                                                 </View>
-                                                <TouchableNativeFeedback onPress={() => navigation.navigate("ProduitFormulaireScreen", {product:false})}>
+                                                <TouchableNativeFeedback onPress={() => navigation.navigate("ProduitFormulaireScreen", {product:false, partenaire:partenaire})}>
                                                         <View style={styles.cardComplet}>
 
                                                                 <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -72,7 +76,7 @@ export default function AccueilSearchProduitScreen() {
 
                                                 {allProduits.map((produit, index) => {
                                                         return (
-                                                                <TouchableOpacity style={styles.cardComplet} key={index} onPress={()=>navigation.navigate("ProduitFormulaireScreen",{product:produit})}>
+                                                                <TouchableOpacity style={styles.cardComplet} key={index} onPress={()=>navigation.navigate("ProduitFormulaireScreen",{product:produit, partenaire:partenaire})}>
                                                                         <View style={{ flexDirection: "row", alignItems: "center" }}>
                                                                                 <View style={styles.cardIcon1}>
                                                                                         {/* <MaterialIcons name="home" size={24} color="black" /> */}

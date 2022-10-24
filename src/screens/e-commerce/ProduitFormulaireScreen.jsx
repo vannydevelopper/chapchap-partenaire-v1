@@ -21,7 +21,8 @@ import Loading from "../../components/app/Loading"
 export default function ProduitFormulaireScreen() {
         const navigation = useNavigation()
         const route = useRoute()
-        const { product } = route.params
+        const { product, partenaire } = route.params
+        // console.log(partenaire)
         const couleurModalizeRef = useRef(null)
         const tailleModalizeRef = useRef(null)
         const ajoutDetailsModalizeRef = useRef(null)
@@ -227,10 +228,12 @@ export default function ProduitFormulaireScreen() {
                         const form = new FormData()
                         if (product) {
                                 form.append('PRODUIT', JSON.stringify(product))
+                                form.append('ID_PARTENAIRE_SERVICE', partenaire)
                         } else {
                                 form.append('ID_CATEGORIE_PRODUIT', CategorieSelect.ID_CATEGORIE_PRODUIT)
                                 form.append('ID_PRODUIT_SOUS_CATEGORIE', selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE)
                                 form.append('NOM', data.produit)
+                                form.append('ID_PARTENAIRE_SERVICE', partenaire)
                                 if (logoImage) {
                                         const manipResult = await manipulateAsync(
                                                 logoImage.uri,
@@ -256,7 +259,7 @@ export default function ProduitFormulaireScreen() {
                                 method: "POST",
                                 body: form
                         })
-                        navigation.navigate("EcommerceHomeScreen")
+                        navigation.navigate("EcommerceHomeScreen",{partenaire:false})
                 }
 
                 catch (error) {
