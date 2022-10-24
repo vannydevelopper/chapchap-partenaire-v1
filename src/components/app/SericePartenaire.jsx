@@ -5,6 +5,7 @@ import fetchApi from "../../helpers/fetchApi";
 import { COLORS } from "../../styles/COLORS";
 import { Modalize } from 'react-native-modalize'
 import Loading from './Loading'
+import { AntDesign } from '@expo/vector-icons';
 
 export default function SericePartenaire() {
         const { width, height } = useWindowDimensions()
@@ -56,6 +57,7 @@ export default function SericePartenaire() {
                                                                                         <ImageBackground source={{ uri: service.produit.BACKGROUND_IMAGE }} style={[styles.serviceBackgound]} borderRadius={10} resizeMode='cover' imageStyle={{ opacity: 0.8 }}>
                                                                                                 <View style={{ position: 'absolute', width: "100%", height: "100%", backgroundColor: "rgba(0, 0, 0, 0.3)", borderRadius: 10 }} />
                                                                                                 <View style={styles.serviceIcon}>
+
                                                                                                         <Image source={{ uri: service.produit.LOGO }} style={styles.serviceIconImage} />
                                                                                                 </View>
                                                                                                 <Text style={styles.serviceName}>{service.produit.NOM_SERVICE}</Text>
@@ -69,11 +71,10 @@ export default function SericePartenaire() {
                                                 <View style={[styles.serviceContainer, { width: SERVICE_WIDTH, height: SERVICE_WIDTH }]}>
                                                         <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} onPress={() => navigation.navigate("HomeAllServiceScreen")}>
                                                                 <View style={[styles.service]}>
-                                                                        <ImageBackground style={[styles.serviceBackgound]} borderRadius={10} resizeMode='cover' imageStyle={{ opacity: 0.8 }}>
+                                                                        <ImageBackground source={require("../../../assets/images/nouveau.png")} style={[styles.serviceBackgound]} borderRadius={10} resizeMode='cover' imageStyle={{ opacity: 0.8 }}>
                                                                                 <View style={{ position: 'absolute', width: "100%", height: "100%", backgroundColor: "rgba(0, 0, 0, 0.3)", borderRadius: 10 }} />
                                                                                 <View style={styles.serviceIcon}>
-                                                                                        {/* <Image source={{ uri: service.produit.LOGO }} style={styles.serviceIconImage} /> */}
-                                                                                        <Text>hhhh</Text>
+                                                                                        <AntDesign name="plus" size={40} color="black" />
                                                                                 </View>
                                                                                 <Text style={styles.serviceName}>Demander le service</Text>
                                                                         </ImageBackground>
