@@ -57,6 +57,7 @@ export default function ProduitFormulaireScreen() {
                 CategorieSelect: null,
                 selectedSousCategorie: null,
                 produit: "",
+                prix:"",
                 quantite: "",
                 logoImage: "",
                 autresTaille: "",
@@ -233,6 +234,7 @@ export default function ProduitFormulaireScreen() {
                                 form.append('ID_CATEGORIE_PRODUIT', CategorieSelect.ID_CATEGORIE_PRODUIT)
                                 form.append('ID_PRODUIT_SOUS_CATEGORIE', selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE)
                                 form.append('NOM', data.produit)
+                                form.append('PRIX', data.prix)
                                 form.append('ID_PARTENAIRE_SERVICE', partenaire)
                                 if (logoImage) {
                                         const manipResult = await manipulateAsync(
@@ -259,7 +261,7 @@ export default function ProduitFormulaireScreen() {
                                 method: "POST",
                                 body: form
                         })
-                        navigation.navigate("EcommerceHomeScreen",{partenaire:false})
+                        navigation.navigate("EcommerceHomeScreen", { partenaire: false })
                 }
 
                 catch (error) {
@@ -274,7 +276,7 @@ export default function ProduitFormulaireScreen() {
 
         return (
                 <>
-                        { loading && <Loading/>}
+                        {loading && <Loading />}
                         <View style={styles.container}>
                                 <View style={styles.cardHeader}>
                                         <TouchableOpacity style={styles.menuOpener} onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
@@ -343,6 +345,20 @@ export default function ProduitFormulaireScreen() {
                                                                                 </View>
                                                                                 <AntDesign name="caretdown" size={20} color="#777" />
                                                                         </TouchableOpacity>
+                                                                </View>
+                                                                <View style={styles.inputCard}>
+                                                                        <OutlinedTextField
+                                                                                label={"Entrez votre prix"}
+                                                                                fontSize={14}
+                                                                                value={data.prix}
+                                                                                onChangeText={(newValue) => handleChange('prix', newValue)}
+                                                                                onBlur={() => checkFieldData('prix')}
+                                                                                error={hasError('prix') ? getError('prix') : ''}
+                                                                                lineWidth={0.5}
+                                                                                activeLineWidth={0.5}
+                                                                                baseColor={COLORS.smallBrown}
+                                                                                tintColor={COLORS.primary}
+                                                                        />
                                                                 </View>
                                                         </View>
                                                         :
@@ -432,8 +448,8 @@ export default function ProduitFormulaireScreen() {
                                                                                         </Text>
                                                                                 </View>
                                                                                 {product.produit.IMAGE_1 ?
-                                                                                        <Image source={{ uri: product.produit.IMAGE_1.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />:
-                                                                                <Text>null</Text>
+                                                                                        <Image source={{ uri: product.produit.IMAGE_1.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} /> :
+                                                                                        <Text>null</Text>
                                                                                 }
                                                                         </View>
                                                                 </TouchableWithoutFeedback>
