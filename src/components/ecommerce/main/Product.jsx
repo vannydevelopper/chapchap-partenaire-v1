@@ -20,10 +20,10 @@ export default function Product({ product, index, totalLength, fixMargins = fals
                 marginRight: index == totalLength - 1 ? PRODUCT_MARGIN : (fixMargins ? 0 : 0)
         }
         const navigation = useNavigation()
-        const detail = async (detail) => {
-                const details = detail
-                navigation.navigate("ProductDetailScreen", { detail: product })
-        }
+        // const detail = async (detail) => {
+        //         const details = detail
+        //         navigation.navigate("ProductDetailScreen", { detail: product })
+        // }
 
 
         return (
@@ -31,7 +31,7 @@ export default function Product({ product, index, totalLength, fixMargins = fals
 
                         <View key={index} style={[styles.product, additionStyles]}>
                                 <ImageBackground style={[styles.serviceBackgound]} borderRadius={10} resizeMode='cover' imageStyle={{ opacity: 0.8 }}>
-                                        <View style={{...styles.productHeader, marginHorizontal:10 }}>
+                                        <View style={{...styles.productHeader, marginHorizontal:10, marginBottom:20 }}>
                                                 <Text numberOfLines={2} style={styles.productName}> {product.produit_partenaire.NOM}</Text>
                                                 <Text numberOfLines={2} style={styles.productCategory}>
                                                         {product.produit.NOM}
@@ -42,11 +42,14 @@ export default function Product({ product, index, totalLength, fixMargins = fals
                                                 </View>
                                         </View>
                                         <View style={styles.serviceIcon}>
-                                                <TouchableOpacity onPress={() => detail(product)}>
+                                                <TouchableOpacity>
                                                         <Image source={{ uri: product.produit_partenaire.IMAGE_1 }} style={styles.serviceIconImage} />
                                                 </TouchableOpacity>
+                                                {/* <TouchableOpacity onPress={() => detail(product)}>
+                                                        <Image source={{ uri: product.produit_partenaire.IMAGE_1 }} style={styles.serviceIconImage} />
+                                                </TouchableOpacity> */}
                                         </View>
-                                        <View style={{ flexDirection: "row", }}>
+                                        {/* <View style={{ flexDirection: "row", }}>
                                                 <Text style={styles.serviceName}>Quantite Total</Text>
                                                 <Text style={{ fontWeight: "bold", color:"#777", marginLeft: 5 }}>{product.stock.QUANTITE_STOCKE}</Text>
                                         </View>
@@ -57,7 +60,7 @@ export default function Product({ product, index, totalLength, fixMargins = fals
                                         <View style={{ flexDirection: "row" }}>
                                                 <Text style={styles.serviceName1}>Restante</Text>
                                                 <Text style={{ fontWeight: "bold",color:"#777", marginLeft: 5 }}>{product.stock.QUANTITE_RESTANTE}</Text>
-                                        </View>
+                                        </View> */}
                                 </ImageBackground>
                         </View>
                 </>
@@ -138,8 +141,8 @@ const styles = StyleSheet.create({
                 height: 100,
                 backgroundColor: "#fff",
                 borderRadius: 10,
-                marginLeft: 33,
-                marginTop: -5,
+                marginLeft: 30,
+                // marginTop: -9,
                 justifyContent: 'center',
                 alignItems: 'center'
         },
@@ -165,8 +168,8 @@ const styles = StyleSheet.create({
                 marginHorizontal:10
         },
         serviceIconImage: {
-                width: 90,
-                height: 90,
+                width: 140,
+                height: 140,
                 borderRadius: 10,
         },
 })
