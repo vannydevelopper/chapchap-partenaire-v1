@@ -20,10 +20,10 @@ export default function Product({ product, index, totalLength, fixMargins = fals
                 marginRight: index == totalLength - 1 ? PRODUCT_MARGIN : (fixMargins ? 0 : 0)
         }
         const navigation = useNavigation()
-        // const detail = async (detail) => {
-        //         const details = detail
-        //         navigation.navigate("ProductDetailScreen", { detail: product })
-        // }
+        const detail = async (detail) => {
+                const details = detail
+                navigation.navigate("ProductDetailScreen", { detail: product })
+        }
 
 
         return (
@@ -32,7 +32,7 @@ export default function Product({ product, index, totalLength, fixMargins = fals
                         <View key={index} style={[styles.product, additionStyles]}>
                                 <ImageBackground style={[styles.serviceBackgound]} borderRadius={10} resizeMode='cover' imageStyle={{ opacity: 0.8 }}>
                                         <View style={{...styles.productHeader, marginHorizontal:10, marginBottom:20 }}>
-                                                <Text numberOfLines={2} style={styles.productName}> {product.produit_partenaire.NOM}</Text>
+                                                {/* <Text numberOfLines={2} style={styles.productName}> {product.produit_partenaire.NOM}</Text> */}
                                                 <Text numberOfLines={2} style={styles.productCategory}>
                                                         {product.produit.NOM}
                                                 </Text>
@@ -42,12 +42,9 @@ export default function Product({ product, index, totalLength, fixMargins = fals
                                                 </View>
                                         </View>
                                         <View style={styles.serviceIcon}>
-                                                <TouchableOpacity>
+                                                <TouchableOpacity onPress={() => detail(product)}>
                                                         <Image source={{ uri: product.produit_partenaire.IMAGE_1 }} style={styles.serviceIconImage} />
                                                 </TouchableOpacity>
-                                                {/* <TouchableOpacity onPress={() => detail(product)}>
-                                                        <Image source={{ uri: product.produit_partenaire.IMAGE_1 }} style={styles.serviceIconImage} />
-                                                </TouchableOpacity> */}
                                         </View>
                                         {/* <View style={{ flexDirection: "row", }}>
                                                 <Text style={styles.serviceName}>Quantite Total</Text>
@@ -72,7 +69,7 @@ const styles = StyleSheet.create({
                 maxWidth: 200,
                 // backgroundColor: '#F1F1F1',
                 borderWidth:1,
-                borderColor:"#000",
+                borderColor:"#D7D9E4",
                 borderRadius: 5,
                 marginTop: 10,
         },

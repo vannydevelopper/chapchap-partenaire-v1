@@ -9,6 +9,7 @@ import { Host } from "react-native-portalize";
 import EcommerceHomeScreen from "../screens/e-commerce/EcommerceHomeScreen";
 import HomeAllServiceScreen from "../screens/home/HomeAllServiceScreen";
 import ProductDetailScreen from "../screens/e-commerce/ProductDetailScreen";
+import ApprovisionnementScreen from "../screens/e-commerce/ApprovisionnementScreen";
 
 export default function HomeNavigator() {
           const Stack = createStackNavigator()
@@ -22,6 +23,7 @@ export default function HomeNavigator() {
                               <Stack.Screen name="AccueilSearchProduitScreen" component={AccueilSearchProduitScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
                               <Stack.Screen name="ProduitFormulaireScreen" component={ProduitFormulaireScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
                               <Stack.Screen name="ProductDetailScreen" component={ProductDetailScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
+                              <Stack.Screen name="ApprovisionnementScreen" component={ApprovisionnementScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
                     </Stack.Navigator>
           )
 }
