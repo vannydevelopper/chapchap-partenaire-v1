@@ -17,7 +17,7 @@ import { Ionicons, AntDesign, MaterialIcons } from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import fetchApi from '../../helpers/fetchApi'
 import Product from '../../components/ecommerce/main/Product'
-import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons'
+import { Entypo, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons'
 import { COLORS } from '../../styles/COLORS'
 import { useRef } from 'react'
 import { Modalize } from "react-native-modalize";
@@ -29,10 +29,11 @@ export default function ProductDetailScreen() {
         const route = useRoute()
         const { width } = useWindowDimensions()
         const { detail } = route.params
+        // console.log(detail)
 
-        const PRODUCT_MARGIN = 10
-        const PRODUCT_WIDTH = width / 2 - PRODUCT_MARGIN - 10
-        const PRODUCT_HEIGHT = 270
+        const PRODUCT_MARGIN = 0
+        const PRODUCT_WIDTH = width / 2 - PRODUCT_MARGIN
+        const PRODUCT_HEIGHT = 100
         const additionStyles = {
                 width: PRODUCT_WIDTH,
                 height: PRODUCT_HEIGHT,
@@ -53,6 +54,25 @@ export default function ProductDetailScreen() {
 
         const [isOpen, setIsOpen] = useState(false)
         const [loadingForm, setLoadingForm] = useState(true)
+
+        const [AllDetails, setAllDetails] = useState([])
+
+        useEffect(() => {
+                (async () => {
+                        try {
+                                if (detail.produit_partenaire.ID_PRODUIT_PARTENAIRE != null) {
+                                        const detailss = await fetchApi(`/partenaire/produit/detail/${detail.produit_partenaire.ID_PRODUIT_PARTENAIRE}`)
+                                        setAllDetails(detailss.result)
+                                        console.log(detailss.result)
+
+                                }
+                        } catch (error) {
+                                console.log(error)
+                        } finally {
+
+                        }
+                })()
+        }, [detail])
 
         const productInCart = null
 
@@ -84,7 +104,7 @@ export default function ProductDetailScreen() {
 
         const onOptionSelect = (option) => {
                 setSelectOption(option)
-                navigation.navigate("ApprovisionnementScreen", {detail:detail})
+                // navigation.navigate("ApprovisionnementScreen", { detail: detail })
                 modalizeApproRef.current.close()
                 // setSelectOption(null)
 
@@ -142,81 +162,75 @@ export default function ProductDetailScreen() {
                                                         {/* {detail.produit_partenaire.DESCRIPTION} */}
                                                 </Text>
                                         </View>
-                                        <View
-                                                style={{
-                                                        flexDirection: 'row',
-                                                        justifyContent: 'center',
-                                                        flexWrap: 'wrap',
-                                                }}
-                                        >
-                                                <View key={1} style={[styles.product, additionStyles]}>
-                                                        <View style={{ paddingHorizontal: 10, }}>
-                                                                <Text style={{ ...styles.quantite, fontWeight: "bold" }}>QUANTITE STOCK</Text>
-                                                                <View style={{ flexDirection: "row", alignContent: "center", alignItems: "center", justifyContent: "center" }}>
-                                                                        <View style={styles.cardQuantite}>
-                                                                                <Text style={styles.valeur}> {detail.stock.QUANTITE_STOCKE} </Text>
-                                                                        </View>
-                                                                        <View>
-                                                                                <View style={{ flexDirection: "row", marginLeft: 5 }}>
-                                                                                        <Text style={styles.quantite}>Couleur</Text>
-                                                                                        <Text style={{ marginLeft: 8 }}>{detail.couleur.COULEUR}</Text>
-                                                                                </View>
-                                                                                <View style={{ flexDirection: "row", marginLeft: 5 }}>
-                                                                                        <Text style={styles.quantite}>Taille</Text>
-                                                                                        <Text style={{ marginLeft: 8 }}>{detail.taille.TAILLE}</Text>
-                                                                                </View>
-                                                                        </View>
-
-
+                                        <View style={styles.cardApprove}>
+                                                <View style={{ borderWidth: 1, borderColor: "#F29558", borderRadius: 10 }}>
+                                                        <View style={{ flexDirection: "row", alignContent: "center", alignItems: "center", marginHorizontal: 10, marginTop: 10 }}>
+                                                                <View style={styles.cardPhoto}>
+                                                                        <FontAwesome5 name="elementor" size={24} color="white" />
+                                                                </View>
+                                                                <View style={{ marginLeft: 10 }}>
+                                                                        <Text style={{ fontSize: 15, fontWeight: "bold" }}>kkkk</Text>
+                                                                        {/* <Text>Prix bbb</Text> */}
                                                                 </View>
 
                                                         </View>
-                                                </View>
-                                                <View key={2} style={[styles.product, additionStyles]}>
-                                                        <View style={{ paddingHorizontal: 10 }}>
-                                                                <Text style={{ ...styles.quantite, fontWeight: "bold" }}>QUANTITE RESTANTE</Text>
-                                                                <View style={{ flexDirection: "row", alignContent: "center", alignItems: "center", justifyContent: "center" }}>
-                                                                        <View style={styles.cardQuantite}>
-                                                                                <Text style={styles.valeur}> {detail.stock.QUANTITE_RESTANTE} </Text>
-                                                                        </View>
-                                                                        <View>
-                                                                                <View style={{ flexDirection: "row", marginLeft: 5 }}>
-                                                                                        <Text style={styles.quantite}>Couleur</Text>
-                                                                                        <Text style={{ marginLeft: 8 }}>{detail.couleur.COULEUR}</Text>
+                                                        <View style={{ flexDirection: "row", marginHorizontal: 40, justifyContent: "space-between"}}>
+                                                                <View style={styles.cardType}>
+                                                                        <Text style={{ color: "#fff" }}>categorie</Text>
+                                                                </View>
+                                                                <View style={styles.cardType}>
+                                                                        <Text style={{ color: "#fff" }}> sous catego</Text>
+                                                                </View>
+                                                        </View>
+                                                        <View style={styles.cardDetail}>
+                                                                <View style={{ marginHorizontal: 10, marginBottom: 5 }}>
+                                                                        <Text style={{ fontSize: 15, fontWeight: "bold", marginLeft: 10 }}>Quantite Stocke</Text>
+                                                                        <View style={{ flexDirection: "row", alignContent: "center", alignItems: "center" }}>
+                                                                                <View style={styles.cardQuantite}>
+                                                                                        <Text style={{ fontSize: 20, fontWeight: "bold", color: "#fff" }}>120</Text>
                                                                                 </View>
-                                                                                <View style={{ flexDirection: "row", marginLeft: 5 }}>
-                                                                                        <Text style={styles.quantite}>Taille</Text>
-                                                                                        <Text style={{ marginLeft: 8 }}>{detail.taille.TAILLE}</Text>
+                                                                                <View style={{ marginLeft: 10 }}>
+                                                                                        <Text style={{ fontSize: 15, color: "#777" }}>couleur</Text>
+                                                                                        <Text style={{ fontSize: 15, color: "#777" }}>taille</Text>
+
                                                                                 </View>
                                                                         </View>
-
-
                                                                 </View>
                                                         </View>
 
-                                                </View>
-                                                <View key={3} style={[styles.product, additionStyles]}>
-                                                        <View style={{ paddingHorizontal: 10, marginTop: 5 }}>
-                                                                <Text style={{ ...styles.quantite, fontWeight: "bold" }}>QUANTITE VENDUE</Text>
-                                                                <View style={{ flexDirection: "row", alignContent: "center", alignItems: "center", justifyContent: "center" }}>
-                                                                        <View style={styles.cardQuantite}>
-                                                                                <Text style={styles.valeur}> {detail.stock.QUANTITE_VENDUE} </Text>
-                                                                        </View>
-                                                                        <View>
-                                                                                <View style={{ flexDirection: "row", marginLeft: 5 }}>
-                                                                                        <Text style={styles.quantite}>Couleur</Text>
-                                                                                        <Text style={{ marginLeft: 8 }}>{detail.couleur.COULEUR}</Text>
+                                                        <View style={styles.cardDetail}>
+                                                                <View style={{ marginHorizontal: 10, marginBottom: 5 }}>
+                                                                        <Text style={{ fontSize: 15, fontWeight: "bold", marginLeft: 10 }}>Quantite vendus</Text>
+                                                                        <View style={{ flexDirection: "row", alignContent: "center", alignItems: "center" }}>
+                                                                                <View style={styles.cardQuantite}>
+                                                                                        <Text style={{ fontSize: 20, fontWeight: "bold", color: "#fff" }}>120</Text>
                                                                                 </View>
-                                                                                <View style={{ flexDirection: "row", marginLeft: 5 }}>
-                                                                                        <Text style={styles.quantite}>Taille</Text>
-                                                                                        <Text style={{ marginLeft: 8 }}>{detail.taille.TAILLE}</Text>
+                                                                                <View style={{ marginLeft: 10 }}>
+                                                                                        <Text style={{ fontSize: 15, color: "#777" }}>couleur</Text>
+                                                                                        <Text style={{ fontSize: 15, color: "#777" }}>taille</Text>
+
                                                                                 </View>
                                                                         </View>
+                                                                </View>
+                                                        </View>
 
+                                                        <View style={styles.cardDetail}>
+                                                                <View style={{ marginHorizontal: 10, marginBottom: 5 }}>
+                                                                        <Text style={{ fontSize: 15, fontWeight: "bold", marginLeft: 10 }}>Quantite restante</Text>
+                                                                        <View style={{ flexDirection: "row", alignContent: "center", alignItems: "center" }}>
+                                                                                <View style={styles.cardQuantite}>
+                                                                                        <Text style={{ fontSize: 20, fontWeight: "bold", color: "#fff" }}>120</Text>
+                                                                                </View>
+                                                                                <View style={{ marginLeft: 10 }}>
+                                                                                        <Text style={{ fontSize: 15, color: "#777" }}>couleur</Text>
+                                                                                        <Text style={{ fontSize: 15, color: "#777" }}>taille</Text>
 
+                                                                                </View>
+                                                                        </View>
                                                                 </View>
                                                         </View>
                                                 </View>
+
                                         </View>
 
                                 </ScrollView>
@@ -251,8 +265,8 @@ export default function ProductDetailScreen() {
                                                         return (
                                                                 <TouchableOpacity key={index} onPress={() => onOptionSelect(option)}>
                                                                         <View style={styles.modalItemModel2} >
-                                                                                {selectOption?.id == option.id ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" />:
-                                                                                <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                                                                {selectOption?.id == option.id ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                                                        <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
                                                                                 <Text>{option.title}</Text>
                                                                         </View>
 
@@ -268,12 +282,12 @@ export default function ProductDetailScreen() {
 }
 const styles = StyleSheet.create({
         product: {
-                maxWidth: 900,
-                maxHeight: 100,
+                // maxWidth: 900,
+                // maxHeight: 100,
                 backgroundColor: '#F1F1F1',
                 borderRadius: 10,
                 marginVertical: 10,
-                marginHorizontal: 10,
+                // marginHorizontal: 10,
                 paddingVertical: 10
         },
         cardHeader: {
@@ -461,17 +475,58 @@ const styles = StyleSheet.create({
                 color: '#FFF',
                 fontWeight: 'bold',
         },
-        cardQuantite: {
-                width: 40,
-                height: 40,
-                backgroundColor: COLORS.ecommerceOrange,
-                borderRadius: 10
-        },
+        // cardQuantite: {
+        //         width: 70,
+        //         height: 60,
+        //         backgroundColor: COLORS.ecommerceOrange,
+        //         borderRadius: 10
+        // },
         modalItemModel2: {
                 paddingVertical: 15,
                 paddingHorizontal: 20,
                 flexDirection: 'row',
                 alignItems: 'center',
                 alignContent: 'center'
+        },
+        cardApprove: {
+                padding: 10,
+                backgroundColor: "#fff",
+                borderRadius: 20,
+                // marginHorizontal:10,
+                marginTop: 5
+        },
+        cardType: {
+                minWidth: 20,
+                padding: 3,
+                backgroundColor: "#777",
+                borderRadius: 5,
+                justifyContent: "center",
+                alignItems: "center"
+        },
+        cardPhoto: {
+                width: 40,
+                height: 40,
+                backgroundColor: "#777",
+                borderRadius: 50,
+                justifyContent: "center",
+                alignItems: "center"
+        },
+        cardDetail: {
+                borderWidth: 1,
+                // borderRadius: 20,
+                borderBottomLeftRadius:20,
+                borderBottomRightRadius:20,
+                borderColor: "#F29558",
+                marginTop: 10,
+                backgroundColor: COLORS.ecommerceOrange,
+
+        },
+        cardQuantite: {
+                width: 70,
+                height: 40,
+                backgroundColor: "#777",
+                borderRadius: 10,
+                justifyContent: "center",
+                alignItems: "center"
         },
 })

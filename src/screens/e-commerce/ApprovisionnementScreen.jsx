@@ -38,16 +38,91 @@ export default function ApprovisionnementScreen() {
         const [tailles, setTaille] = useState([])
         const [couleurs, setCouleur] = useState([])
 
+        const [TailleSelect, setTailleSelect] = useState(null)
+        const [selectedCouleur, setselectedCouleur] = useState(null)
+
+        const [autreTailles, setAutreTailles] = useState("")
+        const [autreCouleurs, setAutreCouleurs] = useState("")
+
+        const [detailData, setDetailData] = useState([])
+        // console.log(detailData)
+
         const AutresTypesTaille = () => {
                 setShowAUtresTaille(true)
-                // setTailleSelect(null)
+                setTailleSelect(null)
         }
 
         const AutresTypesCouleurs = () => {
                 setShowAUtresCouleur(true)
-                // setselectedCouleur(false)
+                setselectedCouleur(false)
 
         }
+
+        const onTaillesSelect = (taille) => {
+                setTailleSelect(taille)
+                setShowAUtresTaille(false)
+                tailleModalizeRef.current.close()
+        }
+
+        const onCouleurSelect = (couleur) => {
+                setselectedCouleur(couleur)
+                setShowAUtresCouleur(false)
+                couleurModalizeRef.current.close()
+        }
+
+        const ajoutTailleInput = (autresTaille) => {
+                setAutreTailles(autresTaille)
+                tailleModalizeRef.current.close()
+        }
+
+        const autreCouleurInput = (autresCouleur) => {
+                setAutreCouleurs(autresCouleur)
+                couleurModalizeRef.current.close()
+        }
+
+        const Ajouter_detail = () => {
+                var taille = TailleSelect
+                var coul = selectedCouleur
+                if (showAUtresTaille) {
+                        taille = {
+                                ID_TAILLE: 'autre',
+                                TAILLE: autreTailles
+                        }
+                }
+                if (showAUtresCouleur) {
+                        coul = {
+                                ID_COULEUR: 'autre',
+                                COULEUR: autreCouleurs
+                        }
+                }
+                setDetailData(t => [...t, {
+                        quantite: data.quantite,
+                        TailleSelect: taille,
+                        selectedCouleur: coul
+                }])
+                modalizeQuantiteStockerRef.current.close()
+        }
+
+
+        const [data, handleChange, setValue] = useForm({
+                TailleSelect: null,
+                selectedCouleur: null,
+                quantite: "",
+                autresTaille: "",
+                autresCouleur: ""
+        })
+
+        const { checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
+                //         quantite: {
+                //                 required: true,
+
+                //         },
+                // }, {
+                //         quantite: {
+                //                 required: "Quantite est obligatoire"
+                //         },
+        })
+
 
 
         var IMAGES = [
@@ -60,18 +135,36 @@ export default function ApprovisionnementScreen() {
                 (async () => {
                         try {
                                 var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${detail.categorie.ID_CATEGORIE_PRODUIT}`)
-                                // setTaille(taille.result)
                                 if (detail.sous_categorie.ID_PRODUIT_SOUS_CATEGORIE != null) {
                                         var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${detail.categorie.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${detail.sous_categorie.ID_PRODUIT_SOUS_CATEGORIE}`)
                                         setTaille(taille.result)
                                 }
-                                console.log(taille.result)
+                                // console.log(taille.result)
                         }
                         catch (error) {
                                 console.log(error)
                         } finally {
 
                         }
+                })()
+        }, [detail])
+
+        useEffect(() => {
+                (async () => {
+                        try {
+                                var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${detail.categorie.ID_CATEGORIE_PRODUIT}`)
+                                if (detail.sous_categorie.ID_PRODUIT_SOUS_CATEGORIE != null) {
+                                        var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${detail.categorie.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${detail.sous_categorie.ID_PRODUIT_SOUS_CATEGORIE}`)
+                                        setCouleur(couleur.result)
+                                }
+                                console.log(couleur.result)
+                        }
+                        catch (error) {
+                                console.log(error)
+                        } finally {
+
+                        }
+
                 })()
         }, [detail])
         return (
@@ -130,6 +223,16 @@ export default function ApprovisionnementScreen() {
                                                                 </View>
                                                         </TouchableOpacity>
                                                 </View>
+                                               {/* {detailData && <View>
+                                                        {detailData.map((details, index) => {
+                                                                return (
+                                                                        <View>
+                                                                                <Text style={{ color: "#000" }}>{details.selectedCouleur.COULEUR}</Text>
+                                                                        </View>
+                                                                )
+                                                        })}
+                                                </View>} */}
+
 
                                                 <View style={styles.cardDetail}>
                                                         <View style={{ marginHorizontal: 10, marginBottom: 5 }}>
@@ -179,10 +282,10 @@ export default function ApprovisionnementScreen() {
                                                                         <OutlinedTextField
                                                                                 label={"Quantite Total"}
                                                                                 fontSize={14}
-                                                                                // value={data.quantite}
-                                                                                // onChangeText={(newValue) => handleChange('quantite', newValue)}
-                                                                                // onBlur={() => checkFieldData('quantite')}
-                                                                                // error={hasError('quantite') ? getError('quantite') : ''}
+                                                                                value={data.quantite}
+                                                                                onChangeText={(newValue) => handleChange('quantite', newValue)}
+                                                                                onBlur={() => checkFieldData('quantite')}
+                                                                                error={hasError('quantite') ? getError('quantite') : ''}
                                                                                 keyboardType='number-pad'
                                                                                 lineWidth={0.5}
                                                                                 activeLineWidth={0.5}
@@ -198,9 +301,10 @@ export default function ApprovisionnementScreen() {
                                                                                                 <Text style={[styles.inputText, { fontSize: 13 }]}>
                                                                                                         Taille
                                                                                                 </Text>
-                                                                                                <Text style={[styles.inputText, { color: '#000' }]}>
-                                                                                                        ffffff
-                                                                                                </Text>
+                                                                                                {TailleSelect ? <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                                        {TailleSelect.TAILLE}
+                                                                                                </Text> :
+                                                                                                        <Text style={[styles.inputText, { color: '#000' }]}>{autreTailles}</Text>}
                                                                                         </View>
                                                                                         <AntDesign name="caretdown" size={20} color="#777" />
                                                                                 </TouchableOpacity>
@@ -215,15 +319,16 @@ export default function ApprovisionnementScreen() {
                                                                                                 <Text style={[styles.inputText, { fontSize: 13 }]}>
                                                                                                         Couleur
                                                                                                 </Text>
-                                                                                                <Text style={[styles.inputText, { color: '#000' }]}>
-                                                                                                        kkk
-                                                                                                </Text>
+                                                                                                {selectedCouleur ? <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                                        {selectedCouleur.COULEUR}
+                                                                                                </Text> :
+                                                                                                        <Text style={[styles.inputText, { color: '#000' }]}>{autreCouleurs}</Text>}
                                                                                         </View>
                                                                                         <AntDesign name="caretdown" size={20} color="#777" />
                                                                                 </TouchableOpacity>
                                                                         </View>
 
-                                                                        <TouchableOpacity >
+                                                                        <TouchableOpacity onPress={Ajouter_detail}>
                                                                                 <View style={styles.buttonModal}>
                                                                                         <Text style={styles.buttonText} >Ajouter</Text>
                                                                                 </View>
@@ -250,11 +355,11 @@ export default function ApprovisionnementScreen() {
                                                 </TouchableOpacity>
                                                 {tailles.map((taille, index) => {
                                                         return (
-                                                                <TouchableOpacity key={index}>
+                                                                <TouchableOpacity key={index} onPress={() => onTaillesSelect(taille)}>
                                                                         <View style={styles.modalItemModel2} >
-                                                                                <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> 
-                                                                                        <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />
-                                                                                <Text>33333</Text>
+                                                                                {TailleSelect?.ID_TAILLE == taille.ID_TAILLE ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                                                        <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                                                                <Text>{taille.TAILLE}</Text>
                                                                         </View>
 
                                                                 </TouchableOpacity>
@@ -265,10 +370,10 @@ export default function ApprovisionnementScreen() {
                                                         <OutlinedTextField
                                                                 label={"Autres Tailles"}
                                                                 fontSize={14}
-                                                                // value={data.autresTaille}
-                                                                // onChangeText={(newValue) => handleChange('autresTaille', newValue)}
-                                                                // onBlur={() => checkFieldData('autresTaille')}
-                                                                // error={hasError('autresTaille') ? getError('autresTaille') : ''}
+                                                                value={data.autresTaille}
+                                                                onChangeText={(newValue) => handleChange('autresTaille', newValue)}
+                                                                onBlur={() => checkFieldData('autresTaille')}
+                                                                error={hasError('autresTaille') ? getError('autresTaille') : ''}
                                                                 lineWidth={0.5}
                                                                 activeLineWidth={0.5}
                                                                 baseColor={COLORS.smallBrown}
@@ -276,7 +381,7 @@ export default function ApprovisionnementScreen() {
                                                         />
                                                 </View>}
 
-                                                {showAUtresTaille && <TouchableOpacity >
+                                                {showAUtresTaille && <TouchableOpacity onPress={() => ajoutTailleInput(data.autresTaille)}>
                                                         <View style={styles.buttonModalSecond}>
                                                                 <Text style={styles.buttonText} >Ajouter</Text>
                                                         </View>
@@ -299,22 +404,26 @@ export default function ApprovisionnementScreen() {
                                                                 <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
                                                         <Text style={{ fontSize: 15, fontWeight: "bold" }}>Autres</Text>
                                                 </TouchableOpacity>
-                                                <TouchableOpacity >
-                                                        <View style={styles.modalItemModel2} >
-                                                                <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" />
-                                                                <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />
-                                                                <Text>ghfhf</Text>
-                                                        </View>
-                                                </TouchableOpacity>
+                                                {couleurs.map((couleur, index) => {
+                                                        return (
+                                                                <TouchableOpacity key={index} onPress={() => onCouleurSelect(couleur)}>
+                                                                        <View style={styles.modalItemModel2} >
+                                                                                {selectedCouleur?.ID_COULEUR == couleur.ID_COULEUR ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                                                        <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                                                                <Text>{couleur.COULEUR}</Text>
+                                                                        </View>
+                                                                </TouchableOpacity>
+                                                        )
+                                                })}
 
                                                 {showAUtresCouleur && <View style={{ marginHorizontal: 20, marginTop: 10 }}>
                                                         <OutlinedTextField
                                                                 label={"Autres Couleurs"}
                                                                 fontSize={14}
-                                                                // value={data.autresCouleur}
-                                                                // onChangeText={(newValue) => handleChange('autresCouleur', newValue)}
-                                                                // onBlur={() => checkFieldData('autresCouleur')}
-                                                                // error={hasError('autresCouleur') ? getError('autresCouleur') : ''}
+                                                                value={data.autresCouleur}
+                                                                onChangeText={(newValue) => handleChange('autresCouleur', newValue)}
+                                                                onBlur={() => checkFieldData('autresCouleur')}
+                                                                error={hasError('autresCouleur') ? getError('autresCouleur') : ''}
                                                                 lineWidth={0.5}
                                                                 activeLineWidth={0.5}
                                                                 baseColor={COLORS.smallBrown}
@@ -322,7 +431,7 @@ export default function ApprovisionnementScreen() {
                                                         />
                                                 </View>}
 
-                                                {showAUtresCouleur && <TouchableOpacity>
+                                                {showAUtresCouleur && <TouchableOpacity onPress={() => autreCouleurInput(data.autresCouleur)}>
                                                         <View style={styles.buttonModalSecond}>
                                                                 <Text style={styles.buttonText} >Ajouter</Text>
                                                         </View>
