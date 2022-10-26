@@ -6,7 +6,6 @@ import { COLORS } from '../../styles/COLORS'
 import fetchApi from "../../helpers/fetchApi";
 import Loading from './Loading'
 
-
 const SERVICES = [{
           id_service: 1,
           title: "Achat de produits",
@@ -71,6 +70,8 @@ export default function ServicesCategories() {
                               setLoading(false)
                     }
           }
+
+
           useEffect(() => {
                     modalizeRef.current?.open()
           }, [modalizeRef])
@@ -90,6 +91,7 @@ export default function ServicesCategories() {
                                         <Text style={styles.title}>Catégories de service</Text>
                                         <View style={styles.services}>
                                                   {SERVICES.map((service, index) => {
+
                                                             return (
                                                                       <View style={[styles.serviceContainer, { width: SERVICE_WIDTH, height: SERVICE_WIDTH }]} key={index.toString()}>
                                                                                 {/* <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} useForeground onPress={() => navigation.navigate(service.route)}> */}

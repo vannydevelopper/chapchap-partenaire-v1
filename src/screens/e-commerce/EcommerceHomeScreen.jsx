@@ -2,7 +2,7 @@ import React, { useCallback, useState, useEffect } from "react";
 import { Text, View, useWindowDimensions, ImageBackground, StatusBar, StyleSheet, Image, TextInput, ScrollView, TouchableOpacity, FlatList, TouchableNativeFeedback } from "react-native";
 import { EvilIcons, MaterialIcons, AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome, SimpleLineIcons, Octicons, Feather } from '@expo/vector-icons';
 import fetchApi from "../../helpers/fetchApi";
-import { DrawerActions, useFocusEffect, useNavigation } from "@react-navigation/native";
+import { DrawerActions, useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import { COLORS } from "../../styles/COLORS";
 import SubCategories from "../../components/ecommerce/home/SubCategories";
 import HomeProducts from "../../components/ecommerce/home/HomeProducts";
@@ -19,9 +19,10 @@ export default function EcommerceHomeScreen() {
           useFocusEffect(useCallback(() => {
                     (async () => {
                               try {
-                                        var url = "/partenaire/produit"
+                                        var url = `/partenaire/produit/${partenaire.produit.ID_PARTENAIRE_SERVICE}`
                                         const produits = await fetchApi(url)
                                         setProducts(produits.result)
+                                        // console.log(produits.result)
                               } catch (error) {
                                         console.log(error)
                               } finally {
@@ -31,6 +32,8 @@ export default function EcommerceHomeScreen() {
           }, []))
 
           const navigation = useNavigation()
+          const route = useRoute()
+          const {partenaire} = route.params
 
           return (
                     <View style={styles.container}>
@@ -102,7 +105,7 @@ export default function EcommerceHomeScreen() {
                                                   </View>
                                         }
                               </ScrollView>
-                              <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewProductSreen')}>
+                              <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('AccueilSearchProduitScreen', {partenaire:partenaire.produit.ID_PARTENAIRE_SERVICE} )}>
                                         <Text style={styles.addBtnText}>Nouveau produit</Text>
                               </TouchableOpacity>
                     </View>
