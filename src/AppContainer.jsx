@@ -19,7 +19,7 @@ export default function AppContainer() {
     useEffect(() => {
         (async function () {
             const user = await AsyncStorage.getItem("user")
-             await AsyncStorage.removeItem('user')
+            //  await AsyncStorage.removeItem('user')
             const onboarding = JSON.parse(await AsyncStorage.getItem('onboarding'))
             setShowOnBoarding(!onboarding || !onboarding.finished)
             dispatch(setUserAction(JSON.parse(user)))

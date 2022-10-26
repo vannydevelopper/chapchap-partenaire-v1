@@ -53,7 +53,7 @@ export default function Product({ product, index, totalLength, fixMargins = fals
                                         <View style={styles.detail}>
                                                   <Text style={styles.detailLabel}>Restante</Text>
                                                   <Text style={[styles.detailValue, { fontSize: 18 }]}>{product.stock.QUANTITE_RESTANTE}</Text>
-                                        </View>
+                                                    </View>
                               </View>
                     </View>
           )
