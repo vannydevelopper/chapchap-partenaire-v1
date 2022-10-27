@@ -22,7 +22,7 @@ export default function AccueilSearchProduitScreen() {
                         try {
                                 const produi = await fetchApi("/produit")
                                 setAllProduits(produi.result)
-                                console.log(produi.result)
+                                
                         }
                         catch (error) {
                                 console.log(error)

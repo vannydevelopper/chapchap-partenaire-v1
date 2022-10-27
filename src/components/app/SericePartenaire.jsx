@@ -24,6 +24,7 @@ export default function SericePartenaire() {
                         try {
                                 const partenaire = await fetchApi("/service/partenaire")
                                 setServices(partenaire.result)
+                              
                         } catch (error) {
                                 console.log(error)
                         } finally {
@@ -48,7 +49,7 @@ export default function SericePartenaire() {
                                 <View style={{ flex: 1 }}>
                                         <Text style={styles.title}>Vos services</Text>
                                         <View style={styles.services}>
-                                                {services.map((service, index) => {
+                                                {services.map(( service, index) => {
                                                         return (
                                                                 <View style={[styles.serviceContainer, { width: SERVICE_WIDTH, height: SERVICE_WIDTH }]} key={index}>
                                                                         <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} onPress={() => searchProduit(service)}>

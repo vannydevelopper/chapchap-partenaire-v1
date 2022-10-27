@@ -38,9 +38,8 @@ export default function InscriptionPartenaireScreen() {
           const [backgroundImage, setBackgroundImage] = useState(null)
           const [isLoading, setIsLoading] = useState(false)
           const [loading, setLoading] = useState(false);
-          const { service } = route.params
+          const { id_service,service } = route.params
           const user = useSelector(userSelector)
-
           const [data, handleChange, setValue] = useForm({
                     ServiceSelect: null,
                     typepartenaireselect: null,
@@ -51,7 +50,7 @@ export default function InscriptionPartenaireScreen() {
                     adresse: "",
           })
 
-          console.log(data.typepartenaireselect)
+      //     console.log(data.typepartenaireselect)
 
           const isValid = useCallback(() => {
                     const basicValidation = selectedTypePartenaire !=null && data.email != "" && data.telephone != "" && logoImage != null
@@ -90,7 +89,7 @@ export default function InscriptionPartenaireScreen() {
                               form.append('ADRESSE_COMPLETE', data.adresse)
                               // form.append('LONGITUDE', location.coords.longitude)
                               // form.append('LATITUDE', location.coords)
-                              form.append('ID_SERVICE', selectedTypePartenaire.ID_PARTENAIRE_TYPE)
+                              form.append('ID_SERVICE', id_service)
 
                               if (logoImage) {
                                         const manipResult = await manipulateAsync(
