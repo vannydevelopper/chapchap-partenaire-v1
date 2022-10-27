@@ -1,916 +1,512 @@
-import React, { useEffect, useRef, useCallback, useState } from "react";
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TextInput, TouchableNativeFeedback, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { ActivityIndicator, Image, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableNativeFeedback, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { TextField, FilledTextField, InputAdornment, OutlinedTextField } from 'rn-material-ui-textfield'
 import { Modalize } from "react-native-modalize";
-import { DrawerActions, useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Portal } from "react-native-portalize";
 import useFetch from "../../hooks/useFetch";
 import { useForm } from "../../hooks/useForm";
 import { COLORS } from "../../styles/COLORS";
-import { SimpleLineIcons, AntDesign, Ionicons } from '@expo/vector-icons';
+import { SimpleLineIcons, AntDesign, Ionicons, Octicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useFormErrorsHandle } from "../../hooks/useFormErrorsHandle";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import fetchApi from "../../helpers/fetchApi";
-import Loading from "../../components/app/Loading";
-
+import Loading from "../../components/app/Loading"
 export default function NewMenuScreen() {
-          const [isOpen, setIsOpen] = useState(false)
-          const [loadingForm, setLoadingForm] = useState(true)
-          const [isLoading, setIsLoading] = useState(false)
+    const navigation = useNavigation()
+    const route = useRoute()
+    // const { product, partenaire } = route.params
+    // console.log(partenaire)
+    const couleurModalizeRef = useRef(null)
+    const tailleModalizeRef = useRef(null)
+    const ajoutDetailsModalizeRef = useRef(null)
+    const categoriesModalizeRef = useRef(null)
+    const SousCategoriesModalizeRef = useRef(null)
 
-          const navigation = useNavigation()
+    const [logoImage, setLogoImage] = useState(null)
+    const [logoImage1, setLogoImage1] = useState(null)
+    const [logoImage2, setLogoImage2] = useState(null)
 
-          const repasModalizeRef = useRef(null)
-          const categoriesModalizeRef = useRef(null)
-          const sousCategoriesModalizeRef = useRef(null)
-          const sousSousCategoriesModalizeRef = useRef(null)
-          const unitesModalizeRef = useRef(null)
-          const typesModalizeRef = useRef(null)
+    const [TailleSelect, setTailleSelect] = useState(null)
+    const [selectedCouleur, setselectedCouleur] = useState(null)
+    const [CategorieSelect, setCategorieSelect] = useState(null)
+    const [selectedSousCategorie, setselectedSousCategorie] = useState(null)
 
-          const [data, handleChange] = useForm({
-                    typess: null,
-                    repas: null,
-                    category: null,
-                    subcategory: null,
-                    subSubcategory: null,
-                    unity: null,
-                    quantite: "",
-                    descriptionTaille: "",
-                    montant: ""
-          })
-          // console.log(data.typess)
-          const { errors, setError, getErrors, setErrors, checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
-                    repas: {
-                              required: true,
-                    },
-                    category: {
-                              required: true,
-                    },
-                    descriptionTaille: {
-                              length: [1, 3000]
-                    },
-                    quantite: {
-                              required: true,
-                              length: [1, 11]
-                    },
-                    montant: {
-                              required: true,
-                              length: [1, 11]
-                    }
-          }, {
-                    repas: {
-                              required: "Veuillez choisir le produit",
-                    },
-                    category: {
-                              required: "Veuillez choisir la catégorie",
-                    },
-                    descriptionTaille: {
-                              length: "La description du produit ne peut pas dépasser 3000 caractères"
-                    },
-                    quantite: {
-                              required: "La quantité est obligatoire",
-                              length: "Quantité invalide"
-                    },
-                    montant: {
-                              required: "Le prix unitaire est obligatoire",
-                              length: "Prix unitaire invalide"
-                    }
-          })
+    const [showAUtresTaille, setShowAUtresTaille] = useState(false)
+    const [showAUtresCouleur, setShowAUtresCouleur] = useState(false)
 
-          const nomRef = useRef(null)
-          const descriptionrepasRef = useRef(null)
-          const quantiteRef = useRef(null)
-          const descriptionTailleRef = useRef(null)
-          const amountRef = useRef(null)
+    const [categories, setCategories] = useState([])
+    const [souscategories, setSouscategories] = useState([])
+    const [loading, setLoading] = useState(false);
 
-          const [types, setTypes] = useState([])
-          const [loadingTypes, setLoadingTypes] = useState(true)
+    const [data, handleChange, setValue] = useForm({
+        CategorieSelect: null,
+        selectedSousCategorie: null,
+        nom: "",
+        prix: "",
+        logoImage: "",
+        logoImage1: "",
+        logoImage2: "",
+    })
 
-          const [repas, setRepas] = useState([])
-          const [loadingRepas, setLoadingRepas] = useState(true)
+    // console.log(detailData)
 
-          const [categories, setCategories] = useState([])
-          const [loadingCategories, setLoadingCategories] = useState(true)
+    const { checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
+        quantite: {
+            required: true,
 
-          const [sousCategorie, setSousCategorie] = useState([])
-          const [loadingSousCategorie, setLoadingSousCategorie] = useState(true)
+        },
+    }, {
+        quantite: {
+            required: "Quantite est obligatoire"
+        },
+    })
 
-          const [sousSousCategorie, setSousSousCategorie] = useState([])
-          const [loadingSousSousCategorie, setLoadingSousSousCategorie] = useState(true)
+    useEffect(() => {
+        (async () => {
+            try {
+                const catego = await fetchApi("/resto/menu/categories")
+                setCategories(catego.result)
+                // console.log(catego.result)
+            } catch (error) {
+                console.log(error)
+            } finally {
 
-          const [unites, setUnites] = useState([])
-          const [loadingUnites, setLoadingUnites] = useState(true)
+            }
+        })()
+    }, [])
 
-          const [images, setImages] = useState([])
+    useEffect(() => {
+        (async () => {
+            try {
+                if (CategorieSelect != null) {
+                    var sousCatego = await fetchApi(`/resto/menu/sous_categories/${CategorieSelect.ID_CATEGORIE_MENU}`)
+                    setSouscategories(sousCatego.result)
+                }
+                // console.log(sousCatego.result)
 
-          useEffect(() => {
-                    if (isOpen) {
-                              const timer = setTimeout(() => {
-                                        setLoadingForm(false)
-                              })
-                              return () => {
-                                        clearTimeout(timer)
-                              }
-                    }
-          }, [isOpen])
+            }
+            catch (error) {
+                console.log(error)
+            } finally {
 
-          useFocusEffect(useCallback(() => {
-                    (async () => {
-                              try {
-                                        var url = "/resto/menu/types"
-                                        const type = await fetchApi(url)
-                                        setTypes(type.result)
-                                        // console.log(type.result)
-                              } catch (error) {
-                                        console.log(error)
-                              } finally {
-                                        setLoadingRepas(false)
-                              }
-                    })()
-          }, []))
+            }
+        })()
+    }, [CategorieSelect])
 
-          useFocusEffect(useCallback(() => {
-                    (async () => {
-                              try {
-                                        // var url = `/resto/menu/repas/${data.typess.ID_TYPE_REPAS}`
-                                        const type = await fetchApi(`/resto/menu/repas/${data.typess.ID_TYPE_REPAS}`)
-                                        setRepas(type.result)
-                                        // console.log(repa.result)
-                              } catch (error) {
-                                        console.log(error)
-                              } finally {
-                                        setLoadingRepas(false)
-                              }
-                    })()
-          }, [data]))
+    // useEffect(() => {
+    //         (async () => {
+    //                 try {
+    //                         var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
+    //                         if (selectedSousCategorie != null) {
+    //                                 var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE}`)
+    //                                 setTaille(taille.result)
+    //                         }
+    //                         // console.log(taille.result)
+    //                 }
+    //                 catch (error) {
+    //                         console.log(error)
+    //                 } finally {
 
-          useFocusEffect(useCallback(() => {
-                    (async () => {
-                              try {
-                                        var url = "/resto/menu/categories"
-                                        const categorie = await fetchApi(url)
-                                        setCategories(categorie.result)
-                                        // console.log(categorie.result)
-                              } catch (error) {
-                                        console.log(error)
-                              } finally {
-                                        setLoadingCategories(false)
-                              }
-                    })()
-          }, []))
+    //                 }
+    //         })()
+    // }, [CategorieSelect, selectedSousCategorie])
 
-          useFocusEffect(useCallback(() => {
-                    (async () => {
-                              try {
-                                        var url = "/resto/menu/souscategories"
-                                        const souscategorie = await fetchApi(url)
-                                        setSousCategorie(souscategorie.result)
-                                        // console.log(souscategorie.result)
-                              } catch (error) {
-                                        console.log(error)
-                              } finally {
-                                        setLoadingSousCategorie(false)
-                              }
-                    })()
-          }, []))
+    // useEffect(() => {
+    //         (async () => {
+    //                 try {
+    //                         var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
+    //                         if (selectedSousCategorie != null) {
+    //                                 var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE}`)
+    //                                 setCouleur(couleur.result)
+    //                         }
 
-          useFocusEffect(useCallback(() => {
-                    (async () => {
-                              try {
-                                        var url = "/resto/menu/soussouscategories"
-                                        const soussouscategorie = await fetchApi(url)
-                                        setSousSousCategorie(soussouscategorie.result)
-                                        // console.log(soussouscategorie.result)
-                              } catch (error) {
-                                        console.log(error)
-                              } finally {
-                                        setLoadingSousSousCategorie(false)
-                              }
-                    })()
-          }, []))
+    //                         // console.log(couleur.result)
+    //                 }
+    //                 catch (error) {
+    //                         console.log(error)
+    //                 } finally {
 
-          useFocusEffect(useCallback(() => {
-                    (async () => {
-                              try {
-                                        var url = "/resto/menu/unites"
-                                        const unites = await fetchApi(url)
-                                        setUnites(unites.result)
-                                        // console.log(unites.result)
-                              } catch (error) {
-                                        console.log(error)
-                              } finally {
-                                        setLoadingUnites(false)
-                              }
-                    })()
-          }, []))
+    //                 }
 
-          const onImageSelect = async () => {
-                    const image = await ImagePicker.launchImageLibraryAsync({
-                              mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                              quality: 0.6
-                    });
-                    if (!image.cancelled) {
-                              setImages(t => [...t, image])
-                    }
-          }
+    //         })()
+    // }, [CategorieSelect, selectedSousCategorie])
+    const onCategorieSelect = (categorie) => {
+        console.log(CategorieSelect)
+        setCategorieSelect(categorie)
+        categoriesModalizeRef.current.close()
+    }
+    const onSousCategorieSelect = (souscategorie) => {
+        setselectedSousCategorie(souscategorie)
+        SousCategoriesModalizeRef.current.close()
+    }
+    const onImagesSelect = async () => {
+        const photo = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsMultipleSelection: true
+        })
+        if (photo.cancelled) {
+            return false
+        }
+        setLogoImage(photo)
+    }
+    const onImagesSelect1 = async () => {
+        const photo = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsMultipleSelection: true
+        })
+        if (photo.cancelled) {
+            return false
+        }
+        setLogoImage1(photo)
+    }
+    const onImagesSelect2 = async () => {
+        const photo = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsMultipleSelection: true
+        })
+        if (photo.cancelled) {
+            return false
+        }
+        setLogoImage2(photo)
+    }
 
-          const onRemoveImage = index => {
-                    const newImages = images.filter((_, i) => i != index)
-                    setImages(newImages)
-          }
+    const SendData = async () => {
+        try {
+            setLoading(true)
+            const form = new FormData()
+            form.append("ID_CATEGORIE_MENU", CategorieSelect.ID_CATEGORIE_MENU)
+            if (data.subSubcategory != null) {
+                form.append("ID_SOUS_SOUS_CATEGORIE", selectedSousCategorie.ID_SOUS_SOUS_CATEGORIE)
+            }                    
+            form.append('ID_PARTENAIRE_SERVICE', 1)
+            form.append("NOM_MENU", data.nom)
+            form.append("PRIX", data.prix)
 
-          const onSubmit = async () => {
-                    try {
-                              setIsLoading(true)
-                              if (!isValidate()) throw { errors: getErrors() }
-                              const form = new FormData()
-                              form.append("DESCRIPTION", data.repas.ID_REPAS)
-                              form.append("ID_CATEGORIE_MENU", data.category.ID_CATEGORIE_MENU)
-                              form.append("ID_SOUS_CATEGORIE_MENU", data.subcategory.ID_SOUS_CATEGORIE_MENU)
-                              if (data.subSubcategory != null) {
-                                        form.append("ID_SOUS_SOUS_CATEGORIE", data.subSubcategory.ID_SOUS_SOUS_CATEGORIE)
-                              }
-                              form.append("QUANTITE", data.quantite)
-                              form.append("DESCRIPTION_TAILLE", data.descriptionTaille)
-                              form.append("ID_UNITE", data.unity.ID_UNITE)
-                              form.append("MONTANT", data.montant)
+            if (logoImage) {
+                const manipResult = await manipulateAsync(
+                        logoImage.uri,
+                        [
+                                { resize: { width: 500 } }
+                        ],
+                        { compress: 0.8, format: SaveFormat.JPEG }
+                );
+                let localUri = manipResult.uri;
+                let filename = localUri.split('/').pop();
+                let match = /\.(\w+)$/.exec(filename);
+                let type = match ? `image/${match[1]}` : `image`;
+                form.append('IMAGE_1', {
+                        uri: localUri, name: filename, type
+                })
 
-                              if (images.length > 0) {
-                                        await Promise.all(images.map(async (image, index) => {
-                                                  const key = `IMAGE_${index + 1}`
-                                                  // const manipResult = await manipulateAsync(
-                                                  //           image.uri,
-                                                  //           [
-                                                  //                     { resize: { width: 500 } }
-                                                  //           ],
-                                                  //           { compress: 0.8, format: SaveFormat.JPEG }
-                                                  // );
-                                                  const manipResult = image
-                                                  let localUri = manipResult.uri;
-                                                  let filename = localUri.split('/').pop();
-                                                  let match = /\.(\w+)$/.exec(filename);
-                                                  let type = match ? `image/${match[1]}` : `image`;
-                                                  form.append(key, {
-                                                            uri: localUri, name: filename, type
-                                                  })
-                                        }))
-                              }
-                              console.log(form)
-                              const newMenu = await fetchApi('/resto/menu/create', {
-                                        method: "POST",
-                                        body: form
-                              })
-                              navigation.navigate("NewMenuDetailScreen", { menus: newMenu })
-                    } catch (error) {
-                              console.log(error)
-                    } finally {
-                              setIsLoading(false)
-                    }
-          }
+        }
+            form.append("DESCRIPTION_TAILLE", data.descriptionTaille)
 
-          const TypesModalize = () => {
-                    return (
-                              <View style={styles.modalContainer}>
-                                        <View style={styles.modalHeader}>
-                                                  <Text style={styles.modalTitle}>Les types de repas</Text>
-                                                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                            <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                      <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                            </TouchableOpacity>
-                                                            <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                      <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                            </TouchableOpacity>
-                                                  </View>
+            console.log(form)
+            //   const newMenu = await fetchApi('/resto/menu/create', {
+            //             method: "POST",
+            //             body: form
+            //   })
+            //   navigation.navigate("NewMenuDetailScreen", { menus: newMenu })
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setLoading(false)
+        }
+    }
+    return (
+        <>
+            {loading && <Loading />}
+            <View style={styles.container}>
+                <View style={styles.cardHeader}>
+                    <TouchableOpacity style={styles.menuOpener} onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
+                        <View style={styles.menuOpenerLine} />
+                        <View style={[styles.menuOpenerLine, { width: 15 }]} />
+                        <View style={[styles.menuOpenerLine, { width: 25 }]} />
+                    </TouchableOpacity>
+                    <View style={styles.imageContainer}>
+                        <Image source={require('../../../assets/images/chapchap.png')} style={styles.logo} />
+                    </View>
+                    <View style={{ marginTop: 25 }}>
+                        <Octicons name="bell" size={24} color={COLORS.primary} />
+                    </View>
+                </View>
+                <Text style={styles.title}>Nouveau Menu</Text>
+                <ScrollView keyboardShouldPersistTaps="handled" style={{ marginBottom: 20 }}>
+                    <View>
+                        <View>
+                            <View style={styles.inputCard}>
+                                <OutlinedTextField
+                                    label={"Nom du menu"}
+                                    fontSize={14}
+                                    value={data.produit}
+                                    onChangeText={(newValue) => handleChange('produit', newValue)}
+                                    onBlur={() => checkFieldData('produit')}
+                                    error={hasError('produit') ? getError('produit') : ''}
+                                    lineWidth={0.5}
+                                    activeLineWidth={0.5}
+                                    baseColor={COLORS.smallBrown}
+                                    tintColor={COLORS.primary}
+                                />
+                            </View>
+                            <View>
+                                <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: 20 }}
+                                    onPress={() => categoriesModalizeRef.current.open()}
+                                // disabled={service.id_service == 2}
+                                >
+                                    <View >
+                                        <Text style={[styles.inputText, { fontSize: 13 }]}>
+                                            Categorie
+                                        </Text>
+                                        {CategorieSelect && <Text style={[styles.inputText, { color: '#000' }]}>
+                                            {CategorieSelect.NOM}
+                                        </Text>}
+                                    </View>
+                                    <AntDesign name="caretdown" size={20} color="#777" />
+                                </TouchableOpacity>
+                            </View>
+                            <View>
+                                <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: 20, marginTop: 10 }}
+                                    onPress={() => SousCategoriesModalizeRef.current.open()}
+                                // disabled={service.id_service == 2}
+                                >
+                                    <View >
+                                        <Text style={[styles.inputText, { fontSize: 13 }]}>
+                                            Sous Categorie
+                                        </Text>
+                                        {selectedSousCategorie && <Text style={[styles.inputText, { color: '#000' }]}>
+                                            {selectedSousCategorie.NOM}
+                                        </Text>}
+                                    </View>
+                                    <AntDesign name="caretdown" size={20} color="#777" />
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.inputCard}>
+                                <OutlinedTextField
+                                    label={"Entrez votre prix"}
+                                    fontSize={14}
+                                    value={data.prix}
+                                    onChangeText={(newValue) => handleChange('prix', newValue)}
+                                    onBlur={() => checkFieldData('prix')}
+                                    error={hasError('prix') ? getError('prix') : ''}
+                                    lineWidth={0.5}
+                                    activeLineWidth={0.5}
+                                    baseColor={COLORS.smallBrown}
+                                    tintColor={COLORS.primary}
+                                />
+                            </View>
+                            <View style={[styles.addImageContainer, { marginVertical: 30 }]}>
+                                <TouchableWithoutFeedback onPress={onImagesSelect}>
+                                    <View style={styles.addImageItem}>
+                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                            <Feather name="image" size={24} color="#777" />
+                                            <Text style={styles.addImageLabel}>
+                                                Images
+                                            </Text>
                                         </View>
-                                        {types.map((type, index) => {
-                                                  return (
-                                                            <TouchableNativeFeedback
-                                                                      onPress={() => {
-                                                                                handleChange("typess", type)
-                                                                                typesModalizeRef.current.close()
-                                                                      }} key={index.toString()}>
-                                                                      <View style={styles.modalItem}>
-                                                                                {/* <View style={styles.modalImageContainer}>
-                                                                <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
-                                                        </View> */}
-                                                                                <Text style={styles.itemTitle}>{type.DESCRIPTION}</Text>
-                                                                      </View>
-                                                            </TouchableNativeFeedback>
-                                                  )
-                                        })}
-
-                              </View>
-                    )
-          }
-
-          const RepasModalize = () => {
-                    return (
-                              (loadingForm || loadingRepas) ? <ActivityIndicator
-                                        animating
-                                        size={"small"}
-                                        color='#777'
-                                        style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
-                              /> :
-
-                                        <View style={styles.modalContainer}>
-                                                  <View style={styles.modalHeader}>
-                                                            <Text style={styles.modalTitle}>Les repas</Text>
-                                                            <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                            </View>
-                                                  </View>
-
-                                                  {repas.map((repa, index) => {
-                                                            return (
-                                                                      <TouchableNativeFeedback onPress={() => {
-                                                                                handleChange("repas", repa)
-                                                                                repasModalizeRef.current.close()
-                                                                      }} key={index.toString()}>
-                                                                                <View style={[styles.modalItem, repa.ID_REPAS == data.repas?.ID_REPAS && { backgroundColor: '#ddd' }]} >
-                                                                                          {/* <View style={styles.modalImageContainer}>
-                                                                <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
-                                                        </View> */}
-                                                                                          <Text style={styles.itemTitle}>{repa.DESCRIPTION}</Text>
-                                                                                </View>
-                                                                      </TouchableNativeFeedback>
-                                                            )
-                                                  })}
-
+                                        {logoImage && <Image source={{ uri: logoImage.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
+                                    </View>
+                                </TouchableWithoutFeedback>
+                            </View>
+                            <View style={[styles.addImageContainer, { marginVertical: 30 }]}>
+                                <TouchableWithoutFeedback onPress={onImagesSelect1}>
+                                    <View style={styles.addImageItem}>
+                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                            <Feather name="image" size={24} color="#777" />
+                                            <Text style={styles.addImageLabel}>
+                                                Images_1
+                                            </Text>
                                         </View>
-                    )
-          }
-
-          const CategoriesModalize = () => {
-                    return (
-                              (loadingForm || loadingCategories) ? <ActivityIndicator
-                                        animating
-                                        size={"small"}
-                                        color='#777'
-                                        style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
-                              /> :
-                                        <View style={styles.modalContainer}>
-                                                  <View style={styles.modalHeader}>
-                                                            <Text style={styles.modalTitle}>Les categories</Text>
-                                                            <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                            </View>
-                                                  </View>
-                                                  {categories.map((categorie, index) => {
-                                                            return (
-                                                                      <TouchableNativeFeedback onPress={() => {
-                                                                                handleChange("category", categorie)
-                                                                                categoriesModalizeRef.current.close()
-                                                                      }} key={index.toString()}>
-                                                                                <View style={[styles.modalItem, categorie.ID_CATEGORIE_MENU == data.category?.ID_CATEGORIE_MENU && { backgroundColor: '#ddd' }]} >
-                                                                                          {/* <View style={styles.modalImageContainer}>
-                                                                                        <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
-                                                                                </View> */}
-                                                                                          <Text style={styles.itemTitle}>{categorie.NOM}</Text>
-                                                                                </View>
-                                                                      </TouchableNativeFeedback>
-                                                            )
-                                                  })}
+                                        {logoImage1 && <Image source={{ uri: logoImage1.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
+                                    </View>
+                                </TouchableWithoutFeedback>
+                            </View>
+                            <View style={[styles.addImageContainer, { marginVertical: 30 }]}>
+                                <TouchableWithoutFeedback onPress={onImagesSelect2}>
+                                    <View style={styles.addImageItem}>
+                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                            <Feather name="image" size={24} color="#777" />
+                                            <Text style={styles.addImageLabel}>
+                                                Images_2
+                                            </Text>
                                         </View>
-                    )
-          }
+                                        {logoImage2 && <Image source={{ uri: logoImage2.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
+                                    </View>
+                                </TouchableWithoutFeedback>
+                            </View>
+                        </View>
+                        <TouchableOpacity onPress={SendData}>
+                            <View style={styles.button}>
+                                <Text style={styles.buttonText} >Enregistrer</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            </View>
+            <Modalize ref={categoriesModalizeRef} adjustToContentHeight handlePosition='inside'>
+                <>
+                    <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 15 }}>
+                        <Text style={{ fontSize: 17, fontWeight: "bold" }}>Categories</Text>
+                    </View>
+                    <View>
+                        {categories.map((categorie, index) => {
+                            return (
+                                <TouchableOpacity key={index} onPress={() => onCategorieSelect(categorie)}>
+                                    <View style={styles.modalItemModel2} >
+                                        {CategorieSelect?.ID_CATEGORIE_MENU == categorie.ID_CATEGORIE_MENU ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                            <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                        <Text>{categorie.NOM}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            )
+                        })}
 
-          const SousCategoriesModalize = () => {
-                    return (
-                              (loadingForm || loadingSousCategorie) ? <ActivityIndicator
-                                        animating
-                                        size={"small"}
-                                        color='#777'
-                                        style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
-                              /> :
-                                        <View style={styles.modalContainer}>
-                                                  <View style={styles.modalHeader}>
-                                                            <Text style={styles.modalTitle}>Les sous categories</Text>
-                                                            <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                            </View>
-                                                  </View>
-                                                  {sousCategorie.map((sousCateg, index) => {
-                                                            return (
-                                                                      <TouchableNativeFeedback onPress={() => {
-                                                                                handleChange("subcategory", sousCateg)
-                                                                                sousCategoriesModalizeRef.current.close()
-                                                                      }} key={index.toString()}>
-                                                                                <View style={[styles.modalItem, sousCateg.ID_SOUS_CATEGORIE_MENU == data.subcategory?.ID_SOUS_CATEGORIE_MENU && { backgroundColor: '#ddd' }]} >
-                                                                                          {/* <View style={styles.modalImageContainer}>
-                                                                                        <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
-                                                                                </View> */}
-                                                                                          <Text style={styles.itemTitle}>{sousCateg.NOM}</Text>
-                                                                                </View>
-                                                                      </TouchableNativeFeedback>
-                                                            )
-                                                  })}
-                                        </View>
-                    )
-          }
+                    </View>
+                </>
+            </Modalize>
 
-          const SousSousCategoriesModalize = () => {
-                    return (
-                              (loadingForm || loadingSousSousCategorie) ? <ActivityIndicator
-                                        animating
-                                        size={"small"}
-                                        color='#777'
-                                        style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
-                              /> :
-                                        <View style={styles.modalContainer}>
-                                                  <View style={styles.modalHeader}>
-                                                            <Text style={styles.modalTitle}>Les des sous categories</Text>
-                                                            <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                            </View>
-                                                  </View>
-                                                  {sousSousCategorie.map((soussousCateg, index) => {
-                                                            return (
-                                                                      <TouchableNativeFeedback onPress={() => {
-                                                                                handleChange("subSubcategory", soussousCateg)
-                                                                                sousSousCategoriesModalizeRef.current.close()
-                                                                      }} key={index.toString()} >
-                                                                                <View style={[styles.modalItem, soussousCateg.ID_SOUS_SOUS_CATEGORIE == data.subSubcategory?.ID_SOUS_SOUS_CATEGORIE && { backgroundColor: '#ddd' }]} >
-                                                                                          {/* <View style={styles.modalImageContainer}>
-                                                                                        <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
-                                                                                </View> */}
-                                                                                          <Text style={styles.itemTitle}>{soussousCateg.DESCRIPTION}</Text>
-                                                                                </View>
-                                                                      </TouchableNativeFeedback>
-                                                            )
-                                                  })}
-                                        </View>
-                    )
-          }
-
-          const UnitesModalize = () => {
-                    return (
-                              (loadingForm || loadingUnites) ? <ActivityIndicator
-                                        animating
-                                        size={"small"}
-                                        color='#777'
-                                        style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
-                              /> :
-                                        <View style={styles.modalContainer}>
-                                                  <View style={styles.modalHeader}>
-                                                            <Text style={styles.modalTitle}>Les des sous categories</Text>
-                                                            <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                            </View>
-                                                  </View>
-                                                  {unites.map((unite, index) => {
-                                                            return (
-                                                                      <TouchableNativeFeedback
-                                                                                onPress={() => {
-                                                                                          handleChange("unity", unite)
-                                                                                          unitesModalizeRef.current.close()
-                                                                                }} key={index.toString()} >
-                                                                                <View style={[styles.modalItem, unite.ID_UNITE == data.unity?.ID_UNITE && { backgroundColor: '#ddd' }]} >
-                                                                                          {/* <View style={styles.modalImageContainer}>
-                                                        <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
-                                                </View> */}
-                                                                                          <Text style={styles.itemTitle}>{unite.UNITES_MESURES}</Text>
-                                                                                </View>
-                                                                      </TouchableNativeFeedback>
-                                                            )
-                                                  })}
-
-                                        </View>
-                    )
-          }
+            <Modalize ref={SousCategoriesModalizeRef} adjustToContentHeight handlePosition='inside'>
+                <>
+                    <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 15 }}>
+                        <Text style={{ fontSize: 17, fontWeight: "bold" }}>Sous Categories</Text>
+                    </View>
+                    <View>
+                        {souscategories.map((souscategorie, index) => {
+                            return (
+                                <TouchableOpacity key={index} onPress={() => onSousCategorieSelect(souscategorie)}>
+                                    <View style={styles.modalItemModel2} >
+                                        {selectedSousCategorie?.ID_SOUS_CATEGORIE_MENU == souscategorie.ID_SOUS_CATEGORIE_MENU ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                            <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                        <Text>{souscategorie.NOM}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            )
+                        })}
 
 
-          return (
-                    <>
-                              <ScrollView style={styles.container}>
-                                        {isLoading && <Loading />}
-                                        <View style={styles.header}>
-                                                  <Text style={styles.title}>Nouveau menu</Text>
-                                                  <TouchableNativeFeedback useForeground onPress={() => navigation.goBack()}>
-                                                            <View style={styles.cancelBtn}>
-                                                                      <Ionicons name="close" size={30} color="#777" />
-                                                            </View>
-                                                  </TouchableNativeFeedback>
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Type de repas</Text>
-                                                  <TouchableOpacity style={styles.selectedLabelContainer}
-                                                            onPress={() => {
-                                                                      setIsOpen(true)
-                                                                      typesModalizeRef.current?.open()
-                                                            }}>
-                                                            <Text style={styles.selectedLabel} >
-                                                                      {data.typess ? data.typess.DESCRIPTION : "Aucun type de repas selectionné"}
-                                                            </Text>
-                                                  </TouchableOpacity>
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Nom du repas</Text>
-                                                  <TouchableOpacity style={styles.selectedLabelContainer}
-                                                            onPress={() => {
-                                                                      setIsOpen(true)
-                                                                      repasModalizeRef.current?.open()
-                                                            }}
-                                                  >
-                                                            <Text style={styles.selectedLabel} >
-                                                                      {data.repas ? data.repas.DESCRIPTION : " Aucun Nom du repas selectionné"}
-                                                            </Text>
-                                                  </TouchableOpacity>
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Catégorie</Text>
-                                                  <TouchableOpacity style={styles.selectedLabelContainer}
-                                                            onPress={() => {
-                                                                      setIsOpen(true)
-                                                                      categoriesModalizeRef.current?.open()
-                                                            }}
-                                                  >
-                                                            <Text style={styles.selectedLabel} >
-                                                                      {data.category ? data.category.NOM : "Aucune catégorie selectionné"}
-                                                            </Text>
-                                                  </TouchableOpacity>
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Sous catégorie</Text>
-                                                  <TouchableOpacity style={styles.selectedLabelContainer}
-                                                            onPress={() => {
-                                                                      setIsOpen(true)
-                                                                      sousCategoriesModalizeRef.current?.open()
-                                                            }}
-                                                  >
-                                                            <Text style={styles.selectedLabel} >
-                                                                      {data.subcategory ? data.subcategory.NOM : "Aucun sous-catégorie selectionné"}
-                                                            </Text>
-                                                  </TouchableOpacity>
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Plus de précision</Text>
-                                                  <TouchableOpacity style={styles.selectedLabelContainer}
-                                                            onPress={() => {
-                                                                      setIsOpen(true)
-                                                                      sousSousCategoriesModalizeRef.current?.open()
-                                                            }}
-                                                  >
-                                                            <Text style={styles.selectedLabel} >
-                                                                      {data.subSubcategory ? data.subSubcategory.DESCRIPTION : "Aucune autre precision selectionné"}
-                                                            </Text>
-                                                  </TouchableOpacity>
-                                        </View>
 
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>
-                                                            Taille
-                                                  </Text>
-                                                  <TextInput
-                                                            ref={quantiteRef}
-                                                            style={styles.input}
-                                                            value={data.quantite}
-                                                            onChangeText={e => handleChange("quantite", e)}
-                                                            //  onFocus={() => setIsAmountFocused(true)}
-                                                            placeholder="Taille de votre repas"
-                                                            //  onBlur={() => {
-                                                            //            setIsAmountFocused(false)
-                                                            //  }}
-                                                            keyboardType="decimal-pad"
-                                                            returnKeyType="next"
-                                                            //  onSubmitEditing={() => priceRef.current.focus()}
-                                                            blurOnSubmit={false}
-                                                  />
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Unité de la taille</Text>
-                                                  <TouchableOpacity style={styles.selectedLabelContainer}
-                                                            onPress={() => {
-                                                                      setIsOpen(true)
-                                                                      unitesModalizeRef.current?.open()
-                                                            }}
-                                                  >
-                                                            <Text style={styles.selectedLabel} >
-                                                                      {data.unity ? data.unity.UNITES_MESURES : "cl, mm..."}
-
-                                                            </Text>
-                                                  </TouchableOpacity>
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Titre de la taille</Text>
-                                                  <TextInput
-                                                            ref={descriptionTailleRef}
-                                                            style={styles.input}
-                                                            value={data.descriptionTaille}
-                                                            onChangeText={e => handleChange("descriptionTaille", e)}
-                                                            // onFocus={() => setIsDescFocused(true)}
-                                                            placeholder="Plat..."
-                                                            // onBlur={() => {
-                                                            //         setIsDescFocused(false)
-                                                            // }}
-                                                            multiline
-                                                  />
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Montant</Text>
-                                                  <TextInput
-                                                            ref={amountRef}
-                                                            style={styles.input}
-                                                            value={data.montant}
-                                                            onChangeText={e => handleChange("montant", e)}
-                                                            //  onFocus={() => setIsAmountFocused(true)}
-                                                            placeholder="Combien coûte un plat ?"
-                                                            //  onBlur={() => {
-                                                            //            setIsAmountFocused(false)
-                                                            //  }}
-                                                            keyboardType="decimal-pad"
-                                                            returnKeyType="next"
-                                                            //  onSubmitEditing={() => priceRef.current.focus()}
-                                                            blurOnSubmit={false}
-                                                  />
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Images du produit</Text>
-                                                  <View style={styles.images}>
-                                                            {images.map((image, index) => {
-                                                                      return (
-                                                                                <TouchableWithoutFeedback onPress={() => onRemoveImage(index)} key={index}>
-                                                                                          <Image style={[styles.addImager, index > 0 && { marginLeft: 10 }]} source={{ uri: image.uri }} />
-                                                                                </TouchableWithoutFeedback>
-                                                                      )
-                                                            })}
-                                                            {images.length < 3 ? <TouchableWithoutFeedback onPress={onImageSelect}>
-                                                                      <View style={[styles.addImager, images.length > 0 && { marginLeft: 10 }]}>
-                                                                                <Feather name="image" size={30} color="#777" />
-                                                                      </View>
-                                                            </TouchableWithoutFeedback> : null}
-                                                  </View>
-                                        </View>
-
-                                        <TouchableOpacity style={styles.addBtn} onPress={onSubmit}>
-                                                  <Text style={styles.addBtnText}>Publier un menu</Text>
-                                        </TouchableOpacity>
-
-                              </ScrollView>
-                              <Modalize
-                                        ref={typesModalizeRef}
-                                        adjustToContentHeight
-                                        handlePosition='inside'
-                                        modalStyle={{
-                                                  borderTopRightRadius: 25,
-                                                  borderTopLeftRadius: 25,
-                                                  paddingVertical: 20
-                                        }}
-                                        handleStyle={{ marginTop: 10 }}
-                                        scrollViewProps={{
-                                                  keyboardShouldPersistTaps: "handled"
-                                        }}
-                                        onClosed={() => {
-                                                  setIsOpen(false)
-                                                  setLoadingForm(true)
-                                        }}
-                              >
-                                        <TypesModalize />
-                              </Modalize>
-                              <Modalize
-                                        ref={repasModalizeRef}
-                                        adjustToContentHeight
-                                        handlePosition='inside'
-                                        modalStyle={{
-                                                  borderTopRightRadius: 25,
-                                                  borderTopLeftRadius: 25,
-                                                  paddingVertical: 20
-                                        }}
-                                        handleStyle={{ marginTop: 10 }}
-                                        scrollViewProps={{
-                                                  keyboardShouldPersistTaps: "handled"
-                                        }}
-                                        onClosed={() => {
-                                                  setIsOpen(false)
-                                                  setLoadingForm(true)
-                                        }}
-                              >
-                                        <RepasModalize />
-                              </Modalize>
-                              <Modalize
-                                        ref={categoriesModalizeRef}
-                                        adjustToContentHeight
-                                        handlePosition='inside'
-                                        modalStyle={{
-                                                  borderTopRightRadius: 25,
-                                                  borderTopLeftRadius: 25,
-                                                  paddingVertical: 20
-                                        }}
-                                        handleStyle={{ marginTop: 10 }}
-                                        scrollViewProps={{
-                                                  keyboardShouldPersistTaps: "handled"
-                                        }}
-                                        onClosed={() => {
-                                                  setIsOpen(false)
-                                                  setLoadingForm(true)
-                                        }}
-                              >
-                                        <CategoriesModalize />
-                              </Modalize>
-                              <Modalize
-                                        ref={sousCategoriesModalizeRef}
-                                        adjustToContentHeight
-                                        handlePosition='inside'
-                                        modalStyle={{
-                                                  borderTopRightRadius: 25,
-                                                  borderTopLeftRadius: 25,
-                                                  paddingVertical: 20
-                                        }}
-                                        handleStyle={{ marginTop: 10 }}
-                                        scrollViewProps={{
-                                                  keyboardShouldPersistTaps: "handled"
-                                        }}
-                                        onClosed={() => {
-                                                  setIsOpen(false)
-                                                  setLoadingForm(true)
-                                        }}
-                              >
-                                        <SousCategoriesModalize />
-                              </Modalize>
-                              <Modalize
-                                        ref={sousSousCategoriesModalizeRef}
-                                        adjustToContentHeight
-                                        handlePosition='inside'
-                                        modalStyle={{
-                                                  borderTopRightRadius: 25,
-                                                  borderTopLeftRadius: 25,
-                                                  paddingVertical: 20
-                                        }}
-                                        handleStyle={{ marginTop: 10 }}
-                                        scrollViewProps={{
-                                                  keyboardShouldPersistTaps: "handled"
-                                        }}
-                                        onClosed={() => {
-                                                  setIsOpen(false)
-                                                  setLoadingForm(true)
-                                        }}
-                              >
-                                        <SousSousCategoriesModalize />
-                              </Modalize>
-                              <Modalize
-                                        ref={unitesModalizeRef}
-                                        adjustToContentHeight
-                                        handlePosition='inside'
-                                        modalStyle={{
-                                                  borderTopRightRadius: 25,
-                                                  borderTopLeftRadius: 25,
-                                                  paddingVertical: 20
-                                        }}
-                                        handleStyle={{ marginTop: 10 }}
-                                        scrollViewProps={{
-                                                  keyboardShouldPersistTaps: "handled"
-                                        }}
-                                        onClosed={() => {
-                                                  setIsOpen(false)
-                                                  setLoadingForm(true)
-                                        }}
-                              >
-                                        <UnitesModalize />
-                              </Modalize>
-                    </>
-          )
+                    </View>
+                </>
+            </Modalize>
+        </>
+    )
 }
-
 const styles = StyleSheet.create({
-          container: {
-                    flex: 1
-          },
-          header: {
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    paddingHorizontal: 20
-          },
-          title: {
-                    fontWeight: "bold",
-                    fontSize: 18,
-                    textAlign: "center",
-                    marginVertical: 40
-          },
-          selectControl: {
-                    paddingHorizontal: 20,
-                    marginTop: 10
-          },
-          selectLabel: {
-                    fontWeight: "bold",
-                    marginLeft: 5
-          },
-          selectedLabelContainer: {
-                    borderWidth: 1,
-                    borderColor: '#ddd',
-                    padding: 10,
-                    borderRadius: 5,
-                    marginTop: 2
-          },
-          images: {
-                    flexDirection: "row"
-          },
-          addImager: {
-                    width: 100,
-                    height: 100,
-                    backgroundColor: '#F1F1F1',
-                    borderRadius: 8,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginTop: 5
-          },
-          addBtn: {
-                    paddingVertical: 10,
-                    minWidth: "90%",
-                    alignSelf: "center",
-                    backgroundColor: COLORS.ecommerceOrange,
-                    borderRadius: 10,
-                    paddingVertical: 15,
-                    marginBottom: 10,
-                    marginTop: 10
-          },
-          detailBouton: {
-                    paddingVertical: 10,
-                    minWidth: "100%",
-                    alignSelf: "center",
-                    backgroundColor: COLORS.ecommerceOrange,
-                    borderRadius: 10,
-                    paddingVertical: 15,
-                    marginBottom: 10,
-                    marginTop: 10
-          },
-          addBtnText: {
-                    color: '#FFF',
-                    fontWeight: "bold",
-                    textAlign: "center",
-          },
-          modalTitle: {
-                    fontWeight: "bold",
-                    textAlign: "center",
-                    marginTop: 10,
-                    fontSize: 16
-          },
-          modalHeader: {
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    paddingHorizontal: 20,
-                    paddingVertical: 5
-          },
-          modalItem: {
-                    flexDirection: "row",
-                    alignItems: "center",
-                    paddingHorizontal: 20,
-                    paddingVertical: 10,
-                    borderBottomWidth: 1,
-                    borderBottomColor: '#F1F1F1'
-          },
-          modalImageContainer: {
-                    width: 60,
-                    height: 60,
-                    backgroundColor: '#F1F1F1',
-                    borderRadius: 60,
-                    justifyContent: "center",
-                    alignItems: "center"
-          },
-          modalImage: {
-                    width: "85%",
-                    height: "85%",
-                    resizeMode: "center",
-                    borderRadius: 100
-          },
-          itemTitle: {
-                    fontWeight: "bold",
-                    marginLeft: 10
-          },
-          input: {
-                    borderRadius: 5,
-                    borderWidth: 1,
-                    borderColor: '#ddd',
-                    height: 50,
-                    color: COLORS.ecommercePrimaryColor,
-                    fontWeight: 'bold',
-                    paddingHorizontal: 10
-          },
+    container: {
+        flex: 1,
+    },
+    cardHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        height: 88
+    },
+    menuOpener: {
+        marginTop: 25
+    },
+    menuOpenerLine: {
+        height: 3,
+        width: 30,
+        backgroundColor: COLORS.primary,
+        marginTop: 5
+    },
+    logo: {
+        resizeMode: 'center',
+        height: "50%",
+        width: "50%",
+        marginTop: 25
+    },
+    imageContainer: {
+        height: "100%",
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    title: {
+        fontWeight: 'bold',
+        fontSize: 25,
+        fontWeight: "bold",
+        marginBottom: 12,
+        color: COLORS.ecommercePrimaryColor,
+        margin: 20
+    },
+    modalCard: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        // marginHorizontal: 20,
+        backgroundColor: "#fff",
+        padding: 13,
+        borderRadius: 5,
+        borderWidth: 0.5,
+        borderColor: "#ddd"
+    },
+    inputText: {
+        color: '#777'
+    },
+    inputCard: {
+        marginHorizontal: 20,
+        marginTop: 10,
+
+    },
+    button: {
+        marginTop: 10,
+        borderRadius: 8,
+        paddingVertical: 14,
+        paddingHorizontal: 10,
+        backgroundColor: COLORS.primaryPicker,
+        marginHorizontal: 20
+    },
+    buttonText: {
+        color: "#fff",
+        fontWeight: "bold",
+        // textTransform:"uppercase",
+        fontSize: 16,
+        textAlign: "center"
+    },
+    buttonModal: {
+        marginTop: 10,
+        borderRadius: 8,
+        paddingVertical: 14,
+        paddingHorizontal: 10,
+        backgroundColor: COLORS.primaryPicker,
+        marginBottom: 10
+    },
+    addImageContainer: {
+        paddingHorizontal: 20
+    },
+    addImageItem: {
+        borderWidth: 0.5,
+        borderColor: COLORS.smallBrown,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        paddingVertical: 15
+    },
+    modalItemModel2: {
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignContent: 'center'
+    },
+    modalAutres: {
+        paddingHorizontal: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignContent: 'center',
+    },
+    buttonModalSecond: {
+        marginTop: 10,
+        borderRadius: 8,
+        paddingVertical: 14,
+        paddingHorizontal: 10,
+        backgroundColor: COLORS.primaryPicker,
+        marginBottom: 10,
+        marginHorizontal: 20
+    },
+
 })

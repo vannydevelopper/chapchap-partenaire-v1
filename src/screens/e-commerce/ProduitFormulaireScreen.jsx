@@ -425,7 +425,8 @@ export default function ProduitFormulaireScreen() {
                                                         )
                                                 })}
 
-                                                {product == false ? <View style={[styles.addImageContainer, { marginVertical: 30 }]}>
+                                                {product == false ? 
+                                                <View style={[styles.addImageContainer, { marginVertical: 30 }]}>
                                                         <TouchableWithoutFeedback onPress={onImagesSelect}>
                                                                 <View style={styles.addImageItem}>
                                                                         <View style={{ flexDirection: "row", alignItems: "center" }}>

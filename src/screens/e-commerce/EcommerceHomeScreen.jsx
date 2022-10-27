@@ -12,7 +12,6 @@ import { CategoriesSkeletons, HomeProductsSkeletons, SubCategoriesSkeletons } fr
 
 export default function EcommerceHomeScreen() {
           const { height } = useWindowDimensions()
-          
           const [firstLoadingProducts, setFirstLoadingProducts] = useState(true)
           const [products, setProducts] = useState([])
 
@@ -22,8 +21,7 @@ export default function EcommerceHomeScreen() {
                                         var url = `/partenaire/produit/${partenaire.produit.ID_PARTENAIRE_SERVICE}`
                                         const produits = await fetchApi(url)
                                         setProducts(produits.result)
-                                        console.log(produits.result)
-                                        console.log(products.produit_partenaire.length)
+                                       
                               } catch (error) {
                                         console.log(error)
                               } finally {
@@ -35,7 +33,6 @@ export default function EcommerceHomeScreen() {
           const navigation = useNavigation()
           const route = useRoute()
           const {partenaire} = route.params
-
           return (
                     <View style={styles.container}>
                               <View style={styles.cardHeader}>
@@ -62,29 +59,7 @@ export default function EcommerceHomeScreen() {
                                                             <SimpleLineIcons name="equalizer" size={24} color="white" style={{ fontWeight: 'bold', transform: [{ rotate: '-90deg' }] }} />
                                                   </View>
                                         </View>}
-                                        {/* {(loadingCategories || firstLoadingProducts) ? <CategoriesSkeletons /> :
-                                        <View>
-                                                  <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 10, backgroundColor: '#fff', paddingBottom: 10 }}>
-                                                            {categories.map((categorie, index) => {
-                                                                      return (
-                                                                                <TouchableOpacity key={index} onPress={() => onCategoryPress(categorie)}>
-                                                                                          <View style={{ alignContent: "center", alignItems: "center" }}>
-                                                                                                    <View style={[styles.cardPhoto, { backgroundColor: categorie.ID_CATEGORIE_PRODUIT == selectedCategorie?.ID_CATEGORIE_PRODUIT ? COLORS.handleColor : "#DFE1E9" }]}>
-                                                                                                              <Image source={{ uri: categorie.IMAGE }} style={styles.DataImageCategorie} />
-                                                                                                    </View>
-                                                                                                    <Text style={[{ fontSize: 12, fontWeight: "bold" }, { color: COLORS.ecommercePrimaryColor }]}>{categorie.NOM}</Text>
-                                                                                          </View>
-                                                                                </TouchableOpacity>
-                                                                      )
-                                                            })}
-                                                  </View>
-                                        </View>}
-
-                                        {selectedCategorie && ((loadingSubCategories || loadingProducts) ? <SubCategoriesSkeletons /> : <SubCategories
-                                                  sousCategories={sousCategories}
-                                                  selectedItemSousCategories={selectedItemSousCategories}
-                                                  selectedsousCategories={selectedsousCategories}
-                                        />)} */}
+                                       
                                         {firstLoadingProducts ? <HomeProductsSkeletons wrap /> :
                                                   products.length == 0 ? <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 100 }}>
                                                             <Feather name="check-square" size={24} color="#777" />
