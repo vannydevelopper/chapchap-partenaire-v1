@@ -22,7 +22,8 @@ export default function EcommerceHomeScreen() {
                                         var url = `/partenaire/produit/${partenaire.produit.ID_PARTENAIRE_SERVICE}`
                                         const produits = await fetchApi(url)
                                         setProducts(produits.result)
-                                        // console.log(produits.result)
+                                        console.log(produits.result)
+                                        console.log(products.produit_partenaire.length)
                               } catch (error) {
                                         console.log(error)
                               } finally {
@@ -91,7 +92,7 @@ export default function EcommerceHomeScreen() {
                                                                       Votre stock est vide. Cliquez sur le bouton en dessous pour ajouter un nouveau produit
                                                             </Text>
                                                             </View> : <View style={styles.products}>
-                                                            {products.map((product, index) => {
+                                                            {products?.map((product, index) => {
                                                                       return (
                                                                                 <Product
                                                                                           product={product}
