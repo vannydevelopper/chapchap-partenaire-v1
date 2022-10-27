@@ -1,7 +1,12 @@
 import React, { useState } from "react"
 import { Image, View, StyleSheet, Text, TouchableOpacity, TextInput, ScrollView } from "react-native"
 import { Ionicons, AntDesign, Entypo, Foundation } from '@expo/vector-icons';
+import { useRoute } from "@react-navigation/native";
 export default function MenuDetailScreen() {
+    const route=useRoute()
+    const { detail } = route.params
+    console.log(detail)
+
           const [nombre, setNombre] = useState(0);
           const addNumber = async () => {
 
