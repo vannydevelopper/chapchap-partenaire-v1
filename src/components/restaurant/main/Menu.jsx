@@ -4,7 +4,8 @@ import { MaterialIcons, AntDesign, Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../../styles/COLORS';
 
 export default function Menu({ product, index, totalLength, fixMargins = false }) {
-          const { width } = useWindowDimensions()
+          console.log(product)
+    const { width } = useWindowDimensions()
           const MAX_WIDTH = 200
           const PRODUCT_MARGIN = 10
           const PRODUCT_WIDTH = (width / 2) - PRODUCT_MARGIN - 10
@@ -26,7 +27,7 @@ export default function Menu({ product, index, totalLength, fixMargins = false }
                               <View style={styles.imageCard}>
                                         <Image source={{ uri: product.IMAGE }} style={styles.image} />
                               </View>
-                              {product.MONTANT ? <Text style={styles.price}>{product.MONTANT.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Fbu</Text> : null}
+                              {product.PRIX ? <Text style={styles.price}>{product.PRIX.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Fbu</Text> : null}
                               {/* <View style={styles.details}>
                                         <View style={styles.detail}>
                                                   <Text style={styles.detailLabel}>Quantité total</Text>

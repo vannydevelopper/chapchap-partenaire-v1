@@ -15,14 +15,14 @@ export default function NewMenuDetailScreen() {
         const route = useRoute()
         const navigation = useNavigation()
         const { menus } = route.params
-        // console.log(menus)
+         console.log(menus)
 
         var IMAGES = [
                 menus.result.IMAGES_1 ? menus.result.IMAGES_1 : undefined,
                 menus.result.IMAGES_2 ? menus.result.IMAGES_2 : undefined,
                 menus.result.IMAGES_3 ? menus.result.IMAGES_3 : undefined,
         ]
-        console.log(IMAGES)
+        // console.log(IMAGES)
         return (
                 <>
                         <View style={{ marginTop: 0, flex: 1 }}>
@@ -42,39 +42,26 @@ export default function NewMenuDetailScreen() {
                                                 <View>
                                                         <TouchableOpacity style={styles.category} >
                                                                 <Entypo name="shopping-cart" size={24} color={COLORS.primary} />
-                                                                <Text style={styles.categoryName} numberOfLines={2}>{menus.result.NOM_ORGANISATION}</Text>
+                                                                <Text style={styles.categoryName} numberOfLines={2}>{menus.result.NOM_MENU}</Text>
                                                         </TouchableOpacity>
-                                                        <View style={styles.productNames}>
+                                                        {/* <View style={styles.productNames}>
                                                                 <Text style={styles.productName}>
-                                                                        <Text numberOfLines={2} style={styles.productName}>{menus.result.repas.NOM_REPAS}</Text>
+                                                                        <Text numberOfLines={2} style={styles.productName}>{menus.result.NOM_MENU}</Text>
                                                                 </Text>
-                                                        </View>
+                                                        </View> */}
                                                 </View>
                                                 <View style={styles.shareBtn}>
                                                         <AntDesign name="sharealt" size={20} color={COLORS.primary} />
                                                 </View>
                                         </View>
                                         <View style={{ paddingHorizontal: 10, marginTop: 20 }}>
-                                                <View style={styles.card}>
-                                                        <View style={styles.cardMenu}>
-                                                                <Text style={{ fontSize: 20, fontWeight: "bold" }}>Quantites</Text>
-                                                                <Text style={{ fontSize: 20, fontWeight: "bold" }}>{menus.result.QUANTITE}</Text>
-                                                        </View>
-                                                        <View style={styles.cardMenu}>
-                                                                <Text style={{ fontSize: 20, fontWeight: "bold" }}>Unites</Text>
-                                                                <Text style={{ fontSize: 20, fontWeight: "bold" }}>{menus.result.unites.UNITES_MESURES}</Text>
-                                                        </View>
-                                                </View>
-                                                <View style={{ justifyContent: "center", alignItems: "center" }}>
-                                                        <View style={styles.cardMenu}>
-                                                                <Text style={{ fontWeight: "bold" }}>{menus.result.categorie.NOM_CATEGORIE}</Text>
-                                                        </View>
-                                                </View>
+                                                    <Text style={{ fontWeight: "bold" }}>{menus.result.DESCRIPTION}</Text>
+                                                 
                                         </View>
                                 </ScrollView>
                         </View>
                         <View style={styles.productFooter}>
-                                {menus.result.prix.MONTANT ? <Text style={styles.productPrice}>{menus.result.prix.MONTANT.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Fbu</Text> : null}
+                                 <Text style={styles.productPrice}>{menus.result.PRIX} Fbu</Text> 
                                 <TouchableOpacity style={[styles.addCartBtn]} >
                                         <>
                                                 <View>

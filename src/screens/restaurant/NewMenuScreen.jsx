@@ -45,8 +45,9 @@ export default function NewMenuScreen() {
     const [data, handleChange, setValue] = useForm({
         CategorieSelect: null,
         selectedSousCategorie: null,
-        nom: "",
+        nom:"",
         prix: "",
+        description:"",
         logoImage: "",
         logoImage1: "",
         logoImage2: "",
@@ -96,44 +97,6 @@ export default function NewMenuScreen() {
             }
         })()
     }, [CategorieSelect])
-
-    // useEffect(() => {
-    //         (async () => {
-    //                 try {
-    //                         var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
-    //                         if (selectedSousCategorie != null) {
-    //                                 var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE}`)
-    //                                 setTaille(taille.result)
-    //                         }
-    //                         // console.log(taille.result)
-    //                 }
-    //                 catch (error) {
-    //                         console.log(error)
-    //                 } finally {
-
-    //                 }
-    //         })()
-    // }, [CategorieSelect, selectedSousCategorie])
-
-    // useEffect(() => {
-    //         (async () => {
-    //                 try {
-    //                         var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
-    //                         if (selectedSousCategorie != null) {
-    //                                 var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE}`)
-    //                                 setCouleur(couleur.result)
-    //                         }
-
-    //                         // console.log(couleur.result)
-    //                 }
-    //                 catch (error) {
-    //                         console.log(error)
-    //                 } finally {
-
-    //                 }
-
-    //         })()
-    // }, [CategorieSelect, selectedSousCategorie])
     const onCategorieSelect = (categorie) => {
         console.log(CategorieSelect)
         setCategorieSelect(categorie)
@@ -179,13 +142,11 @@ export default function NewMenuScreen() {
             setLoading(true)
             const form = new FormData()
             form.append("ID_CATEGORIE_MENU", CategorieSelect.ID_CATEGORIE_MENU)
-            if (data.subSubcategory != null) {
-                form.append("ID_SOUS_SOUS_CATEGORIE", selectedSousCategorie.ID_SOUS_SOUS_CATEGORIE)
-            }                    
+            form.append("ID_SOUS_CATEGORIE_MENU",selectedSousCategorie.ID_SOUS_CATEGORIE_MENU )                 
+
             form.append('ID_PARTENAIRE_SERVICE', 1)
             form.append("NOM_MENU", data.nom)
             form.append("PRIX", data.prix)
-
             if (logoImage) {
                 const manipResult = await manipulateAsync(
                         logoImage.uri,
@@ -201,16 +162,50 @@ export default function NewMenuScreen() {
                 form.append('IMAGE_1', {
                         uri: localUri, name: filename, type
                 })
+                if (logoImage1) {
+                    const manipResult = await manipulateAsync(
+                            logoImage1.uri,
+                            [
+                                    { resize: { width: 500 } }
+                            ],
+                            { compress: 0.8, format: SaveFormat.JPEG }
+                    );
+                    let localUri = manipResult.uri;
+                    let filename = localUri.split('/').pop();
+                    let match = /\.(\w+)$/.exec(filename);
+                    let type = match ? `image/${match[1]}` : `image`;
+                    form.append('IMAGE_2', {
+                            uri: localUri, name: filename, type
+                    })
+
+            }
+            if (logoImage2) {
+                    const manipResult = await manipulateAsync(
+                            logoImage2.uri,
+                            [
+                                    { resize: { width: 500 } }
+                            ],
+                            { compress: 0.8, format: SaveFormat.JPEG }
+                    );
+                    let localUri = manipResult.uri;
+                    let filename = localUri.split('/').pop();
+                    let match = /\.(\w+)$/.exec(filename);
+                    let type = match ? `image/${match[1]}` : `image`;
+                    form.append('IMAGE_3', {
+                            uri: localUri, name: filename, type
+                    })
+
+            }
 
         }
-            form.append("DESCRIPTION_TAILLE", data.descriptionTaille)
+            form.append("DESCRIPTION", data.description)
 
             console.log(form)
-            //   const newMenu = await fetchApi('/resto/menu/create', {
-            //             method: "POST",
-            //             body: form
-            //   })
-            //   navigation.navigate("NewMenuDetailScreen", { menus: newMenu })
+              const newMenu = await fetchApi('/resto/menu/create', {
+                        method: "POST",
+                        body: form
+              })
+              navigation.navigate("NewMenuDetailScreen", { menus: newMenu })
         } catch (error) {
             console.log(error)
         } finally {
@@ -242,11 +237,26 @@ export default function NewMenuScreen() {
                                 <OutlinedTextField
                                     label={"Nom du menu"}
                                     fontSize={14}
-                                    value={data.produit}
-                                    onChangeText={(newValue) => handleChange('produit', newValue)}
-                                    onBlur={() => checkFieldData('produit')}
-                                    error={hasError('produit') ? getError('produit') : ''}
+                                    value={data.nom}
+                                    onChangeText={(newValue) => handleChange('nom', newValue)}
+                                    onBlur={() => checkFieldData('nom')}
+                                    error={hasError('nom') ? getError('nom') : ''}
                                     lineWidth={0.5}
+                                    activeLineWidth={0.5}
+                                    baseColor={COLORS.smallBrown}
+                                    tintColor={COLORS.primary}
+                                />
+                            </View>
+                            <View style={styles.inputCard}>
+                                <OutlinedTextField
+                                    label={"Description"}
+                                    fontSize={14}
+                                    value={data.description}
+                                    onChangeText={(newValue) => handleChange('description', newValue)}
+                                    onBlur={() => checkFieldData('nom')}
+                                    error={hasError('description') ? getError('description') : ''}
+                                    lineWidth={0.5}
+                                    multiline={true}
                                     activeLineWidth={0.5}
                                     baseColor={COLORS.smallBrown}
                                     tintColor={COLORS.primary}
