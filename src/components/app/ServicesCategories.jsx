@@ -53,7 +53,8 @@ export default function ServicesCategories() {
           const navigation = useNavigation()
           const [loading, setLoading] = useState(false)
 
-          const search = async (service) => {
+          const search = async (id_service,service) => {
+            
                     setLoading(true)
                     const services = service
                     try {
@@ -62,7 +63,9 @@ export default function ServicesCategories() {
                                         navigation.navigate(services.route)
                               }
                               else {
-                                        navigation.navigate("ServiceNotFoundScreen", { service: services })
+                            
+                                        
+                                navigation.navigate("ServiceNotFoundScreen", { id_service:id_service,service: services })
                               }
                     } catch (error) {
                               console.log(error)
@@ -95,7 +98,7 @@ export default function ServicesCategories() {
                                                             return (
                                                                       <View style={[styles.serviceContainer, { width: SERVICE_WIDTH, height: SERVICE_WIDTH }]} key={index.toString()}>
                                                                                 {/* <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} useForeground onPress={() => navigation.navigate(service.route)}> */}
-                                                                                <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} useForeground onPress={() => search(service)}>
+                                                                                <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} useForeground onPress={() => search(service.id_service,service)}>
 
                                                                                           <View style={[styles.service]}>
                                                                                                     <ImageBackground source={service.imageBg} style={[styles.serviceBackgound]} borderRadius={10} resizeMode='cover' imageStyle={{ opacity: 0.8 }}>

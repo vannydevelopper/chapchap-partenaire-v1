@@ -10,10 +10,10 @@ export default function ServiceNotFoundScreen() {
           const { height } = useWindowDimensions()
           const navigation = useNavigation()
           const route = useRoute()
-          const { service } = route.params
+          const { id_service,service } = route.params
 
           const onRequestPress = () => {
-                    navigation.navigate(service.noRegisteredDirection, { service})
+                    navigation.navigate(service.noRegisteredDirection, { id_service,service})
                 // navigation.navigate("AccueilSearchProduitScreen")
           }
           return (
