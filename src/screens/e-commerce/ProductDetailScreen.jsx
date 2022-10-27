@@ -63,7 +63,7 @@ export default function ProductDetailScreen() {
                                 if (detail.produit_partenaire.ID_PRODUIT_PARTENAIRE != null) {
                                         const detailss = await fetchApi(`/partenaire/produit/detail/${detail.produit_partenaire.ID_PRODUIT_PARTENAIRE}`)
                                         setAllDetails(detailss.result)
-                                        console.log(detailss.result)
+                                        // console.log(detailss.result)
 
                                 }
                         } catch (error) {
