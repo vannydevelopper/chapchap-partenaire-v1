@@ -11,57 +11,57 @@ import Product from "../../components/ecommerce/main/Product";
 import { CategoriesSkeletons, HomeProductsSkeletons, SubCategoriesSkeletons } from "../../components/ecommerce/skeletons/Skeletons";
 
 export default function EcommerceHomeScreen() {
-          const { height } = useWindowDimensions()
-          
-          const [firstLoadingProducts, setFirstLoadingProducts] = useState(true)
-          const [products, setProducts] = useState([])
+        const { height } = useWindowDimensions()
 
-          useFocusEffect(useCallback(() => {
-                    (async () => {
-                              try {
-                                        var url = `/partenaire/produit/${partenaire.produit.ID_PARTENAIRE_SERVICE}`
-                                        const produits = await fetchApi(url)
-                                        setProducts(produits.result)
-                                        // console.log(produits.result)
-                              } catch (error) {
-                                        console.log(error)
-                              } finally {
-                                        setFirstLoadingProducts(false)
-                              }
-                    })()
-          }, []))
+        const [firstLoadingProducts, setFirstLoadingProducts] = useState(true)
+        const [products, setProducts] = useState([])
 
-          const navigation = useNavigation()
-          const route = useRoute()
-          const {partenaire} = route.params
+        useFocusEffect(useCallback(() => {
+                (async () => {
+                        try {
+                                var url = `/partenaire/produit/${partenaire.produit.ID_PARTENAIRE_SERVICE}`
+                                const produits = await fetchApi(url)
+                                setProducts(produits.result)
+                                // console.log(produits.result)
+                        } catch (error) {
+                                console.log(error)
+                        } finally {
+                                setFirstLoadingProducts(false)
+                        }
+                })()
+        }, []))
 
-          return (
-                    <View style={styles.container}>
-                              <View style={styles.cardHeader}>
-                                        <TouchableOpacity style={styles.menuOpener} onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
-                                                  <View style={styles.menuOpenerLine} />
-                                                  <View style={[styles.menuOpenerLine, { width: 15 }]} />
-                                                  <View style={[styles.menuOpenerLine, { width: 25 }]} />
-                                        </TouchableOpacity>
-                                        <View style={{ marginTop: 25 }}>
-                                                  <Octicons name="bell" size={24} color={COLORS.ecommercePrimaryColor} />
+        const navigation = useNavigation()
+        const route = useRoute()
+        const { partenaire } = route.params
+
+        return (
+                <View style={styles.container}>
+                        <View style={styles.cardHeader}>
+                                <TouchableOpacity style={styles.menuOpener} onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
+                                        <View style={styles.menuOpenerLine} />
+                                        <View style={[styles.menuOpenerLine, { width: 15 }]} />
+                                        <View style={[styles.menuOpenerLine, { width: 25 }]} />
+                                </TouchableOpacity>
+                                <View style={{ marginTop: 25 }}>
+                                        <Octicons name="bell" size={24} color={COLORS.ecommercePrimaryColor} />
+                                </View>
+                        </View>
+                        <ScrollView style={styles.cardOrginal}>
+                                <Text style={[styles.titlePrincipal, products.length == 0 && { textAlign: "center" }]}>Vos produits</Text>
+                                {products.length > 0 && <View style={{ flexDirection: "row", alignItems: "center", alignContent: "center", justifyContent: "space-between", marginBottom: 25, paddingHorizontal: 10 }}>
+                                        <View style={styles.searchSection}>
+                                                <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                <TextInput
+                                                        style={styles.input}
+                                                        placeholder="Recherche..."
+                                                />
                                         </View>
-                              </View>
-                              <ScrollView style={styles.cardOrginal}>
-                                        <Text style={[styles.titlePrincipal, products.length == 0 && { textAlign: "center" }]}>Vos produits</Text>
-                                        {products.length > 0 && <View style={{ flexDirection: "row", alignItems: "center", alignContent: "center", justifyContent: "space-between", marginBottom: 25, paddingHorizontal: 10 }}>
-                                                  <View style={styles.searchSection}>
-                                                            <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                            <TextInput
-                                                                      style={styles.input}
-                                                                      placeholder="Recherche..."
-                                                            />
-                                                  </View>
-                                                  <View style={styles.cardRecherche}>
-                                                            <SimpleLineIcons name="equalizer" size={24} color="white" style={{ fontWeight: 'bold', transform: [{ rotate: '-90deg' }] }} />
-                                                  </View>
-                                        </View>}
-                                        {/* {(loadingCategories || firstLoadingProducts) ? <CategoriesSkeletons /> :
+                                        <View style={styles.cardRecherche}>
+                                                <SimpleLineIcons name="equalizer" size={24} color="white" style={{ fontWeight: 'bold', transform: [{ rotate: '-90deg' }] }} />
+                                        </View>
+                                </View>}
+                                {/* {(loadingCategories || firstLoadingProducts) ? <CategoriesSkeletons /> :
                                         <View>
                                                   <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 10, backgroundColor: '#fff', paddingBottom: 10 }}>
                                                             {categories.map((categorie, index) => {
@@ -84,149 +84,178 @@ export default function EcommerceHomeScreen() {
                                                   selectedItemSousCategories={selectedItemSousCategories}
                                                   selectedsousCategories={selectedsousCategories}
                                         />)} */}
-                                        {firstLoadingProducts ? <HomeProductsSkeletons wrap /> :
-                                                  products.length == 0 ? <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 100 }}>
-                                                            <Feather name="check-square" size={24} color="#777" />
-                                                            <Text style={{ color: '#777', paddingHorizontal: 50, textAlign: "center", marginTop: 10  }}>
-                                                                      Votre stock est vide. Cliquez sur le bouton en dessous pour ajouter un nouveau produit
-                                                            </Text>
-                                                            </View> : <View style={styles.products}>
-                                                            {products?.map((product, index) => {
-                                                                      return (
-                                                                                <Product
-                                                                                          product={product}
-                                                                                          index={index}
-                                                                                          totalLength={products.length}
-                                                                                          key={index}
-                                                                                          fixMargins
-                                                                                />
-                                                                      )
-                                                            })}
-                                                  </View>
-                                        }
-                              </ScrollView>
-                              <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('AccueilSearchProduitScreen', {partenaire:partenaire.produit.ID_PARTENAIRE_SERVICE} )}>
+                                {firstLoadingProducts ? <HomeProductsSkeletons wrap /> :
+                                        products.length == 0 ? <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 100 }}>
+                                                <Feather name="check-square" size={24} color="#777" />
+                                                <Text style={{ color: '#777', paddingHorizontal: 50, textAlign: "center", marginTop: 10 }}>
+                                                        Votre stock est vide. Cliquez sur le bouton en dessous pour ajouter un nouveau produit
+                                                </Text>
+                                        </View> : <View style={styles.products}>
+                                                {products?.map((product, index) => {
+                                                        return (
+                                                                <Product
+                                                                        product={product}
+                                                                        index={index}
+                                                                        totalLength={products.length}
+                                                                        key={index}
+                                                                        fixMargins
+                                                                />
+                                                        )
+                                                })}
+                                        </View>
+                                }
+                        </ScrollView>
+                        <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('AccueilSearchProduitScreen', {partenaire:partenaire.produit.ID_PARTENAIRE_SERVICE} )}>
                                         <Text style={styles.addBtnText}>Nouveau produit</Text>
                               </TouchableOpacity>
-                    </View>
-          )
+                        {/* <TouchableNativeFeedback onPress={() => navigation.navigate('AccueilSearchProduitScreen', { partenaire: partenaire.produit.ID_PARTENAIRE_SERVICE })}>
+                                <View style={styles.positionCard}>
+                                        <View style={styles.btnRonde} >
+                                                <Text style={styles.addBtnText}>Nouveau </Text>
+                                        </View>
+                                </View>
+                        </TouchableNativeFeedback> */}
+
+
+                </View>
+        )
 }
 
 const styles = StyleSheet.create({
-          container: {
-                    flex: 1
-          },
-          cardHeader: {
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    paddingHorizontal: 10,
-                    height: 88
-          },
-          menuOpener: {
-                    marginTop: 25
-          },
-          menuOpenerLine: {
-                    height: 3,
-                    width: 30,
-                    backgroundColor: COLORS.ecommercePrimaryColor,
-                    marginTop: 5
-          },
-          imgBackground: {
-                    flex: 1,
-                    width: '100%',
-                    height: "100%"
-          },
-          cardOrginal: {
-          },
-          titlePrincipal: {
-                    fontSize: 20,
-                    fontWeight: "bold",
-                    marginBottom: 12,
-                    color: COLORS.ecommercePrimaryColor,
-                    marginHorizontal: 10
-          },
+        container: {
+                flex: 1
+        },
+        cardHeader: {
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                paddingHorizontal: 10,
+                height: 88
+        },
+        menuOpener: {
+                marginTop: 25
+        },
+        menuOpenerLine: {
+                height: 3,
+                width: 30,
+                backgroundColor: COLORS.ecommercePrimaryColor,
+                marginTop: 5
+        },
+        imgBackground: {
+                flex: 1,
+                width: '100%',
+                height: "100%"
+        },
+        cardOrginal: {
+        },
+        titlePrincipal: {
+                fontSize: 20,
+                fontWeight: "bold",
+                marginBottom: 12,
+                color: COLORS.ecommercePrimaryColor,
+                marginHorizontal: 10
+        },
 
-          searchSection: {
-                    flexDirection: "row",
-                    marginTop: 10,
-                    padding: 5,
-                    borderRadius: 10,
-                    borderWidth: 1,
-                    borderColor: "#ddd",
-                    alignItems: 'center',
-                    backgroundColor: '#fff',
-                    backgroundColor: "#D7D9E4",
-                    width: "84%",
-                    height: 50,
-                    paddingHorizontal: 10
-          },
-          input: {
-                    flex: 1,
-                    marginLeft: 10
-          },
-          cardRecherche: {
-                    width: 50,
-                    height: 50,
-                    borderRadius: 10,
-                    backgroundColor: "#EF4255",
-                    marginTop: 8,
-                    justifyContent: "center",
-                    alignContent: "center",
-                    alignItems: "center"
-          },
+        searchSection: {
+                flexDirection: "row",
+                marginTop: 10,
+                padding: 5,
+                borderRadius: 10,
+                borderWidth: 1,
+                borderColor: "#ddd",
+                alignItems: 'center',
+                backgroundColor: '#fff',
+                backgroundColor: "#D7D9E4",
+                width: "84%",
+                height: 50,
+                paddingHorizontal: 10
+        },
+        input: {
+                flex: 1,
+                marginLeft: 10
+        },
+        cardRecherche: {
+                width: 50,
+                height: 50,
+                borderRadius: 10,
+                backgroundColor: "#EF4255",
+                marginTop: 8,
+                justifyContent: "center",
+                alignContent: "center",
+                alignItems: "center"
+        },
 
-          DataImageCategorie: {
-                    minWidth: 40,
-                    minHeight: 40,
-                    borderRadius: 10,
-          },
-          cardPhoto1: {
-                    marginTop: 10,
-                    width: 50,
-                    height: 50,
-                    backgroundColor: "#DFE1E9",
-                    borderRadius: 10,
-                    justifyContent: "center",
-                    alignItems: "center",
-          },
-          cardPhoto: {
-                    marginTop: 10,
-                    width: 50,
-                    height: 50,
-                    //backgroundColor: "#242F68",
-                    backgroundColor: "#DFE1E9",
-                    borderRadius: 10,
-                    justifyContent: "center",
-                    alignItems: "center",
-          },
-          productsHeader: {
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginTop: 10,
-                    paddingVertical: 10,
-                    paddingHorizontal: 10
-          },
-          title: {
-                    fontWeight: 'bold'
-          },
-          products: {
-                    flexDirection: 'row',
-                    flexWrap: 'wrap'
-          },
-          addBtn: {
-                    paddingVertical: 10,
-                    minWidth: "90%",
-                    alignSelf: "center",
-                    backgroundColor: COLORS.ecommerceOrange,
-                    borderRadius: 10,
-                    paddingVertical: 15,
-                    marginBottom: 10,
-          },
-          addBtnText: {
-                    color: '#FFF',
-                    fontWeight: "bold",
-                    textAlign: "center",
-          }
+        DataImageCategorie: {
+                minWidth: 40,
+                minHeight: 40,
+                borderRadius: 10,
+        },
+        cardPhoto1: {
+                marginTop: 10,
+                width: 50,
+                height: 50,
+                backgroundColor: "#DFE1E9",
+                borderRadius: 10,
+                justifyContent: "center",
+                alignItems: "center",
+        },
+        cardPhoto: {
+                marginTop: 10,
+                width: 50,
+                height: 50,
+                //backgroundColor: "#242F68",
+                backgroundColor: "#DFE1E9",
+                borderRadius: 10,
+                justifyContent: "center",
+                alignItems: "center",
+        },
+        productsHeader: {
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: 10,
+                paddingVertical: 10,
+                paddingHorizontal: 10
+        },
+        title: {
+                fontWeight: 'bold'
+        },
+        products: {
+                flexDirection: 'row',
+                flexWrap: 'wrap'
+        },
+        addBtn: {
+                paddingVertical: 10,
+                minWidth: "90%",
+                alignSelf: "center",
+                backgroundColor: COLORS.ecommerceOrange,
+                borderRadius: 10,
+                paddingVertical: 15,
+                marginBottom: 10,
+        },
+        btnRonde: {
+                backgroundColor: COLORS.ecommerceOrange,
+                padding: 40,
+                width: 40,
+                borderRadius: 50,
+                borderWidth: 2,
+                borderColor: "#ddd",
+                
+
+        },
+        positionCard:{
+                position: "absolute",
+                bottom: 20,
+                marginHorizontal: 20,
+                right: 0
+        },
+        addBtnText: {
+                color: '#fff',
+                fontWeight: "bold",
+                textAlign: "center",
+                // position: "absolute",
+                // marginTop: 25,
+                // marginLeft:8,
+                // fontSize:17
+        }
 })

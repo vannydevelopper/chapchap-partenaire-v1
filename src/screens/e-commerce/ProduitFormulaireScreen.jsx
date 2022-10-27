@@ -469,7 +469,7 @@ export default function ProduitFormulaireScreen() {
                                                 <TouchableOpacity
                                                         onPress={() => ajoutDetailsModalizeRef.current.open()}
                                                 >
-                                                        <View style={styles.button}>
+                                                        <View style={styles.button1}>
                                                                 <Text style={styles.buttonText} >Ajout de details </Text>
                                                         </View>
                                                 </TouchableOpacity>
@@ -843,6 +843,14 @@ const styles = StyleSheet.create({
                 paddingVertical: 14,
                 paddingHorizontal: 10,
                 backgroundColor: COLORS.primaryPicker,
+                marginHorizontal: 20
+        },
+        button1: {
+                marginTop: 10,
+                borderRadius: 8,
+                paddingVertical: 14,
+                paddingHorizontal: 10,
+                backgroundColor: COLORS.ecommerceOrange,
                 marginHorizontal: 20
         },
         buttonText: {
