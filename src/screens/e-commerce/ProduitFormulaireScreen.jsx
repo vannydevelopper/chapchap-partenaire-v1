@@ -22,7 +22,8 @@ export default function ProduitFormulaireScreen() {
         const navigation = useNavigation()
         const route = useRoute()
         const { product, partenaire } = route.params
-        // console.log(partenaire)
+        // console.log(product)
+
         const couleurModalizeRef = useRef(null)
         const tailleModalizeRef = useRef(null)
         const ajoutDetailsModalizeRef = useRef(null)
@@ -30,6 +31,9 @@ export default function ProduitFormulaireScreen() {
         const SousCategoriesModalizeRef = useRef(null)
 
         const [logoImage, setLogoImage] = useState(null)
+        const [logoImage2, setLogoImage2] = useState(null)
+        const [logoImage3, setLogoImage3] = useState(null)
+
         const [TailleSelect, setTailleSelect] = useState(null)
         const [selectedCouleur, setselectedCouleur] = useState(null)
         const [CategorieSelect, setCategorieSelect] = useState(null)
@@ -191,6 +195,28 @@ export default function ProduitFormulaireScreen() {
                 setLogoImage(photo)
         }
 
+        const onImages2Select = async () => {
+                const photo = await ImagePicker.launchImageLibraryAsync({
+                        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                        allowsMultipleSelection: true
+                })
+                if (photo.cancelled) {
+                        return false
+                }
+                setLogoImage2(photo)
+        }
+
+        const onImages3Select = async () => {
+                const photo = await ImagePicker.launchImageLibraryAsync({
+                        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                        allowsMultipleSelection: true
+                })
+                if (photo.cancelled) {
+                        return false
+                }
+                setLogoImage3(photo)
+        }
+
         const Ajouter_detail = () => {
                 var taille = TailleSelect
                 var coul = selectedCouleur
@@ -249,6 +275,40 @@ export default function ProduitFormulaireScreen() {
                                         let match = /\.(\w+)$/.exec(filename);
                                         let type = match ? `image/${match[1]}` : `image`;
                                         form.append('IMAGE_1', {
+                                                uri: localUri, name: filename, type
+                                        })
+
+                                }
+                                if (logoImage2) {
+                                        const manipResult = await manipulateAsync(
+                                                logoImage2.uri,
+                                                [
+                                                        { resize: { width: 500 } }
+                                                ],
+                                                { compress: 0.8, format: SaveFormat.JPEG }
+                                        );
+                                        let localUri = manipResult.uri;
+                                        let filename = localUri.split('/').pop();
+                                        let match = /\.(\w+)$/.exec(filename);
+                                        let type = match ? `image/${match[1]}` : `image`;
+                                        form.append('IMAGE_2', {
+                                                uri: localUri, name: filename, type
+                                        })
+
+                                }
+                                if (logoImage3) {
+                                        const manipResult = await manipulateAsync(
+                                                logoImage3.uri,
+                                                [
+                                                        { resize: { width: 500 } }
+                                                ],
+                                                { compress: 0.8, format: SaveFormat.JPEG }
+                                        );
+                                        let localUri = manipResult.uri;
+                                        let filename = localUri.split('/').pop();
+                                        let match = /\.(\w+)$/.exec(filename);
+                                        let type = match ? `image/${match[1]}` : `image`;
+                                        form.append('IMAGE_3', {
                                                 uri: localUri, name: filename, type
                                         })
 
@@ -409,7 +469,7 @@ export default function ProduitFormulaireScreen() {
                                                 <TouchableOpacity
                                                         onPress={() => ajoutDetailsModalizeRef.current.open()}
                                                 >
-                                                        <View style={styles.button}>
+                                                        <View style={styles.button1}>
                                                                 <Text style={styles.buttonText} >Ajout de details </Text>
                                                         </View>
                                                 </TouchableOpacity>
@@ -426,7 +486,8 @@ export default function ProduitFormulaireScreen() {
                                                 })}
 
                                                 {product == false ? 
-                                                <View style={[styles.addImageContainer, { marginVertical: 30 }]}>
+                                                <>
+                                                <View style={[styles.addImageContainer, { marginVertical: 10 }]}>
                                                         <TouchableWithoutFeedback onPress={onImagesSelect}>
                                                                 <View style={styles.addImageItem}>
                                                                         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -438,7 +499,35 @@ export default function ProduitFormulaireScreen() {
                                                                         {logoImage && <Image source={{ uri: logoImage.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
                                                                 </View>
                                                         </TouchableWithoutFeedback>
-                                                </View> :
+                                                </View> 
+                                                <View style={[styles.addImageContainer]}>
+                                                        <TouchableWithoutFeedback onPress={onImages2Select}>
+                                                                <View style={styles.addImageItem}>
+                                                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                                                <Feather name="image" size={24} color="#777" />
+                                                                                <Text style={styles.addImageLabel}>
+                                                                                        Images
+                                                                                </Text>
+                                                                        </View>
+                                                                        {logoImage2 && <Image source={{ uri: logoImage2.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
+                                                                </View>
+                                                        </TouchableWithoutFeedback>
+                                                </View> 
+                                                <View style={[styles.addImageContainer,{ marginTop:10}]}>
+                                                        <TouchableWithoutFeedback onPress={onImages3Select}>
+                                                                <View style={styles.addImageItem}>
+                                                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                                                <Feather name="image" size={24} color="#777" />
+                                                                                <Text style={styles.addImageLabel}>
+                                                                                        Images
+                                                                                </Text>
+                                                                        </View>
+                                                                        {logoImage3 && <Image source={{ uri: logoImage3.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
+                                                                </View>
+                                                        </TouchableWithoutFeedback>
+                                                </View>
+                                                </>
+                                                :
                                                         <View style={[styles.addImageContainer, { marginVertical: 30 }]}>
                                                                 <TouchableWithoutFeedback onPress={onImagesSelect}>
                                                                         <View style={styles.addImageItem}>
@@ -754,6 +843,14 @@ const styles = StyleSheet.create({
                 paddingVertical: 14,
                 paddingHorizontal: 10,
                 backgroundColor: COLORS.primaryPicker,
+                marginHorizontal: 20
+        },
+        button1: {
+                marginTop: 10,
+                borderRadius: 8,
+                paddingVertical: 14,
+                paddingHorizontal: 10,
+                backgroundColor: COLORS.ecommerceOrange,
                 marginHorizontal: 20
         },
         buttonText: {
