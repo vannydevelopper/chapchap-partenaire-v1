@@ -86,7 +86,7 @@ export default function ProduitFormulaireScreen() {
                         try {
                                 const catego = await fetchApi("/produit/categorie")
                                 setCategories(catego.result)
-                                // console.log(catego.result)
+                                //  console.log(catego.result)
                         } catch (error) {
                                 console.log(error)
                         } finally {
@@ -102,7 +102,7 @@ export default function ProduitFormulaireScreen() {
                                         var sousCatego = await fetchApi(`/produit/sous_categorie/${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
                                         setSouscategories(sousCatego.result)
                                 }
-                                // console.log(sousCatego.result)
+                                console.log(sousCatego.result)
 
                         }
                         catch (error) {
