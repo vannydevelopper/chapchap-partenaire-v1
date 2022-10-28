@@ -62,6 +62,7 @@ export default function ProduitFormulaireScreen() {
                 selectedSousCategorie: null,
                 produit: "",
                 prix:"",
+                prixNouveau:"",
                 quantite: "",
                 logoImage: "",
                 autresTaille: "",
@@ -256,6 +257,8 @@ export default function ProduitFormulaireScreen() {
                         if (product) {
                                 form.append('PRODUIT', JSON.stringify(product))
                                 form.append('ID_PARTENAIRE_SERVICE', partenaire)
+                                form.append('PRIXNOUVEAU', data.prixNouveau)
+
                         } else {
                                 form.append('ID_CATEGORIE_PRODUIT', CategorieSelect.ID_CATEGORIE_PRODUIT)
                                 form.append('ID_PRODUIT_SOUS_CATEGORIE', selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE)
@@ -461,6 +464,20 @@ export default function ProduitFormulaireScreen() {
                                                                                 {/* <AntDesign name="caretdown" size={20} color="#777" /> */}
                                                                         </View>
                                                                 </View>
+                                                                <View style={styles.inputCard}>
+                                                                        <OutlinedTextField
+                                                                                label={"Entrez votre prix"}
+                                                                                fontSize={14}
+                                                                                value={data.prixNouveau}
+                                                                                onChangeText={(newValue) => handleChange('prixNouveau', newValue)}
+                                                                                onBlur={() => checkFieldData('prixNouveau')}
+                                                                                error={hasError('prixNouveau') ? getError('prixNouveau') : ''}
+                                                                                lineWidth={0.5}
+                                                                                activeLineWidth={0.5}
+                                                                                baseColor={COLORS.smallBrown}
+                                                                                tintColor={COLORS.primary}
+                                                                        />
+                                                                </View>
 
                                                         </View>
                                                 }
@@ -537,10 +554,10 @@ export default function ProduitFormulaireScreen() {
                                                                                                 Images
                                                                                         </Text>
                                                                                 </View>
-                                                                                {product.produit.IMAGE_1 ?
+                                                                                {/* {product.produit.IMAGE_1 ?
                                                                                         <Image source={{ uri: product.produit.IMAGE_1.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} /> :
                                                                                         <Text>null</Text>
-                                                                                }
+                                                                                } */}
                                                                         </View>
                                                                 </TouchableWithoutFeedback>
                                                         </View>
