@@ -1,9 +1,9 @@
 import React, { useCallback, useState, useRef, useEffect } from "react";
-import { StyleSheet, Text, Animated, BackHandler, TouchableOpacity, useWindowDimensions, View, TextInput, Image, ScrollView, TouchableNativeFeedback } from "react-native";
 import { DrawerActions, useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import { COLORS } from "../../styles/COLORS";
 import { EvilIcons, MaterialIcons, AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome, SimpleLineIcons, Feather, Octicons } from '@expo/vector-icons';
 import fetchApi from "../../helpers/fetchApi";
+import { Image, View, StyleSheet, Text, TouchableOpacity, TouchableNativeFeedback, TextInput, ScrollView, StatusBar, Modal, ActivityIndicator } from "react-native"
 import Menu from "../../components/restaurant/main/Menu";
 import { HomeProductsSkeletons } from "../../components/ecommerce/skeletons/Skeletons";
 
