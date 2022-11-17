@@ -294,7 +294,6 @@ export default function ProduitFormulaireScreen() {
                                         form.append('IMAGE_2', {
                                                 uri: localUri, name: filename, type
                                         })
-
                                 }
                                 if (logoImage3) {
                                         const manipResult = await manipulateAsync(
@@ -311,7 +310,6 @@ export default function ProduitFormulaireScreen() {
                                         form.append('IMAGE_3', {
                                                 uri: localUri, name: filename, type
                                         })
-
                                 }
                         }
                         form.append('DETAIL', JSON.stringify(detailData))
@@ -332,8 +330,6 @@ export default function ProduitFormulaireScreen() {
                 }
 
         }
-
-
         return (
                 <>
                         {loading && <Loading />}
