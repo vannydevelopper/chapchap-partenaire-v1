@@ -13,11 +13,8 @@ export default function SericePartenaire() {
         const SERVICE_WIDTH = (width / 2)
         const navigation = useNavigation()
         const modalizeRef = useRef(null)
-
         const [services, setServices] = useState([])
         const [loading, setLoading] = useState(false)
-
-
         useFocusEffect(useCallback(() => {
                 (async () => {
                         setLoading(true)
