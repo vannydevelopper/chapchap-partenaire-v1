@@ -8,7 +8,7 @@ import useFetch from "../../hooks/useFetch";
 import { useForm } from "../../hooks/useForm";
 import { COLORS } from "../../styles/COLORS";
 import { SimpleLineIcons, AntDesign, Ionicons, Octicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Feather } from '@expo/vector-icons';
+import { Feather,FontAwesome } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useFormErrorsHandle } from "../../hooks/useFormErrorsHandle";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
@@ -121,8 +121,11 @@ export default function NewMenuScreen() {
     const onAutreSelect = () => {
         setAutre(true)
         setRepasSelect(false)
-        repasModalizeRef.current.close()
         // setshowMapis(false)
+    }
+    const Terminer=()=>{
+        repasModalizeRef.current.close()
+
     }
     const onSousCategorieSelect = (souscategorie) => {
         setselectedSousCategorie(souscategorie)
@@ -253,7 +256,7 @@ const onRemoveImage = index => {
                                 </TouchableOpacity>
                             </View>
                         
-                            {autre &&
+                            {/* {autre &&
                             <>
                             <View style={styles.inputCard}>
                                 <OutlinedTextField
@@ -285,9 +288,9 @@ const onRemoveImage = index => {
                                     tintColor={COLORS.primary}
                                 />
                             </View>
-                            </>}
+                            </>} */}
                             <View>
-                                <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: 20 }}
+                                <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: 20, marginTop: 10 }}
                                     onPress={() => categoriesModalizeRef.current.open()}
                                 // disabled={service.id_service == 2}
                                 >
@@ -364,6 +367,16 @@ const onRemoveImage = index => {
                     <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 15 }}>
                         <Text style={{ fontSize: 17, fontWeight: "bold" }}>Repas</Text>
                     </View>
+                   {!autre &&<View style={{ flexDirection: "row", alignItems: "center", alignContent: "center", justifyContent: "space-between", marginBottom: 25, paddingHorizontal: 10 }}>
+                                                  <View style={styles.searchSection}>
+                                                            <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                            <TextInput
+                                                                      style={styles.input}
+                                                                      placeholder="Rechercher un repas"
+                                                            />
+                                                  </View>
+                                        </View>
+                   }
                     <View>
                     <TouchableWithoutFeedback onPress={() => onAutreSelect(true)}>
                    
@@ -373,17 +386,57 @@ const onRemoveImage = index => {
                                         <Text>Autre repas</Text>
                                     </View>
                                     </TouchableWithoutFeedback>
-                        {repass.map((rep, index) => {
-                            return (
-                                <TouchableOpacity key={index} onPress={() => onRepasSelect(rep)}>
-                                    <View style={styles.modalItemModel2} >
-                                        {RepasSelect?.ID_REPAS == rep.ID_REPAS ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
-                                            <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
-                                        <Text>{rep.NOM}</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            )
-                        })}
+                                    {autre ?
+                            <>
+                            <View style={styles.inputCard}>
+                                <OutlinedTextField
+                                    label={"Nom du repas"}
+                                    fontSize={14}
+                                    value={data.repas}
+                                    onChangeText={(newValue) => handleChange('repas', newValue)}
+                                    onBlur={() => checkFieldData('nom')}
+                                    error={hasError('repas') ? getError('repas') : ''}
+                                    lineWidth={0.5}
+                                    multiline={true}
+                                    activeLineWidth={0.5}
+                                    baseColor={COLORS.smallBrown}
+                                    tintColor={COLORS.primary}
+                                />
+                            </View>
+                            <View style={styles.inputCard}>
+                                <OutlinedTextField
+                                    label={"Description"}
+                                    fontSize={14}
+                                    value={data.description}
+                                    onChangeText={(newValue) => handleChange('description', newValue)}
+                                    onBlur={() => checkFieldData('nom')}
+                                    error={hasError('description') ? getError('description') : ''}
+                                    lineWidth={0.5}
+                                    multiline={true}
+                                    activeLineWidth={0.5}
+                                    baseColor={COLORS.smallBrown}
+                                    tintColor={COLORS.primary}
+                                />
+                            </View>
+                            <TouchableOpacity onPress={Terminer}>
+                            <View style={styles.button}>
+                                <Text style={styles.buttonText} >Terminer</Text>
+                            </View>
+                        </TouchableOpacity>
+                            </>:
+                             repass.map((rep, index) => {
+                                return (
+                                    <TouchableOpacity key={index} onPress={() => onRepasSelect(rep)}>
+                                        <View style={styles.modalItemModel2} >
+                                            {RepasSelect?.ID_REPAS == rep.ID_REPAS ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                            <Text>{rep.NOM}</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                )
+                            })
+                            }
+                       
 
                     </View>
                 </>
@@ -569,5 +622,33 @@ addImager: {
         marginBottom: 10,
         marginHorizontal: 20
     },
+    searchSection: {
+        flexDirection: "row",
+        marginTop: 10,
+        padding: 5,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: "#ddd",
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        // backgroundColor: "#D7D9E4",
+        width: "100%",
+        height: 50,
+        paddingHorizontal: 10
+},
+input: {
+        flex: 1,
+        marginLeft: 10
+},
+cardRecherche: {
+        width: 50,
+        height: 50,
+        borderRadius: 10,
+        // backgroundColor: "#EF4255",
+        marginTop: 8,
+        justifyContent: "center",
+        alignContent: "center",
+        alignItems: "center"
+},
 
 })

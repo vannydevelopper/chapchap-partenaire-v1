@@ -1,5 +1,5 @@
 import React from 'react'
-import { Image, StyleSheet, Text, TouchableNativeFeedback, useWindowDimensions, View } from 'react-native'
+import { Image, StyleSheet, ImageBackground, Text, TouchableOpacity, TouchableNativeFeedback, useWindowDimensions, View } from 'react-native'
 import { MaterialIcons, AntDesign, Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../../styles/COLORS';
 import { useNavigation } from '@react-navigation/native';
@@ -22,91 +22,112 @@ export default function Menu({ product, index, totalLength, fixMargins = false }
         const details = detail
         navigation.navigate("MenuDetailScreen", { detail: product })
 }
+    // return (
+    //     <View key={index} style={[styles.product, additionStyles]}>
+    //        <View style={styles.imageCard}>
+    //         </View>
+    //         <View style={styles.serviceIcon}>
+    //             <TouchableNativeFeedback onPress={() => detail(product)}>
+    //                 <Image source={{ uri: product.IMAGE }} style={styles.serviceIconImage} />
+
+    //             </TouchableNativeFeedback>
+    //         </View>
+    //         <View style={styles.productHeader}>
+    //             <Text numberOfLines={2} style={styles.productName}>{product.repas}</Text>
+    //             <Text numberOfLines={2} style={styles.productCategory}>
+    //                 {product.categorie}
+    //             </Text>
+    //         </View>
+    //         {product.PRIX ? <Text style={styles.price}>{product.PRIX.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Fbu</Text> : null}
+
+    //     </View>
+    // )
     return (
-        <View key={index} style={[styles.product, additionStyles]}>
-           <View style={styles.imageCard}>
-            </View>
-            <View style={styles.serviceIcon}>
-                <TouchableNativeFeedback onPress={() => detail(product)}>
-                    <Image source={{ uri: product.IMAGE }} style={styles.serviceIconImage} />
-
-                </TouchableNativeFeedback>
-            </View>
-            <View style={styles.productHeader}>
-                <Text numberOfLines={2} style={styles.productName}>{product.repas}</Text>
-                <Text numberOfLines={2} style={styles.productCategory}>
-                    {product.categorie}
-                </Text>
-            </View>
-            {product.PRIX ? <Text style={styles.price}>{product.PRIX.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Fbu</Text> : null}
-
+        <View key={index} style={[styles.product, additionStyles, fixMargins && { marginTop: 10 }]}>
+            <TouchableOpacity onPress={() => detail(product)} style={styles.imageCard}>
+                {/* <Image source={{ uri: menu.IMAGE }} style={styles.image} />
+                 */}
+                 <ImageBackground source={{ uri: product.IMAGE }} style={[styles.serviceBackgound]} marginLeft={5} marginTop={2} mag borderRadius={20}  imageStyle={{ opacity: 0.8 }}>
+                <View style={{ marginTop: 120, marginRight: 0 }}>
+                    <Text style={styles.productName1}>{product.repas}</Text>
+                </View>
+            </ImageBackground>
+            </TouchableOpacity>
+            {product.PRIX ? <Text style={{ marginHorizontal:10, fontsize:10,fontWeight:"bold" ,  color: COLORS.ecommercePrimaryColor}}>{product.PRIX.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Fbu</Text> : null}
+            
         </View>
+
     )
 }
 
 const styles = StyleSheet.create({
+    productName1: {
+        textAlign: 'center',
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 12
+    }, 
+    serviceBackgound: {
+        width: "100%",
+        height: "100%",
+         justifyContent: 'center',
+    },
     product: {
-        maxWidth: 200,
-        backgroundColor: '#F1F1F1',
-        borderRadius: 5,
-        marginTop: 10,
-    },
-    productHeader: {
-        padding: 5,
-        marginTop:20
-    },
-    productName: {
-        color: COLORS.ecommercePrimaryColor,
-        fontWeight: "bold"
-    },
-    productCategory: {
-        fontSize: 13,
-        color: '#777',
-        marginLeft: 5,
+        maxWidth: 300,
+        marginBottom:-40
+        
     },
     imageCard: {
-        width: 100,
-        height: 50,
-    },
-    serviceIcon: {
-        width: 100,
-        height: 100,
-        backgroundColor: "#fff",
-        borderRadius: 10,
-        marginLeft: 30,
-        // marginTop: -9,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    serviceIconImage: {
-        width: 140,
-        height: 140,
-        borderRadius: 10,
+        borderRadius: 8,
+        height: "70%",
+        width: "100%"
     },
     image: {
         height: "100%",
         width: "100%",
+        borderRadius: 8,
         resizeMode: 'contain'
     },
-    price: {
-        color: '#F29558',
-        fontWeight: "bold",
-        padding: 5
+    cardLike: {
+        marginTop: 10,
+        width: 25,
+        height: 25,
+        backgroundColor: "#FBD5DA",
+        borderRadius: 5,
+        justifyContent: "center",
+        alignItems: "center"
     },
-    details: {
-        paddingHorizontal: 5
-    },
-    detail: {
-        flexDirection: "row",
+    cartBtn: {
+        marginTop: 10,
+        width: 25,
+        height: 25,
+        backgroundColor: "#FBD5DA",
+        borderRadius:5,
+        justifyContent: "center",
         alignItems: "center",
-        justifyContent: "space-between",
+        marginLeft: 8
     },
-    detailLabel: {
-        color: '#c4bebe',
-        fontSize: 13,
+    badge: {
+        minWidth: 25,
+        minHeight: 20,
+        paddingHorizontal: 5,
+        borderRadius: 20,
+        backgroundColor: COLORS.ecommerceRed,
+        position: 'absolute',
+        top: -5,
+        right: -10,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    badgeText: {
+        textAlign: 'center',
+        fontSize: 10,
+        color: '#FFF',
         fontWeight: "bold"
     },
-    detailValue: {
-        fontWeight: "bold"
+    productName: {
+        color: COLORS.ecommercePrimaryColor,
+        fontWeight: "400",
+        fontSize: 13
     }
 })
