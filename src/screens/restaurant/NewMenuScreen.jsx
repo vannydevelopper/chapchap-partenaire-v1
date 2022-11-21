@@ -8,7 +8,7 @@ import useFetch from "../../hooks/useFetch";
 import { useForm } from "../../hooks/useForm";
 import { COLORS } from "../../styles/COLORS";
 import { SimpleLineIcons, AntDesign, Ionicons, Octicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Feather,FontAwesome } from '@expo/vector-icons';
+import { Feather, FontAwesome } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useFormErrorsHandle } from "../../hooks/useFormErrorsHandle";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
@@ -18,7 +18,7 @@ import Loading from "../../components/app/Loading"
 export default function NewMenuScreen() {
     const navigation = useNavigation()
     const route = useRoute()
-    const  partenaire=route.params
+    const partenaire = route.params
     const categoriesModalizeRef = useRef(null)
     const repasModalizeRef = useRef(null)
     const SousCategoriesModalizeRef = useRef(null)
@@ -43,10 +43,13 @@ export default function NewMenuScreen() {
     const [data, handleChange, setValue] = useForm({
         CategorieSelect: null,
         selectedSousCategorie: null,
-        nom:"",
-        repas:"",
+        nom: "",
+        q: "",
+        repas: "",
         prix: "",
-        description:"",
+        temps: "",
+        description: "",
+        descriptionRepas:"",
         logoImage: "",
         logoImage1: "",
         logoImage2: "",
@@ -65,6 +68,34 @@ export default function NewMenuScreen() {
         },
     })
 
+    
+
+    // const fecthCategories = async () => {
+    //     try {
+    //         var url = "/resto/menu/categories"
+    //         if (data.q) {
+    //             console.log(data.q)
+    //             url = `/resto/menu/categories?q=${data.q}`
+    //         }
+            
+    //         const catego = await fetchApi(url)
+    //         setCategories(catego.result)
+    //         console.log('cococo')
+           
+    //     } 
+    //     catch (error) {
+    //         console.log(error)
+    //     } 
+        
+    //     finally {
+    //         setLoadingCatagories(false)
+    //     }
+    // }
+    // useFocusEffect(useCallback(() => {
+    //     fecthCategories()
+    // }, [data.q]))
+
+
     useEffect(() => {
         (async () => {
             try {
@@ -78,6 +109,7 @@ export default function NewMenuScreen() {
             }
         })()
     }, [])
+
     useEffect(() => {
         (async () => {
             try {
@@ -123,7 +155,7 @@ export default function NewMenuScreen() {
         setRepasSelect(false)
         // setshowMapis(false)
     }
-    const Terminer=()=>{
+    const Terminer = () => {
         repasModalizeRef.current.close()
 
     }
@@ -163,53 +195,58 @@ export default function NewMenuScreen() {
     }
     const onImageSelect = async () => {
         const image = await ImagePicker.launchImageLibraryAsync({
-                  mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                  quality: 0.6
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            quality: 0.6
         });
         if (!image.cancelled) {
-                  setImages(t => [...t, image])
+            setImages(t => [...t, image])
         }
-}
+    }
 
-const onRemoveImage = index => {
+    const onRemoveImage = index => {
         const newImages = images.filter((_, i) => i != index)
         setImages(newImages)
-}
+    }
 
     const SendData = async () => {
         try {
             setLoading(true)
             const form = new FormData()
             form.append("ID_CATEGORIE_MENU", CategorieSelect.ID_CATEGORIE_MENU)
-            form.append("ID_SOUS_CATEGORIE_MENU",selectedSousCategorie.ID_SOUS_CATEGORIE_MENU )                 
-           if(RepasSelect.ID_REPAS)
-           {
-            form.append('ID_REPAS', RepasSelect.ID_REPAS)
-           }
-            form.append('ID_PARTENAIRE_SERVICE',partenaire.partenaire.produit.ID_PARTENAIRE_SERVICE)
+            form.append("ID_SOUS_CATEGORIE_MENU", selectedSousCategorie.ID_SOUS_CATEGORIE_MENU)
+            if (RepasSelect.ID_REPAS) {
+                form.append('ID_REPAS', RepasSelect.ID_REPAS)
+            }
+            form.append('ID_PARTENAIRE_SERVICE', partenaire.partenaire.produit.ID_PARTENAIRE_SERVICE)
             form.append("NOM_REPAS", data.repas)
 
             form.append("PRIX", data.prix)
+            form.append("TEMPS_PREPARATION", data.temps)
+            form.append("DESCRIPT", data.description)
+            form.append("DESCRIPTIONrepas", data.descriptionRepas)
+
+            
+
             if (images.length > 0) {
                 await Promise.all(images.map(async (image, index) => {
-                          const key = `IMAGE_${index + 1}`
-                          const manipResult = image
-                          let localUri = manipResult.uri;
-                          let filename = localUri.split('/').pop();
-                          let match = /\.(\w+)$/.exec(filename);
-                          let type = match ? `image/${match[1]}` : `image`;
-                          form.append(key, {
-                                    uri: localUri, name: filename, type
-                          })
+                    const key = `IMAGE_${index + 1}`
+                    const manipResult = image
+                    let localUri = manipResult.uri;
+                    let filename = localUri.split('/').pop();
+                    let match = /\.(\w+)$/.exec(filename);
+                    let type = match ? `image/${match[1]}` : `image`;
+                    form.append(key, {
+                        uri: localUri, name: filename, type
+                    })
                 }))
-      }
+            }
             form.append("DESCRIPTION", data.description)
-              const newMenu = await fetchApi('/resto/menu/create', {
-                        method: "POST",
-                        body: form
-              })
-              console.log("newMenu")
-              navigation.navigate("NewMenuDetailScreen", { menus: newMenu })
+            const newMenu = await fetchApi('/resto/menu/create', {
+                method: "POST",
+                body: form
+            })
+            console.log("newMenu")
+            navigation.navigate("NewMenuDetailScreen", { menus: newMenu })
         } catch (error) {
             console.log(error)
         } finally {
@@ -255,7 +292,7 @@ const onRemoveImage = index => {
                                     <AntDesign name="caretdown" size={20} color="#777" />
                                 </TouchableOpacity>
                             </View>
-                        
+
                             {/* {autre &&
                             <>
                             <View style={styles.inputCard}>
@@ -335,24 +372,52 @@ const onRemoveImage = index => {
                                     tintColor={COLORS.primary}
                                 />
                             </View>
-                            
+                            <View style={styles.inputCard}>
+                                <OutlinedTextField
+                                    label={"Entrez temps de preparation"}
+                                    fontSize={14}
+                                    value={data.temps}
+                                    onChangeText={(newValue) => handleChange('temps', newValue)}
+                                    onBlur={() => checkFieldData('temps')}
+                                    error={hasError('temps') ? getError('temps') : ''}
+                                    lineWidth={0.5}
+                                    activeLineWidth={0.5}
+                                    baseColor={COLORS.smallBrown}
+                                    tintColor={COLORS.primary}
+                                />
+                            </View>
+                            <View style={styles.inputCard}>
+                                <OutlinedTextField
+                                    label={"Entrez description"}
+                                    fontSize={14}
+                                    value={data.description}
+                                    onChangeText={(newValue) => handleChange('description', newValue)}
+                                    onBlur={() => checkFieldData('description')}
+                                    error={hasError('description') ? getError('description') : ''}
+                                    lineWidth={0.5}
+                                    activeLineWidth={0.5}
+                                    baseColor={COLORS.smallBrown}
+                                    tintColor={COLORS.primary}
+                                />
+                            </View>
+
                             <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Images du menu</Text>
-                                                  <View style={styles.images}>
-                                                            {images.map((image, index) => {
-                                                                      return (
-                                                                                <TouchableWithoutFeedback onPress={() => onRemoveImage(index)} key={index}>
-                                                                                          <Image style={[styles.addImager, index > 0 && { marginLeft: 10 }]} source={{ uri: image.uri }} />
-                                                                                </TouchableWithoutFeedback>
-                                                                      )
-                                                            })}
-                                                            {images.length < 3 ? <TouchableWithoutFeedback onPress={onImageSelect}>
-                                                                      <View style={[styles.addImager, images.length > 0 && { marginLeft: 10 }]}>
-                                                                                <Feather name="image" size={30} color="#777" />
-                                                                      </View>
-                                                            </TouchableWithoutFeedback> : null}
-                                                  </View>
+                                <Text style={styles.selectLabel}>Images du menu</Text>
+                                <View style={styles.images}>
+                                    {images.map((image, index) => {
+                                        return (
+                                            <TouchableWithoutFeedback onPress={() => onRemoveImage(index)} key={index}>
+                                                <Image style={[styles.addImager, index > 0 && { marginLeft: 10 }]} source={{ uri: image.uri }} />
+                                            </TouchableWithoutFeedback>
+                                        )
+                                    })}
+                                    {images.length < 3 ? <TouchableWithoutFeedback onPress={onImageSelect}>
+                                        <View style={[styles.addImager, images.length > 0 && { marginLeft: 10 }]}>
+                                            <Feather name="image" size={30} color="#777" />
                                         </View>
+                                    </TouchableWithoutFeedback> : null}
+                                </View>
+                            </View>
                         </View>
                         <TouchableOpacity onPress={SendData}>
                             <View style={styles.button}>
@@ -367,64 +432,66 @@ const onRemoveImage = index => {
                     <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 15 }}>
                         <Text style={{ fontSize: 17, fontWeight: "bold" }}>Repas</Text>
                     </View>
-                   {!autre &&<View style={{ flexDirection: "row", alignItems: "center", alignContent: "center", justifyContent: "space-between", marginBottom: 25, paddingHorizontal: 10 }}>
-                                                  <View style={styles.searchSection}>
-                                                            <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                            <TextInput
-                                                                      style={styles.input}
-                                                                      placeholder="Rechercher un repas"
-                                                            />
-                                                  </View>
-                                        </View>
-                   }
+                    {!autre && <View style={{ flexDirection: "row", alignItems: "center", alignContent: "center", justifyContent: "space-between", marginBottom: 25, paddingHorizontal: 10 }}>
+                        <View style={styles.searchSection}>
+                            <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
+                            <TextInput
+                                style={styles.input}
+                                value={data.q}
+                                onChangeText={(newValue) => handleChange('q', newValue)}
+                                placeholder="Rechercher un repas"
+                            />
+                        </View>
+                    </View>
+                    }
                     <View>
-                    <TouchableWithoutFeedback onPress={() => onAutreSelect(true)}>
-                   
-                                        <View style={styles.modalItemModel2} >
-                                        {autre ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
-                                            <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
-                                        <Text>Autre repas</Text>
-                                    </View>
-                                    </TouchableWithoutFeedback>
-                                    {autre ?
+                        <TouchableWithoutFeedback onPress={() => onAutreSelect(true)}>
+
+                            <View style={styles.modalItemModel2} >
+                                {autre ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                    <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                <Text>Autre repas</Text>
+                            </View>
+                        </TouchableWithoutFeedback>
+                        {autre ?
                             <>
-                            <View style={styles.inputCard}>
-                                <OutlinedTextField
-                                    label={"Nom du repas"}
-                                    fontSize={14}
-                                    value={data.repas}
-                                    onChangeText={(newValue) => handleChange('repas', newValue)}
-                                    onBlur={() => checkFieldData('nom')}
-                                    error={hasError('repas') ? getError('repas') : ''}
-                                    lineWidth={0.5}
-                                    multiline={true}
-                                    activeLineWidth={0.5}
-                                    baseColor={COLORS.smallBrown}
-                                    tintColor={COLORS.primary}
-                                />
-                            </View>
-                            <View style={styles.inputCard}>
-                                <OutlinedTextField
-                                    label={"Description"}
-                                    fontSize={14}
-                                    value={data.description}
-                                    onChangeText={(newValue) => handleChange('description', newValue)}
-                                    onBlur={() => checkFieldData('nom')}
-                                    error={hasError('description') ? getError('description') : ''}
-                                    lineWidth={0.5}
-                                    multiline={true}
-                                    activeLineWidth={0.5}
-                                    baseColor={COLORS.smallBrown}
-                                    tintColor={COLORS.primary}
-                                />
-                            </View>
-                            <TouchableOpacity onPress={Terminer}>
-                            <View style={styles.button}>
-                                <Text style={styles.buttonText} >Terminer</Text>
-                            </View>
-                        </TouchableOpacity>
-                            </>:
-                             repass.map((rep, index) => {
+                                <View style={styles.inputCard}>
+                                    <OutlinedTextField
+                                        label={"Nom du repas"}
+                                        fontSize={14}
+                                        value={data.repas}
+                                        onChangeText={(newValue) => handleChange('repas', newValue)}
+                                        onBlur={() => checkFieldData('repas')}
+                                        error={hasError('repas') ? getError('repas') : ''}
+                                        lineWidth={0.5}
+                                        multiline={true}
+                                        activeLineWidth={0.5}
+                                        baseColor={COLORS.smallBrown}
+                                        tintColor={COLORS.primary}
+                                    />
+                                </View>
+                                <View style={styles.inputCard}>
+                                    <OutlinedTextField
+                                        label={"Description"}
+                                        fontSize={14}
+                                        value={data.descriptionRepas}
+                                        onChangeText={(newValue) => handleChange('descriptionRepas', newValue)}
+                                        onBlur={() => checkFieldData('descriptionRepas')}
+                                        error={hasError('descriptionRepas') ? getError('descriptionRepas') : ''}
+                                        lineWidth={0.5}
+                                        multiline={true}
+                                        activeLineWidth={0.5}
+                                        baseColor={COLORS.smallBrown}
+                                        tintColor={COLORS.primary}
+                                    />
+                                </View>
+                                <TouchableOpacity onPress={Terminer}>
+                                    <View style={styles.button}>
+                                        <Text style={styles.buttonText} >Terminer</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            </> :
+                            repass.map((rep, index) => {
                                 return (
                                     <TouchableOpacity key={index} onPress={() => onRepasSelect(rep)}>
                                         <View style={styles.modalItemModel2} >
@@ -435,8 +502,8 @@ const onRemoveImage = index => {
                                     </TouchableOpacity>
                                 )
                             })
-                            }
-                       
+                        }
+
 
                     </View>
                 </>
@@ -550,23 +617,23 @@ const styles = StyleSheet.create({
     selectControl: {
         paddingHorizontal: 20,
         marginTop: 10
-},
-selectLabel: {
-    fontWeight: "bold",
-    marginLeft: 5
-},
-images: {
-    flexDirection: "row"
-},
-addImager: {
-    width: 100,
-    height: 100,
-    backgroundColor: '#F1F1F1',
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 5
-},
+    },
+    selectLabel: {
+        fontWeight: "bold",
+        marginLeft: 5
+    },
+    images: {
+        flexDirection: "row"
+    },
+    addImager: {
+        width: 100,
+        height: 100,
+        backgroundColor: '#F1F1F1',
+        borderRadius: 8,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 5
+    },
     button: {
         marginTop: 10,
         borderRadius: 8,
@@ -635,12 +702,12 @@ addImager: {
         width: "100%",
         height: 50,
         paddingHorizontal: 10
-},
-input: {
+    },
+    input: {
         flex: 1,
         marginLeft: 10
-},
-cardRecherche: {
+    },
+    cardRecherche: {
         width: 50,
         height: 50,
         borderRadius: 10,
@@ -649,6 +716,6 @@ cardRecherche: {
         justifyContent: "center",
         alignContent: "center",
         alignItems: "center"
-},
+    },
 
 })

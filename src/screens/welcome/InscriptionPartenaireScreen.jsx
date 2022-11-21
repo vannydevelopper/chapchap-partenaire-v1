@@ -41,7 +41,6 @@ export default function InscriptionPartenaireScreen() {
           const { id_service,service } = route.params
           const user = useSelector(userSelector)
           const form = new FormData()
-
           const [data, handleChange, setValue] = useForm({
                     ServiceSelect: null,
                     typepartenaireselect: null,
@@ -83,13 +82,22 @@ export default function InscriptionPartenaireScreen() {
                     try {
                               setLoading(true)
                               form.append('ID_TYPE_PARTENAIRE', selectedTypePartenaire.ID_PARTENAIRE_TYPE)
-                              form.append('NOM_ORGANISATION', data.organisation)
+                              if(data.organisation){
+                                console.log("org")
+                                form.append('NOM_ORGANISATION', data.organisation)
+                              }
+                              else{
+                                console.log("user")
+
+                                form.append('NOM_ORGANISATION', user.result.NOM)
+                              }
+                              
                               form.append('TELEPHONE', data.telephone)
                               form.append('NIF', data.nif)
                               form.append('EMAIL', data.email)
                               form.append('ADRESSE_COMPLETE', data.adresse)
-                              // form.append('LONGITUDE', location.coords.longitude)
-                              // form.append('LATITUDE', location.coords)
+                              form.append('LONGITUDE', location.coords.longitude)
+                              form.append('LATITUDE', location.coords.latitude)
                               form.append('ID_SERVICE', id_service)
 
                               if (logoImage) {
@@ -204,6 +212,68 @@ export default function InscriptionPartenaireScreen() {
                     setBackgroundImage(image)
           }
 
+
+          const askLocationPermission = async () => {
+            let {
+                status: locationStatus,
+            } = await Location.requestForegroundPermissionsAsync()
+            if (locationStatus !== 'granted') {
+                console.log('Permission to access location was denied')
+                setLocation(false)
+                return
+            }
+            var locatio = await Location.getCurrentPositionAsync({})
+            setLocation(locatio)
+        }
+        useEffect(() => {
+            askLocationPermission()
+        }, [])
+        useEffect(() => {
+    
+        }, [])
+        if (location === false) {
+            return (
+                <View
+                    style={{
+                        alignContent: 'center',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flex: 1,
+                    }}
+                >
+                    <Text style={{ fontWeight: 'bold', fontSize: 16, opacity: 0.8 }}>
+                        Pas d'accès à la localisation
+                    </Text>
+                    <Text
+                        style={{
+                            textAlign: 'center',
+                            color: '#0a5744',
+                            marginTop: 10,
+                            paddingHorizontal: 10,
+                        }}
+                    >
+                        L'application a besoin de votre localisation pour fonctionner
+                    </Text>
+                    <TouchableNativeFeedback
+                        background={TouchableNativeFeedback.Ripple('#ddd')}
+                        useForeground={true}
+                        onPress={() => askLocationPermission()}
+                    >
+                        <View
+                            style={{
+                                backgroundColor: '#fff',
+                                borderRadius: 10,
+                                padding: 10,
+                                marginTop: 20,
+                            }}
+                        >
+                            <Text>Autoriser l'accès</Text>
+                        </View>
+                    </TouchableNativeFeedback>
+                </View>
+            )
+        }
+    
 
           return (
                     <>
