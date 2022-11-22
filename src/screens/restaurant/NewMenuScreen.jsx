@@ -70,30 +70,27 @@ export default function NewMenuScreen() {
 
     
 
-    // const fecthCategories = async () => {
-    //     try {
-    //         var url = "/resto/menu/categories"
-    //         if (data.q) {
-    //             console.log(data.q)
-    //             url = `/resto/menu/categories?q=${data.q}`
-    //         }
+    const fecthCategories = async () => {
+        try {
+            var url = "/resto/repas/"
+            if (data.q) {
+                url = `/resto/repas/?q=${data.q}`
+            }
             
-    //         const catego = await fetchApi(url)
-    //         setCategories(catego.result)
-    //         console.log('cococo')
-           
-    //     } 
-    //     catch (error) {
-    //         console.log(error)
-    //     } 
+            const repas = await fetchApi(url)
+            setRepass(repas.result)
+        } 
+        catch (error) {
+            console.log(error)
+        } 
         
-    //     finally {
-    //         setLoadingCatagories(false)
-    //     }
-    // }
-    // useFocusEffect(useCallback(() => {
-    //     fecthCategories()
-    // }, [data.q]))
+        finally {
+            // setLoadingCatagories(false)
+        }
+    }
+    useFocusEffect(useCallback(() => {
+        fecthCategories()
+    }, [data.q]))
 
 
     useEffect(() => {
@@ -110,19 +107,19 @@ export default function NewMenuScreen() {
         })()
     }, [])
 
-    useEffect(() => {
-        (async () => {
-            try {
-                const repas = await fetchApi("/resto/repas/")
-                setRepass(repas.result)
-                // console.log(catego.result)
-            } catch (error) {
-                console.log(error)
-            } finally {
+    // useEffect(() => {
+    //     (async () => {
+    //         try {
+    //             const repas = await fetchApi("/resto/repas/")
+    //             setRepass(repas.result)
+    //             // console.log(catego.result)
+    //         } catch (error) {
+    //             console.log(error)
+    //         } finally {
 
-            }
-        })()
-    }, [])
+    //         }
+    //     })()
+    // }, [data.q])
 
     useEffect(() => {
         (async () => {
