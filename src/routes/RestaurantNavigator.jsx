@@ -16,6 +16,6 @@ export default function RestaurantNavigator(){
                         <Stack.Screen name="MenuDetailScreen" initialParams={partenaire} component={MenuDetailScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid}}/>
                         <Stack.Screen name="NewMenuScreen"  initialParams={partenaire} component={NewMenuScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid}}/>
                         <Stack.Screen name="NewMenuDetailScreen" initialParams={partenaire} component={NewMenuDetailScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid}}/>
-                </Stack.Navigator>
+                </Stack.Navigator> 
         )
 }
