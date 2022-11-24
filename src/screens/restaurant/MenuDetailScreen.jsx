@@ -13,9 +13,7 @@ import { useCallback } from "react";
 export default function MenuDetailScreen() {
     const route = useRoute()
     const { detail } = route.params
-    // console.log(detail)
     const uploadModaliseRef = useRef()
-    var restaurant = detail.ID_RESTAURANT_MENU
     var IMAGES = [
         detail.IMAGE ? detail.IMAGE : undefined,
         detail.IMAGE2 ? detail.IMAGE2 : undefined,
@@ -23,39 +21,6 @@ export default function MenuDetailScreen() {
     ]
     const [nombre, setNombre] = useState(0);
     const [menuImage, setMenuImage] = useState(null)
-
-    // useFocusEffect(useCallback(() => {
-    //     (async () => {
-    //         try {
-    //             if (menuImage) {
-    //                 const form = new FormData()
-    //                 const manipResult = await manipulateAsync(
-    //                     logoImage.uri,
-    //                     [
-    //                         { resize: { width: 500 } }
-    //                     ],
-    //                     { compress: 0.8, format: SaveFormat.JPEG }
-    //                 );
-    //                 let localUri = manipResult.uri;
-    //                 let filename = localUri.split('/').pop();
-    //                 let match = /\.(\w+)$/.exec(filename);
-    //                 let type = match ? `image/${match[1]}` : `image`;
-    //                 form.append('IMAGE', {
-    //                     uri: localUri, name: filename, type
-    //                 })
-    //             }
-    //             console.log(form)
-    //             const newProduct = await fetchApi(`/resto/menu/${detail.ID_RESTAURANT_MENU}`, {
-    //                 method: "POST",
-    //                 body: form
-    //             })
-
-    //         }
-    //         catch (error) {
-    //             console.log(error)
-    //         }
-    //     })()
-    // }, []))
 
 
 
@@ -91,11 +56,11 @@ export default function MenuDetailScreen() {
                     uri: localUri, name: filename, type
                 })
             }
-            console.log(form)
-            const newProduct = await fetchApi(`/resto/menu/${restaurant}`, {
-                method: "POST",
+            const newProduct = await fetchApi(`/resto/menu/${detail.ID_RESTAURANT_MENU}`, {
+                method: "PUT",
                 body: form
             })
+            
         }
         catch (error) {
             console.log(error)
