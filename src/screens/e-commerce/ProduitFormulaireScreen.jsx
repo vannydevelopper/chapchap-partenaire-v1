@@ -86,7 +86,6 @@ export default function ProduitFormulaireScreen() {
                         try {
                                 const catego = await fetchApi("/produit/categorie")
                                 setCategories(catego.result)
-                                //  console.log(catego.result)
                         } catch (error) {
                                 console.log(error)
                         } finally {
@@ -102,8 +101,6 @@ export default function ProduitFormulaireScreen() {
                                         var sousCatego = await fetchApi(`/produit/sous_categorie/${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
                                         setSouscategories(sousCatego.result)
                                 }
-                                console.log(sousCatego.result)
-
                         }
                         catch (error) {
                                 console.log(error)
@@ -121,7 +118,6 @@ export default function ProduitFormulaireScreen() {
                                         var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE}`)
                                         setTaille(taille.result)
                                 }
-                                // console.log(taille.result)
                         }
                         catch (error) {
                                 console.log(error)
@@ -139,8 +135,6 @@ export default function ProduitFormulaireScreen() {
                                         var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE}`)
                                         setCouleur(couleur.result)
                                 }
-
-                                // console.log(couleur.result)
                         }
                         catch (error) {
                                 console.log(error)
@@ -314,7 +308,6 @@ export default function ProduitFormulaireScreen() {
                         }
                         form.append('DETAIL', JSON.stringify(detailData))
 
-                        // console.log(form)
                         const res = await fetchApi("/produit/stock/create", {
                                 method: "POST",
                                 body: form

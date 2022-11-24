@@ -407,8 +407,6 @@ export default function NewProductSreen() {
                               quantiteDetail: "",
                               quantite: ""
                     })
-                    console.log(showColor)
-                    console.log(showSize)
 
 
 

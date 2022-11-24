@@ -139,7 +139,6 @@ export default function ApprovisionnementScreen() {
                                         var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${detail.categorie.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${detail.sous_categorie.ID_PRODUIT_SOUS_CATEGORIE}`)
                                         setTaille(taille.result)
                                 }
-                                // console.log(taille.result)
                         }
                         catch (error) {
                                 console.log(error)
@@ -157,7 +156,6 @@ export default function ApprovisionnementScreen() {
                                         var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${detail.categorie.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${detail.sous_categorie.ID_PRODUIT_SOUS_CATEGORIE}`)
                                         setCouleur(couleur.result)
                                 }
-                                console.log(couleur.result)
                         }
                         catch (error) {
                                 console.log(error)
