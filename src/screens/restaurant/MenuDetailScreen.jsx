@@ -1,19 +1,23 @@
 import React, { useRef, useState } from "react"
 import { Image, View, StyleSheet, Text, TouchableOpacity, TextInput, TouchableNativeFeedback, ScrollView } from "react-native"
 import { Ionicons, AntDesign, Entypo, Foundation, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useFocusEffect, useRoute } from "@react-navigation/native";
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import ProductImages from "../../components/restaurant/details/ProductImages"
 import { Modalize } from "react-native-modalize";
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
 import fetchApi from "../../helpers/fetchApi";
+import { TextField, FilledTextField, InputAdornment, OutlinedTextField } from 'rn-material-ui-textfield';
+import { COLORS } from "../../styles/COLORS"
 import { useEffect } from "react";
 import { useCallback } from "react";
 
 export default function MenuDetailScreen() {
     const route = useRoute()
     const { detail } = route.params
+    const navigation = useNavigation()
     const uploadModaliseRef = useRef()
+    const updateAllDetailRef = useRef()
     var IMAGES = [
         detail.IMAGE ? detail.IMAGE : undefined,
         detail.IMAGE2 ? detail.IMAGE2 : undefined,
@@ -21,8 +25,10 @@ export default function MenuDetailScreen() {
     ]
     const [nombre, setNombre] = useState(0);
     const [menuImage, setMenuImage] = useState(null)
+    const [detailImage, setDetailImage] = useState(detail.IMAGE)
 
 
+   
 
     const onSelectPhoto = () => {
         uploadModaliseRef.current.open()
@@ -56,11 +62,14 @@ export default function MenuDetailScreen() {
                     uri: localUri, name: filename, type
                 })
             }
-            const newProduct = await fetchApi(`/resto/menu/${detail.ID_RESTAURANT_MENU}`, {
+            console.log(form)
+            console.log(`/resto/menu/${detail.ID_RESTAURANT_MENU}`)
+            const menuUpdate = await fetchApi(`/resto/menu/${detail.ID_RESTAURANT_MENU}`, {
                 method: "PUT",
                 body: form
             })
-            
+            setDetailImage(menuUpdate.result[0].IMAGE)
+
         }
         catch (error) {
             console.log(error)
@@ -91,12 +100,9 @@ export default function MenuDetailScreen() {
 
             <ScrollView>
                 <View style={{ marginLeft: 30, marginTop: 50, marginHorizontal: 20 }}>
-                    {detail.IMAGE ? <View style={{ width: '100%', marginTop: 10 }}>
-                        <  Image source={{ uri: detail.IMAGE }} style={{ ...styles.imagePrincipal }} />
-                    </View> :
-                        <View>
-                            <Image source={{ uri: menuImage.uri }} style={{ ...styles.imagePrincipal }} />
-                        </View>}
+                    <View style={{ width: '100%', marginTop: 10 }}>
+                        <  Image source={{ uri: detailImage }} style={{ ...styles.imagePrincipal }} />
+                    </View>
 
                     {/* <ProductImages images={IMAGES} /> */}
                     <Ionicons name="ios-arrow-back-outline" size={24} color="white" style={{ ...styles.icon, marginTop: 0 }} />
@@ -108,10 +114,12 @@ export default function MenuDetailScreen() {
                         <Feather name="image" size={24} color="black" />
                     </TouchableOpacity>
 
+                    <TouchableOpacity  onPress={() => navigation.navigate("ModifierMenuDetailScreen",{detail:detail})}>
+                        <View style={{ marginTop: 50 }} >
+                            <Text style={styles.text} numberOfLines={2}>{detail.repas}</Text>
+                        </View>
+                    </TouchableOpacity>
 
-                    <View style={{ marginTop: 50 }} >
-                        <Text style={styles.text} numberOfLines={2}>{detail.repas}</Text>
-                    </View>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20 }}>
                         <View style={{ flexDirection: "row" }}>
                             <AntDesign name="star" size={15} color="#EFC519" />
@@ -123,21 +131,26 @@ export default function MenuDetailScreen() {
                             <AntDesign name="clockcircleo" size={15} color="#797E9A" />
                             <Text style={{ fontSize: 10, marginLeft: 10, color: "#797E9A" }}>30 Min</Text>
                         </View>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => navigation.navigate("ModifierMenuDetailScreen", {detail:detail})}>
                             <View style={{ marginTop: -5 }}>
                                 <Text style={styles.textFbu}>{detail.PRIX} Fbu</Text>
                             </View>
                         </TouchableOpacity>
 
                     </View>
-                    <View style={{ marginTop: 50 }} >
-                        <Text style={styles.text1} numberOfLines={2}>{detail.categorie}</Text>
-                    </View>
-                    <View style={{ marginTop: 15 }} >
-                        <Text style={styles.txtDisplay}>
-                            {detail.DESCRIPTION}
-                        </Text>
-                    </View>
+                    <TouchableOpacity  onPress={() => navigation.navigate("ModifierMenuDetailScreen",{detail:detail})}>
+                        <View style={{ marginTop: 50 }} >
+                            <Text style={styles.text1} numberOfLines={2}>{detail.categorie}</Text>
+                        </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity  onPress={() => navigation.navigate("ModifierMenuDetailScreen",{detail:detail})}>
+                        <View style={{ marginTop: 15 }} >
+                            <Text style={styles.txtDisplay}>
+                                {detail.DESCRIPTION}
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
                     {/* <View>
                                         <View style={{ flexDirection: "row", justifyContent: 'space-around', marginTop: 40 }}>
 
@@ -160,20 +173,8 @@ export default function MenuDetailScreen() {
                               </View> */}
                 </View>
             </ScrollView >
-            <Modalize ref={uploadModaliseRef} handlePosition="inside" modalHeight={200} snapPoint={250}>
+            <Modalize ref={uploadModaliseRef} handlePosition="inside" modalHeight={100} snapPoint={250}>
                 <View style={styles.modalContent}>
-                    {/* <TouchableNativeFeedback>
-                        <View style={styles.modalAction}>
-                            <View style={styles.actionIcon}>
-                            <Feather name="camera" size={24} color="black" />
-                            </View>
-                            <View style={styles.actionLabels}>
-                                <Text style={styles.modalActionText}>
-                                    Prendre une photo
-                                </Text>
-                            </View>
-                        </View>
-                    </TouchableNativeFeedback> */}
                     <TouchableNativeFeedback onPress={() => onImporterPhoto()}>
                         <View style={styles.modalAction}>
                             <View style={styles.actionIcon}>
@@ -186,22 +187,69 @@ export default function MenuDetailScreen() {
                             </View>
                         </View>
                     </TouchableNativeFeedback>
-
-                    <TouchableNativeFeedback>
-                        <View style={styles.modalAction}>
-                            <View style={styles.actionIcon}>
-                                <Feather name="trash" size={24} color="red" />
-                            </View>
-                            <View style={styles.actionLabels}>
-                                <Text style={styles.modalActionText}>
-                                    delete
-                                </Text>
-                            </View>
-                        </View>
-                    </TouchableNativeFeedback>
-
                 </View>
             </Modalize>
+            {/* <Modalize ref={updateAllDetailRef} >
+                <View style={{ ...styles.modalContent, marginTop: 30 }}>
+                    <View style={{ marginHorizontal: 20, justifyContent: "center", alignItems: "center", marginBottom: 10 }}>
+                        <Text style={{ fontWeight: "bold", fontSize: 17 }}>Modification</Text>
+                    </View>
+                    <ScrollView>
+                        <View style={styles.inputCard}>
+                            <OutlinedTextField
+                                label="Produit"
+                                fontSize={14}
+                                value={produit}
+                                onChangeText={(pr) => setProduit(pr)}
+                                lineWidth={0.5}
+                                activeLineWidth={0.5}
+                                baseColor={COLORS.smallBrown}
+                                tintColor={COLORS.primary}
+                            />
+                        </View>
+                        <View style={styles.inputCard}>
+                            <OutlinedTextField
+                                label="Prix"
+                                fontSize={14}
+                                value={prix}
+                                onChangeText={(pri) => setPrix(pri)}
+                                lineWidth={0.5}
+                                activeLineWidth={0.5}
+                                baseColor={COLORS.smallBrown}
+                                tintColor={COLORS.primary}
+                            />
+                        </View>
+                        <View style={styles.inputCard}>
+                            <OutlinedTextField
+                                label="Categorie"
+                                fontSize={14}
+                                value={categorie}
+                                onChangeText={(cat) => setCategorie(cat)}
+                                lineWidth={0.5}
+                                activeLineWidth={0.5}
+                                baseColor={COLORS.smallBrown}
+                                tintColor={COLORS.primary}
+                            />
+                        </View>
+                        <View style={styles.inputCard}>
+                            <OutlinedTextField
+                                label="Description"
+                                fontSize={14}
+                                value={description}
+                                onChangeText={(descr) => setDescription(descr)}
+                                lineWidth={0.5}
+                                activeLineWidth={0.5}
+                                baseColor={COLORS.smallBrown}
+                                tintColor={COLORS.primary}
+                                multiline={true}
+                            />
+                        </View>
+                    </ScrollView>
+                    <TouchableOpacity style={styles.addBtn} onPress={()=>envoiModification()}>
+                        <Text style={styles.addBtnText}>Modifier</Text>
+                    </TouchableOpacity>
+                </View>
+            </Modalize> */}
         </>
     )
 }
@@ -332,7 +380,7 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     modalContent: {
-        marginTop: 40
+        marginTop: 20
     },
     modalAction: {
         flexDirection: "row",
@@ -355,4 +403,24 @@ const styles = StyleSheet.create({
         color: '#777',
         fontSize: 12
     },
+    inputCard: {
+        marginHorizontal: 20,
+        marginTop: 10,
+
+    },
+    addBtn: {
+        paddingVertical: 10,
+        minWidth: "90%",
+        alignSelf: "center",
+        backgroundColor: COLORS.ecommerceOrange,
+        borderRadius: 10,
+        paddingVertical: 15,
+        marginBottom: 10,
+        marginTop: 10
+    },
+    addBtnText: {
+        color: '#FFF',
+        fontWeight: "bold",
+        textAlign: "center",
+    }
 })
