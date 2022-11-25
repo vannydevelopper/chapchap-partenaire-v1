@@ -40,6 +40,8 @@ export default function ModifierMenuDetailScreen() {
         const [prix, setPrix] = useState(detail.PRIX)
         const [description, setDescription] = useState(detail.DESCRIPTION)
 
+        const [menus, setDetailMenu] = useState(null)
+
 
 
         const [data, handleChange, setValue] = useForm({
@@ -162,11 +164,6 @@ export default function ModifierMenuDetailScreen() {
         }
 
         const SendData = async () => {
-                // console.log(prix)
-                // console.log(description)
-                // console.log(data.temps)
-                // console.log(RepasSelect)
-                // console.log(CategorieSelect)
 
                 try {
                         setLoading(true)
@@ -209,8 +206,9 @@ export default function ModifierMenuDetailScreen() {
                                 method: "PUT",
                                 body: form
                         })
-                        // console.log("updateNewMenu")
-                        // navigation.navigate("NewMenuDetailScreen", { menus: newMenu })
+                        setDetailMenu(updateNewMenu.menus)
+                        // console.log(updateNewMenu.menus)
+                        // navigation.navigate("MenuDetailScreen", { detail: menus })
                 } catch (error) {
                         console.log(error)
                 } finally {

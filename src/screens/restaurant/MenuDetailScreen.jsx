@@ -28,7 +28,7 @@ export default function MenuDetailScreen() {
     const [detailImage, setDetailImage] = useState(detail.IMAGE)
 
 
-   
+
 
     const onSelectPhoto = () => {
         uploadModaliseRef.current.open()
@@ -100,9 +100,12 @@ export default function MenuDetailScreen() {
 
             <ScrollView>
                 <View style={{ marginLeft: 30, marginTop: 50, marginHorizontal: 20 }}>
-                    <View style={{ width: '100%', marginTop: 10 }}>
+                    {!detail ? <View style={{ width: '100%', marginTop: 10 }}>
                         <  Image source={{ uri: detailImage }} style={{ ...styles.imagePrincipal }} />
-                    </View>
+                    </View> :
+                        <View style={{ width: '100%', marginTop: 10 }}>
+                            <  Image source={{ uri: detail.IMAGE }} style={{ ...styles.imagePrincipal }} />
+                        </View>}
 
                     {/* <ProductImages images={IMAGES} /> */}
                     <Ionicons name="ios-arrow-back-outline" size={24} color="white" style={{ ...styles.icon, marginTop: 0 }} />
@@ -114,7 +117,7 @@ export default function MenuDetailScreen() {
                         <Feather name="image" size={24} color="black" />
                     </TouchableOpacity>
 
-                    <TouchableOpacity  onPress={() => navigation.navigate("ModifierMenuDetailScreen",{detail:detail})}>
+                    <TouchableOpacity onPress={() => navigation.navigate("ModifierMenuDetailScreen", { detail: detail })}>
                         <View style={{ marginTop: 50 }} >
                             <Text style={styles.text} numberOfLines={2}>{detail.repas}</Text>
                         </View>
@@ -131,20 +134,20 @@ export default function MenuDetailScreen() {
                             <AntDesign name="clockcircleo" size={15} color="#797E9A" />
                             <Text style={{ fontSize: 10, marginLeft: 10, color: "#797E9A" }}>30 Min</Text>
                         </View>
-                        <TouchableOpacity onPress={() => navigation.navigate("ModifierMenuDetailScreen", {detail:detail})}>
+                        <TouchableOpacity onPress={() => navigation.navigate("ModifierMenuDetailScreen", { detail: detail })}>
                             <View style={{ marginTop: -5 }}>
                                 <Text style={styles.textFbu}>{detail.PRIX} Fbu</Text>
                             </View>
                         </TouchableOpacity>
 
                     </View>
-                    <TouchableOpacity  onPress={() => navigation.navigate("ModifierMenuDetailScreen",{detail:detail})}>
+                    <TouchableOpacity onPress={() => navigation.navigate("ModifierMenuDetailScreen", { detail: detail })}>
                         <View style={{ marginTop: 50 }} >
                             <Text style={styles.text1} numberOfLines={2}>{detail.categorie}</Text>
                         </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity  onPress={() => navigation.navigate("ModifierMenuDetailScreen",{detail:detail})}>
+                    <TouchableOpacity onPress={() => navigation.navigate("ModifierMenuDetailScreen", { detail: detail })}>
                         <View style={{ marginTop: 15 }} >
                             <Text style={styles.txtDisplay}>
                                 {detail.DESCRIPTION}
