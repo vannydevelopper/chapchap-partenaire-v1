@@ -289,44 +289,9 @@ export default function NewMenuScreen() {
                                     <AntDesign name="caretdown" size={20} color="#777" />
                                 </TouchableOpacity>
                             </View>
-
-                            {/* {autre &&
-                            <>
-                            <View style={styles.inputCard}>
-                                <OutlinedTextField
-                                    label={"Nom du repas"}
-                                    fontSize={14}
-                                    value={data.repas}
-                                    onChangeText={(newValue) => handleChange('repas', newValue)}
-                                    onBlur={() => checkFieldData('nom')}
-                                    error={hasError('repas') ? getError('repas') : ''}
-                                    lineWidth={0.5}
-                                    multiline={true}
-                                    activeLineWidth={0.5}
-                                    baseColor={COLORS.smallBrown}
-                                    tintColor={COLORS.primary}
-                                />
-                            </View>
-                            <View style={styles.inputCard}>
-                                <OutlinedTextField
-                                    label={"Description"}
-                                    fontSize={14}
-                                    value={data.description}
-                                    onChangeText={(newValue) => handleChange('description', newValue)}
-                                    onBlur={() => checkFieldData('nom')}
-                                    error={hasError('description') ? getError('description') : ''}
-                                    lineWidth={0.5}
-                                    multiline={true}
-                                    activeLineWidth={0.5}
-                                    baseColor={COLORS.smallBrown}
-                                    tintColor={COLORS.primary}
-                                />
-                            </View>
-                            </>} */}
                             <View>
                                 <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: 20, marginTop: 10 }}
                                     onPress={() => categoriesModalizeRef.current.open()}
-                                // disabled={service.id_service == 2}
                                 >
                                     <View >
                                         <Text style={[styles.inputText, { fontSize: 13 }]}>
