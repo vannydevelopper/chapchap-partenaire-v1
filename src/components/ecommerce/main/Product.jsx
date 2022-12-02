@@ -368,14 +368,11 @@ const detail = async (product) => {
             </View> 
           </View>
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.cartBtn} onPress={onCartPress}>
-          <>
           <Fontisto name="shopping-basket" size={24} color="#F29558" />
             <View style={styles.badge}>
               <Text style={styles.badgeText} numberOfLines={1}>200</Text>
             </View> 
-          </>
         </TouchableOpacity>
       </View>
       <View style={styles.productNames}>

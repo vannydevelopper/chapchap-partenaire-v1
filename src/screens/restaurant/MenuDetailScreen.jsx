@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react"
-import { Image, View, StyleSheet, Text, TouchableOpacity, TextInput, TouchableNativeFeedback, ScrollView } from "react-native"
-import { Ionicons, AntDesign, Entypo, Foundation, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Image, View, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, TextInput, TouchableNativeFeedback, ScrollView } from "react-native"
+import { Ionicons, AntDesign, Entypo, Foundation, Feather, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import ProductImages from "../../components/restaurant/details/ProductImages"
 import { Modalize } from "react-native-modalize";
@@ -16,8 +16,17 @@ export default function MenuDetailScreen() {
     const route = useRoute()
     const { detail } = route.params
     const navigation = useNavigation()
+
     const uploadModaliseRef = useRef()
-    const updateAllDetailRef = useRef()
+    const RepasmodaliseRef = useRef()
+    const CategoriemodaliseRef = useRef()
+    const PrixmodaliseRef = useRef()
+    const DescriptionmodaliseRef = useRef()
+    const categoriesModalizeRef = useRef()
+    const repasModalizeRef = useRef()
+
+
+
     var IMAGES = [
         detail.IMAGE ? detail.IMAGE : undefined,
         detail.IMAGE2 ? detail.IMAGE2 : undefined,
@@ -26,10 +35,39 @@ export default function MenuDetailScreen() {
     const [nombre, setNombre] = useState(0);
     const [menuImage, setMenuImage] = useState(null)
     const [detailImage, setDetailImage] = useState(detail.IMAGE)
+    const [categories, setCategories] = useState([])
+    const [repass, setRepass] = useState([])
+    const [CategorieSelect, setCategorieSelect] = useState(null)
+    const [RepasSelect, setRepasSelect] = useState("")
+    const [selectedSousCategorie, setselectedSousCategorie] = useState(null)
+    const [autre, setAutre] = useState(false)
 
-
-
-
+    const onCategorieSelect = (categorie) => {
+        setCategorieSelect(categorie)
+        categoriesModalizeRef.current.close()
+    }
+    const onRepasSelect = (repas) => {
+        setRepasSelect(repas)
+        setAutre(false)
+        repasModalizeRef.current.close()
+    }
+    const onAutreSelect = () => {
+        setAutre(true)
+        setRepasSelect(false)
+        // setshowMapis(false)
+    }
+    const onPressPrice = () => {
+        PrixmodaliseRef.current.open()
+    }
+    const onPressRepas = () => {
+        RepasmodaliseRef.current.open()
+    }
+    const onPressCategory = () => {
+        CategoriemodaliseRef.current.open()
+    }
+    const onPressDescription = () => {
+        DescriptionmodaliseRef.current.open()
+    }
     const onSelectPhoto = () => {
         uploadModaliseRef.current.open()
     }
@@ -75,7 +113,42 @@ export default function MenuDetailScreen() {
             console.log(error)
         }
     }
+    const fecthRepas = async () => {
+        try {
+            var url = "/resto/repas/"
+            // if (data.q) {
+            //         url = `/resto/repas/?q=${data.q}`
+            // }
 
+            const repas = await fetchApi(url)
+            setRepass(repas.result)
+        }
+        catch (error) {
+            console.log(error)
+        }
+
+        finally {
+            // setLoadingCatagories(false)
+        }
+    }
+    useFocusEffect(useCallback(() => {
+        fecthRepas()
+    }, []))
+
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const catego = await fetchApi("/resto/menu/categories")
+                setCategories(catego.result)
+                // console.log(catego.result)
+            } catch (error) {
+                console.log(error)
+            } finally {
+
+            }
+        })()
+    }, [])
 
     const addNumber = async () => {
 
@@ -117,13 +190,13 @@ export default function MenuDetailScreen() {
                         <Feather name="image" size={24} color="black" />
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => navigation.navigate("ModifierMenuDetailScreen", { detail: detail })}>
-                        <View style={{ marginTop: 50 }} >
+                    <TouchableOpacity onPress={onPressRepas}>
+                        <View style={{ marginTop: "2%" }} >
                             <Text style={styles.text} numberOfLines={2}>{detail.repas}</Text>
                         </View>
                     </TouchableOpacity>
 
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20 }}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: "2%" }}>
                         <View style={{ flexDirection: "row" }}>
                             <AntDesign name="star" size={15} color="#EFC519" />
                             <AntDesign name="star" size={15} color="#EFC519" />
@@ -134,26 +207,27 @@ export default function MenuDetailScreen() {
                             <AntDesign name="clockcircleo" size={15} color="#797E9A" />
                             <Text style={{ fontSize: 10, marginLeft: 10, color: "#797E9A" }}>30 Min</Text>
                         </View>
-                        <TouchableOpacity onPress={() => navigation.navigate("ModifierMenuDetailScreen", { detail: detail })}>
+                        <TouchableOpacity onPress={onPressPrice}>
                             <View style={{ marginTop: -5 }}>
                                 <Text style={styles.textFbu}>{detail.PRIX} Fbu</Text>
                             </View>
                         </TouchableOpacity>
 
                     </View>
-                    <TouchableOpacity onPress={() => navigation.navigate("ModifierMenuDetailScreen", { detail: detail })}>
-                        <View style={{ marginTop: 50 }} >
+                    <TouchableOpacity onPress={onPressCategory}>
+                        <View style={{ marginTop: "2%" }} >
                             <Text style={styles.text1} numberOfLines={2}>{detail.categorie}</Text>
                         </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => navigation.navigate("ModifierMenuDetailScreen", { detail: detail })}>
+                    <TouchableOpacity onPress={onPressDescription}>
                         <View style={{ marginTop: 15 }} >
                             <Text style={styles.txtDisplay}>
                                 {detail.DESCRIPTION}
                             </Text>
                         </View>
                     </TouchableOpacity>
+
                     {/* <View>
                                         <View style={{ flexDirection: "row", justifyContent: 'space-around', marginTop: 40 }}>
 
@@ -176,6 +250,9 @@ export default function MenuDetailScreen() {
                               </View> */}
                 </View>
             </ScrollView >
+            <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                <Text style={styles.addBtnText}>supprimer </Text>
+            </TouchableOpacity>
             <Modalize ref={uploadModaliseRef} handlePosition="inside" modalHeight={100} snapPoint={250}>
                 <View style={styles.modalContent}>
                     <TouchableNativeFeedback onPress={() => onImporterPhoto()}>
@@ -191,6 +268,197 @@ export default function MenuDetailScreen() {
                         </View>
                     </TouchableNativeFeedback>
                 </View>
+            </Modalize>
+            <Modalize ref={PrixmodaliseRef} handlePosition="inside" modalHeight={180} snapPoint={250}>
+                <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
+                <View style={styles.searchSection1}>
+                    {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
+                    <TextInput
+                        style={styles.input}
+                        value={detail.PRIX}
+                    // onChangeText={(newValue) => handleChange('menu', newValue)}
+                    // placeholder="Rechercher "
+                    />
+                </View>
+                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                    <Text style={styles.addBtnText}>Modifier</Text>
+                </TouchableOpacity>
+            </Modalize>
+            <Modalize ref={RepasmodaliseRef} handlePosition="inside" modalHeight={180} snapPoint={250}>
+                <Text style={{ marginBottom: "-1%", fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
+                <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: "3%", marginTop: 10 }}
+                    onPress={() => repasModalizeRef.current.open()}
+                // disabled={service.id_service == 2}
+                >
+                    <View >
+                        <Text style={[styles.inputText, { fontSize: 13 }]}>
+                            Repas
+                        </Text>
+                        {RepasSelect ? <Text style={[styles.inputText, { color: '#000' }]}>
+                            {RepasSelect.NOM}
+                        </Text> :
+                            <Text style={[styles.inputText, { color: '#000' }]}>{detail.repas}</Text>
+                        }
+                    </View>
+                    <AntDesign name="caretdown" size={20} color="#777" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.addBtn1} onPress={() => navigation.navigate('NewMenuScreen')}>
+                    <Text style={styles.addBtnText}>Modifier</Text>
+                </TouchableOpacity>
+            </Modalize>
+            <Modalize ref={CategoriemodaliseRef} handlePosition="inside" modalHeight={180} snapPoint={250}>
+                <Text style={{ marginBottom: "-1%", fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
+                <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: "3%", marginTop: 10 }}
+                 onPress={() => categoriesModalizeRef.current.open()}
+                // disabled={service.id_service == 2}
+                >
+                    <View >
+                        <Text style={[styles.inputText, { fontSize: 13 }]}>
+                            Categorie
+                        </Text>
+                        {CategorieSelect ? <Text style={[styles.inputText, { color: '#000' }]}>
+                            {CategorieSelect   .NOM}
+                        </Text> :
+                            <Text style={[styles.inputText, { color: '#000' }]}>{detail.categorie}</Text>
+                        }
+                    </View>
+                    <AntDesign name="caretdown" size={20} color="#777" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.addBtn1} onPress={() => navigation.navigate('NewMenuScreen')}>
+                    <Text style={styles.addBtnText}>Modifier</Text>
+                </TouchableOpacity>
+            </Modalize>
+            <Modalize ref={DescriptionmodaliseRef} handlePosition="inside" modalHeight={260} snapPoint={250}>
+                <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
+                {/* <View style={styles.searchSection1}> */}
+                {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
+                {/* <TextInput
+                        style={styles.input}
+                        multiline={true}
+                        value={detail.DESCRIPTION}
+                        lineWidth={0.5}
+                        activeLineWidth={0.5}
+                    // onChangeText={(newValue) => handleChange('menu', newValue)}
+                    // placeholder="Rechercher "
+                    /> */}
+                <OutlinedTextField
+                    label={"Modifier description"}
+                    fontSize={14}
+                    style={styles.input}
+                    value={detail.DESCRIPTION}
+                    // onChangeText={(desc) => setDescription(desc)}
+                    lineWidth={0.5}
+                    activeLineWidth={0.5}
+                    baseColor={COLORS.smallBrown}
+                    tintColor={COLORS.primary}
+                    multiline={true}
+                />
+                {/* </View> */}
+                <TouchableOpacity style={styles.addBtn1} onPress={() => navigation.navigate('NewMenuScreen')}>
+                    <Text style={styles.addBtnText}>Modifier</Text>
+                </TouchableOpacity>
+            </Modalize>
+            <Modalize ref={repasModalizeRef} adjustToContentHeight handlePosition='inside'>
+                <>
+                    <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 15 }}>
+                        <Text style={{ fontSize: 17, fontWeight: "bold" }}>Repas</Text>
+                    </View>
+                    {!autre && <View style={{ flexDirection: "row", alignItems: "center", alignContent: "center", justifyContent: "space-between", marginBottom: 25, paddingHorizontal: 10 }}>
+                        <View style={styles.searchSection}>
+                            <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
+                            <TextInput
+                                style={styles.input}
+                                // value={data.q}
+                                // onChangeText={(newValue) => handleChange('q', newValue)}
+                                placeholder="Rechercher un repas"
+                            />
+                        </View>
+                    </View>
+                    }
+                    <View>
+                        <TouchableWithoutFeedback onPress={() => onAutreSelect(true)}>
+
+                            <View style={styles.modalItemModel2} >
+                                {autre ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                    <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                <Text>Autre repas</Text>
+                            </View>
+                        </TouchableWithoutFeedback>
+                        {autre ?
+                            <>
+                                <View style={styles.inputCard}>
+                                    <OutlinedTextField
+                                        label={"Nom du repas"}
+                                        fontSize={14}
+                                        // value={data.repas}
+                                        onChangeText={(newValue) => handleChange('repas', newValue)}
+                                        // onBlur={() => checkFieldData('repas')}
+                                        error={hasError('repas') ? getError('repas') : ''}
+                                        lineWidth={0.5}
+                                        multiline={true}
+                                        activeLineWidth={0.5}
+                                        baseColor={COLORS.smallBrown}
+                                        tintColor={COLORS.primary}
+                                    />
+                                </View>
+                                <View style={styles.inputCard}>
+                                    <OutlinedTextField
+                                        label={"Description"}
+                                        fontSize={14}
+                                        // value={data.descriptionRepas}
+                                        // onChangeText={(newValue) => handleChange('descriptionRepas', newValue)}
+                                        onBlur={() => checkFieldData('descriptionRepas')}
+                                        error={hasError('descriptionRepas') ? getError('descriptionRepas') : ''}
+                                        lineWidth={0.5}
+                                        multiline={true}
+                                        activeLineWidth={0.5}
+                                        baseColor={COLORS.smallBrown}
+                                        tintColor={COLORS.primary}
+                                    />
+                                </View>
+                                <TouchableOpacity onPress={Terminer}>
+                                    <View style={styles.button}>
+                                        <Text style={styles.buttonText} >Terminer</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            </> :
+                            repass.map((rep, index) => {
+                                return (
+                                    <TouchableOpacity key={index} onPress={() => onRepasSelect(rep)}>
+                                        <View style={styles.modalItemModel2} >
+                                            {RepasSelect?.ID_REPAS == rep.ID_REPAS ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                            <Text>{RepasSelect?rep.NOM:detail.NOM}</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                )
+                            })
+                        }
+
+
+                    </View>
+                </>
+            </Modalize>
+            <Modalize ref={categoriesModalizeRef} adjustToContentHeight handlePosition='inside'>
+                <>
+                    <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 15 }}>
+                        <Text style={{ fontSize: 17, fontWeight: "bold" }}>Categories</Text>
+                    </View>
+                    <View>
+                        {categories.map((categorie, index) => {
+                            return (
+                                <TouchableOpacity key={index} onPress={() => onCategorieSelect(categorie)}>
+                                    <View style={styles.modalItemModel2} >
+                                        {CategorieSelect?.ID_CATEGORIE_MENU == categorie.ID_CATEGORIE_MENU ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                            <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                        <Text>{categorie.NOM}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            )
+                        })}
+
+                    </View>
+                </>
             </Modalize>
             {/* <Modalize ref={updateAllDetailRef} >
                 <View style={{ ...styles.modalContent, marginTop: 30 }}>
@@ -261,7 +529,7 @@ const styles = StyleSheet.create({
     {
 
         width: '120%',
-        height: 200,
+        height: 400,
         alignSelf: 'center',
         borderBottomLeftRadius: 60,
         borderBottomRightRadius: 60,
@@ -281,7 +549,52 @@ const styles = StyleSheet.create({
     textFbu: {
         color: 'red',
         fontWeight: "bold",
-        fontSize: 15
+        fontSize: 15,
+        opacity: 0.6
+    },
+    modalCard: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        // marginHorizontal: 20,
+        backgroundColor: "#fff",
+        padding: 13,
+        borderRadius: 5,
+        borderWidth: 0.5,
+        borderColor: "#ddd"
+    },
+    modalItemModel2: {
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignContent: 'center'
+    },
+    searchSection: {
+        flexDirection: "row",
+        marginTop: 10,
+        padding: 5,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: "#ddd",
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        // backgroundColor: "#D7D9E4",
+        width: "100%",
+        height: 50,
+        paddingHorizontal: 10
+    },
+    input: {
+        flex: 1,
+        marginLeft: 10
+    },
+    inputText: {
+        color: '#777'
+    },
+    inputCard: {
+        marginHorizontal: 20,
+        marginTop: 10,
+
     },
     carre1: {
         padding: 15,
@@ -378,7 +691,7 @@ const styles = StyleSheet.create({
         borderColor: "#fff",
         position: 'absolute',
         left: 250,
-        marginTop: 160,
+        marginTop: 300,
         justifyContent: "center",
         alignItems: "center"
     },
@@ -396,6 +709,22 @@ const styles = StyleSheet.create({
         height: 30,
         justifyContent: "center"
     },
+    searchSection1: {
+        flexDirection: "row",
+        marginTop: -20,
+        marginBottom: "2%",
+        padding: 5,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: "#ddd",
+        alignItems: 'center',
+        backgroundColor: "white",
+        width: "95%",
+        height: 50,
+        marginHorizontal: 10,
+        paddingHorizontal: 10
+
+    },
     actionLabels: {
         marginLeft: 10
     },
@@ -412,14 +741,33 @@ const styles = StyleSheet.create({
 
     },
     addBtn: {
-        paddingVertical: 10,
-        minWidth: "90%",
+        width: "95%",
         alignSelf: "center",
         backgroundColor: COLORS.ecommerceOrange,
         borderRadius: 10,
         paddingVertical: 15,
         marginBottom: 10,
-        marginTop: 10
+        marginTop: "1%"
+    },
+    modalCard2: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        // marginHorizontal: 20,
+        backgroundColor: "#fff",
+        padding: 13,
+        borderRadius: 5,
+        borderWidth: 0.5,
+        borderColor: "#ddd"
+    },
+    addBtn1: {
+        width: "95%",
+        alignSelf: "center",
+        backgroundColor: COLORS.ecommerceOrange,
+        borderRadius: 10,
+        paddingVertical: 15,
+        marginBottom: 1,
+        marginTop: "1%"
     },
     addBtnText: {
         color: '#FFF',

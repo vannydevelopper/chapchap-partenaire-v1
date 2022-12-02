@@ -1,60 +1,63 @@
-import React from 'react'
-import { Image, StyleSheet, ImageBackground, Text, TouchableOpacity, TouchableNativeFeedback, useWindowDimensions, View } from 'react-native'
-import { MaterialIcons, AntDesign, Ionicons } from '@expo/vector-icons';
+import React, { useRef } from 'react'
+import { Image, StyleSheet,ImageBackground, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native'
+import { MaterialIcons, AntDesign,Fontisto, Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../../styles/COLORS';
-import { useNavigation } from '@react-navigation/native';
+import { Portal } from 'react-native-portalize';
+import { Modalize } from 'react-native-modalize';
+import { useState } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useCallback } from 'react';
+import fetchApi from '../../../helpers/fetchApi';
 
-export default function Menu({ product, index, totalLength, fixMargins = false }) {
-    console.log(product)
+export default function Menu({ menu, index, totalLength, fixMargins = false ,onRemove }) {
+    const navigation = useNavigation()
     const { width } = useWindowDimensions()
-    const navigation=useNavigation()
-    const MAX_WIDTH = 200
     const PRODUCT_MARGIN = 10
     const PRODUCT_WIDTH = (width / 2) - PRODUCT_MARGIN - 10
-    const PRODUCT_HEIGHT = 360
+    const PRODUCT_HEIGHT = 270
     const additionStyles = {
         width: PRODUCT_WIDTH,
-        maxHeight: PRODUCT_HEIGHT,
-        marginLeft: index > 0 ? PRODUCT_MARGIN : (fixMargins ? PRODUCT_MARGIN : 0),
-        marginRight: index == totalLength - 1 ? PRODUCT_MARGIN : (fixMargins ? 0 : 0)
+        height: PRODUCT_HEIGHT,
+        // marginLeft: index > 0 ? PRODUCT_MARGIN : (fixMargins ? PRODUCT_MARGIN : 0),
+        // marginRight: index == totalLength - 1 ? PRODUCT_MARGIN : (fixMargins ? 0 : 0)
     }
-    const detail = async (detail) => {
-        const details = detail
-        navigation.navigate("MenuDetailScreen", { detail: product })
+    const detail = async (menu) => {
+        const details = menu
+        navigation.navigate("MenuDetailScreen", { detail: menu })
 }
-    // return (
-    //     <View key={index} style={[styles.product, additionStyles]}>
-    //        <View style={styles.imageCard}>
-    //         </View>
-    //         <View style={styles.serviceIcon}>
-    //             <TouchableNativeFeedback onPress={() => detail(product)}>
-    //                 <Image source={{ uri: product.IMAGE }} style={styles.serviceIconImage} />
 
-    //             </TouchableNativeFeedback>
-    //         </View>
-    //         <View style={styles.productHeader}>
-    //             <Text numberOfLines={2} style={styles.productName}>{product.repas}</Text>
-    //             <Text numberOfLines={2} style={styles.productCategory}>
-    //                 {product.categorie}
-    //             </Text>
-    //         </View>
-    //         {product.PRIX ? <Text style={styles.price}>{product.PRIX.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Fbu</Text> : null}
-
-    //     </View>
-    // )
     return (
         <View key={index} style={[styles.product, additionStyles, fixMargins && { marginTop: 10 }]}>
-            <TouchableOpacity onPress={() => detail(product)} style={styles.imageCard}>
+            <TouchableOpacity  onPress={() => detail(menu)} style={styles.imageCard}>
                 {/* <Image source={{ uri: menu.IMAGE }} style={styles.image} />
                  */}
-                 <ImageBackground source={{ uri: product.IMAGE }} style={[styles.serviceBackgound]} marginLeft={5} marginTop={2} mag borderRadius={20}  imageStyle={{ opacity: 0.8 }}>
-                <View style={{ marginTop: 120, marginRight: 0 }}>
-                    <Text style={styles.productName1}>{product.repas}</Text>
+                 <ImageBackground source={{ uri: menu.IMAGE }} style={[styles.serviceBackgound]} marginLeft={5} marginTop={2} mag borderRadius={20}  imageStyle={{ opacity: 0.8 }}>
+                <View style={{ marginTop: 50, marginRight: 0 }}>
+                    <Text style={styles.productName1}>{menu.repas}</Text>
                 </View>
             </ImageBackground>
             </TouchableOpacity>
-            {product.PRIX ? <Text style={{ marginHorizontal:10, fontsize:10,fontWeight:"bold" ,  color: COLORS.ecommercePrimaryColor}}>{product.PRIX.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Fbu</Text> : null}
-            
+            <View style={{ flexDirection: "row",marginLeft:"2%" }}>
+        <TouchableOpacity>
+          <View style={styles.cardLike}>
+            <AntDesign name="like2" size={24} color="#F29558" />
+            <View style={styles.badge}>
+              <Text style={styles.badgeText} numberOfLines={1}>1</Text>
+            </View> 
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.cartBtn}>
+          <Fontisto name="shopping-basket" size={24} color="#F29558" />
+            <View style={styles.badge}>
+              <Text style={styles.badgeText} numberOfLines={1}>2</Text>
+            </View> 
+        </TouchableOpacity>
+      </View>
+            {menu.PRIX ? <Text style={{ color: "#F29558", fontWeight: "bold" }}>{menu.PRIX.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Fbu</Text> : null}
+          
         </View>
 
     )
@@ -68,18 +71,23 @@ const styles = StyleSheet.create({
         fontSize: 12
     }, 
     serviceBackgound: {
-        width: "100%",
-        height: "100%",
+        width: "96%",
+        height: "96%",
          justifyContent: 'center',
     },
     product: {
         maxWidth: 300,
-        marginBottom:-40
-        
+        maxHeight:200,
+        marginHorizontal: 10,
+        elevation:15,
+        backgroundColor:'white',
+        borderRadius:10,
+        padding:5,
+        marginBottom:'2%'
     },
     imageCard: {
         borderRadius: 8,
-        height: "70%",
+        height: "60%",
         width: "100%"
     },
     image: {
@@ -90,19 +98,19 @@ const styles = StyleSheet.create({
     },
     cardLike: {
         marginTop: 10,
-        width: 25,
-        height: 25,
+        width: 35,
+        height: 35,
         backgroundColor: "#FBD5DA",
-        borderRadius: 5,
+        borderRadius: 10,
         justifyContent: "center",
         alignItems: "center"
     },
     cartBtn: {
         marginTop: 10,
-        width: 25,
-        height: 25,
+        width: 35,
+        height: 35,
         backgroundColor: "#FBD5DA",
-        borderRadius:5,
+        borderRadius: 10,
         justifyContent: "center",
         alignItems: "center",
         marginLeft: 8
