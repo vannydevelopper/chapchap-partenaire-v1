@@ -428,7 +428,7 @@ export default function MenuDetailScreen() {
                                         <View style={styles.modalItemModel2} >
                                             {RepasSelect?.ID_REPAS == rep.ID_REPAS ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
                                                 <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
-                                            <Text>{RepasSelect?rep.NOM:detail.NOM}</Text>
+                                            <Text>{rep.NOM}</Text>
                                         </View>
                                     </TouchableOpacity>
                                 )
