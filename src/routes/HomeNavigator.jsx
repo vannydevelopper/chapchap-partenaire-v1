@@ -8,7 +8,7 @@ import InscriptionPartenaireScreen from "../screens/welcome/InscriptionPartenair
 import { Host } from "react-native-portalize";
 import EcommerceHomeScreen from "../screens/e-commerce/EcommerceHomeScreen";
 import HomeAllServiceScreen from "../screens/home/HomeAllServiceScreen";
-import ProductDetailScreen from "../screens/e-commerce/ProductDetailScreen";
+import ProductDetailsScreen from "../screens/e-commerce/ProductDetailsScreen";
 import ApprovisionnementScreen from "../screens/e-commerce/ApprovisionnementScreen";
 import PaymentScreen from "../screens/home/PaymentScreen";
 
@@ -23,7 +23,7 @@ export default function HomeNavigator() {
                               <Stack.Screen name="InscriptionPartenaireScreen" component={InscriptionPartenaireScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }} />
                               <Stack.Screen name="AccueilSearchProduitScreen" component={AccueilSearchProduitScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
                               <Stack.Screen name="ProduitFormulaireScreen" component={ProduitFormulaireScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
-                              <Stack.Screen name="ProductDetailScreen" component={ProductDetailScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
+                              <Stack.Screen name="ProductDetailScreen" component={ProductDetailsScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
                               <Stack.Screen name="ApprovisionnementScreen" component={ApprovisionnementScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
                               <Stack.Screen name='PaymentScreen' component={PaymentScreen}/>
                    
