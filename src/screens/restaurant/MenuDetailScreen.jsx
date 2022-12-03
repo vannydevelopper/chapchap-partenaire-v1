@@ -97,14 +97,12 @@ export default function MenuDetailScreen() {
                     uri: localUri, name: filename, type
                 })
             }
-            console.log(form)
             console.log(`/resto/menu/${detail.ID_RESTAURANT_MENU}`)
             const menuUpdate = await fetchApi(`/resto/menu/${detail.ID_RESTAURANT_MENU}`, {
                 method: "PUT",
                 body: form
             })
             setDetailImage(menuUpdate.result[0].IMAGE)
-
         }
         catch (error) {
             console.log(error)
@@ -113,10 +111,6 @@ export default function MenuDetailScreen() {
     const fecthRepas = async () => {
         try {
             var url = "/resto/repas/"
-            // if (data.q) {
-            //         url = `/resto/repas/?q=${data.q}`
-            // }
-
             const repas = await fetchApi(url)
             setRepass(repas.result)
         }
