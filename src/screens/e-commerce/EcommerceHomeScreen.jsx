@@ -13,7 +13,9 @@ import ImageView from "react-native-image-viewing";
 import { Modalize } from "react-native-modalize";
 
 export default function EcommerceHomeScreen() {
-        const { height } = useWindowDimensions()
+        const { width, height } = useWindowDimensions()
+        const SERVICE_MARGIN = 40
+        const SERVICE_WIDTH = (width / 2)
 
         const [firstLoadingProducts, setFirstLoadingProducts] = useState(true)
         const [products, setProducts] = useState([])
@@ -23,6 +25,31 @@ export default function EcommerceHomeScreen() {
         const navigation = useNavigation()
         const route = useRoute()
         const { partenaire } = route.params
+
+        const uploadModaliseRef = useRef()
+        const RestomodaliseRef = useRef()
+        const AdressemodaliseRef = useRef()
+        const OuvertmodaliseRef = useRef()
+        const TelemodaliseRef = useRef()
+        const DescriptionmodalizeRef = useRef()
+        const onPressResto = () => {
+                RestomodaliseRef.current.open()
+        }
+        const onPressAdresse = () => {
+                AdressemodaliseRef.current.open()
+        }
+        const onPressOuvert = () => {
+                OuvertmodaliseRef.current.open()
+        }
+        const onPressTele = () => {
+                TelemodaliseRef.current.open()
+        }
+        const onPressDescription = () => {
+                DescriptionmodalizeRef.current.open()
+        }
+        const onSelectPhoto = () => {
+                uploadModaliseRef.current.open()
+        }
         const productPress = () => {
                 // setIsOpen(true)
                 productmodalizeRef.current?.open()
@@ -47,109 +74,135 @@ export default function EcommerceHomeScreen() {
         }, []))
         return (
                 <>
-                <ScrollView style={styles.container}>
-                        <TouchableWithoutFeedback key={1} onPress={() => {
-                                setImageIndex(1)
-                                setShowImageModal(true)
-                        }}>
-                                <View style={{ width: '100%', maxHeight: "100%", marginTop: 10 }}>
-                                        <  Image source={{ uri: partenaire.produit.LOGO }} style={{ ...styles.imagePrincipal }} />
+                        <ScrollView style={styles.container}>
+                                <TouchableWithoutFeedback key={1} onPress={() => {
+                                        setImageIndex(1)
+                                        setShowImageModal(true)
+                                }}>
+                                        <View style={{ width: '100%', maxHeight: "100%", marginTop: 10 }}>
+                                                <  Image source={{ uri: partenaire.produit.LOGO }} style={{ ...styles.imagePrincipal }} />
+                                        </View>
+                                </TouchableWithoutFeedback>
+                                <View style={styles.cardBack}>
+                                        <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()} >
+                                                <Ionicons name="ios-arrow-back-outline" size={30} color={COLORS.ecommercePrimaryColor} />
+                                        </TouchableOpacity>
                                 </View>
-                        </TouchableWithoutFeedback>
-                        <View style={styles.cardBack}>
-                                <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()} >
-                                        <Ionicons name="ios-arrow-back-outline" size={30} color={COLORS.ecommercePrimaryColor} />
+                                <TouchableOpacity onPress={() => onSelectPhoto()} style={styles.uploadImages}>
+                                        <Feather name="image" size={24} color={COLORS.ecommercePrimaryColor} />
                                 </TouchableOpacity>
-                        </View>
-                        <View style={{ marginHorizontal: "2%", marginTop: "2%", flexDirection: "row", justifyContent: 'space-between' }}>
-                                <Text style={{ fontWeight: "bold" }}>{partenaire.produit.NOM_ORGANISATION}</Text>
-                                <View style={{ flexDirection: "row" }}>
-                                        <SimpleLineIcons name="location-pin" size={15} color="black" />
-                                        <Text style={{ fontSize: 12 }}> KIRIRI </Text>
+                                
+                                <View style={{ marginHorizontal: "2%", marginTop: "2%", flexDirection: "row", justifyContent: 'space-between' }}>
+                                <TouchableOpacity onPress={onPressResto}>
+                                        <Text style={{ fontWeight: "bold" }}>{partenaire.produit.NOM_ORGANISATION}</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={onPressAdresse}>
+                                        <View style={{ flexDirection: "row" }}>
+                                                <SimpleLineIcons name="location-pin" size={15} color="black" />
+                                                <Text style={{ fontSize: 12 }}> KIRIRI </Text>
+                                        </View>
+                                        </TouchableOpacity>
                                 </View>
-                        </View>
-                        <View style={{ flexDirection: "row", marginHorizontal: 10, marginTop: 10, justifyContent: "space-between" }}>
-                                <View style={{ flexDirection: "row" }}>
-                                        {/* {wishlistNumber ?
+                                
+                                <View style={{ flexDirection: "row", marginHorizontal: 10, marginTop: 10, justifyContent: "space-between" }}>
+                                        <View style={{ flexDirection: "row" }}>
+                                                {/* {wishlistNumber ?
                         <AntDesign name="star" size={20} color="#EFC519" /> :
                         <AntDesign name="star" size={20} color="#EFC519" />} */}
-                                        {/* {shop.note.nbre==0 ? */}
-                                        <AntDesign name="staro" size={20} color="#EFC519" />
-                                        {/* : */}
-                                        {/* <AntDesign name="star" size={20} color="#EFC519" />} */}
-                                        {/* <Text style={{ fontSize: 15, marginLeft: 15, color: "#797E9A", right: 15 }}>{shop.note.nbre}.0</Text> */}
-                                        <Text style={{ fontSize: 15, marginLeft: 15, color: "#797E9A", right: 15 }}>5.0</Text>
+                                                {/* {shop.note.nbre==0 ? */}
+                                                <AntDesign name="staro" size={20} color="#EFC519" />
+                                                {/* : */}
+                                                {/* <AntDesign name="star" size={20} color="#EFC519" />} */}
+                                                {/* <Text style={{ fontSize: 15, marginLeft: 15, color: "#797E9A", right: 15 }}>{shop.note.nbre}.0</Text> */}
+                                                <Text style={{ fontSize: 15, marginLeft: 15, color: "#797E9A", right: 15 }}>5.0</Text>
 
-                                </View>
-                                <View style={{ flexDirection: "row", marginHorizontal: 30 }}>
-                                        <AntDesign name="clockcircleo" size={15} color="#797E9A" style={{ marginTop: 5 }} />
-                                        {/* <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{shop.OUVERT}</Text> */}
-                                        <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>08h-18h</Text>
-
-                                </View>
-                                <TouchableOpacity onPress={() => { Linking.openURL(`tel:${partenaire.produit.TELEPHONE}`); }} style={{ flexDirection: "row" }}>
-
-                                        <SimpleLineIcons name="call-end" size={15} color="#797E9A" style={{ marginTop: 5 }} />
-                                        <Text style={{ fontSize: 15, marginLeft: 20, color: "#797E9A", right: 15 }}>{partenaire.produit.TELEPHONE}</Text>
-                                </TouchableOpacity>
-                        </View>
-                        <View style={{ marginTop: 10, marginHorizontal: 10 }} >
-                                <Text style={{ color: "#797E9A" }}>
-                                        the {partenaire.produit.NOM_ORGANISATION} for me, I stayed there for two weeks
-                                        I really enjoyed its great location. I loved the character
-                                        of the hotel. The restaurant was fantastic and the staff was
-                                        friendly. Well maintained rooms, comfortable bed, and great Cafe.
-                                        the WEMA W
-                                </Text>
-                        </View>
-                        <TouchableOpacity onPress={productPress} style={styles.plus}>
-                                <View>
-                                        <Text style={[styles.titlePrincipal, products.length == 0 && { textAlign: "center" }]}>Mes produits</Text>
-                                </View>
-                                <View style={{ marginLeft: 100 }}>
-                                        <View style={{ flexDirection: 'row' }}>
-                                                <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommercePrimaryColor} style={{ marginRight: -15 }} />
-                                                <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommercePrimaryColor} />
                                         </View>
+                                        <TouchableOpacity onPress={onPressOuvert}>
+                                        <View style={{ flexDirection: "row", marginHorizontal: 30 }}>
+                                                <AntDesign name="clockcircleo" size={15} color="#797E9A" style={{ marginTop: 5 }} />
+                                                {/* <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{shop.OUVERT}</Text> */}
+                                                <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>08h-18h</Text>
+                                        </View>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={() => { Linking.openURL(`tel:${partenaire.produit.TELEPHONE}`); }} style={{ flexDirection: "row" }}>
+                                                <SimpleLineIcons name="call-end" size={15} color="#797E9A" style={{ marginTop: 5 }} />
+                                                <TouchableOpacity onPress={onPressTele}>
+                                                <Text style={{ fontSize: 15, marginLeft: 20, color: "#797E9A", right: 15 }}>{partenaire.produit.TELEPHONE}</Text>
+                                                </TouchableOpacity>
+                                        </TouchableOpacity>
                                 </View>
-                        </TouchableOpacity>
-                        {firstLoadingProducts ? <HomeProductsSkeletons wrap /> :
-                                products.length == 0 ? <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 100 }}>
-                                        <Feather name="check-square" size={24} color="#777" />
-                                        <Text style={{ color: '#777', paddingHorizontal: 50, textAlign: "center", marginTop: 10 }}>
-                                                Votre stock est vide. Cliquez sur le bouton en dessous pour ajouter un nouveau produit
+                                <TouchableOpacity onPress={onPressDescription}>
+                                <View style={{ marginTop: 10, marginHorizontal: 10 }} >
+                                        <Text style={{ color: "#797E9A" }}>
+                                                the {partenaire.produit.NOM_ORGANISATION} for me, I stayed there for two weeks
+                                                I really enjoyed its great location. I loved the character
+                                                of the hotel. The restaurant was fantastic and the staff was
+                                                friendly. Well maintained rooms, comfortable bed, and great Cafe.
+                                                the WEMA W
                                         </Text>
-                                </View> : <View style={styles.products}>
-                                        {products?.map((product, index) => {
-
-                                                return (
-                                                        <Product
-                                                                product={product}
-                                                                index={index}
-                                                                totalLength={products.length}
-                                                                key={index}
-                                                                fixMargins
-                                                        />
-                                                )
-                                        })}
                                 </View>
-                        }
-                       
-                        {showImageModal &&
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={productPress} style={styles.plus}>
+                                        <View>
+                                                <Text style={[styles.titlePrincipal, products.length == 0 && { textAlign: "center" }]}>Mes produits</Text>
+                                        </View>
+                                        <View style={{ marginLeft: 100 }}>
+                                                <View style={{ flexDirection: 'row' }}>
+                                                        <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommercePrimaryColor} style={{ marginRight: -15 }} />
+                                                        <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                </View>
+                                        </View>
+                                </TouchableOpacity>
+                                {firstLoadingProducts ? <HomeProductsSkeletons wrap /> :
+                                        products.length == 0 ? <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 100 }}>
+                                                <Feather name="check-square" size={24} color="#777" />
+                                                <Text style={{ color: '#777', paddingHorizontal: 50, textAlign: "center", marginTop: 10 }}>
+                                                        Votre stock est vide. Cliquez sur le bouton en dessous pour ajouter un nouveau produit
+                                                </Text>
+                                        </View> : <View style={styles.products}>
+                                                {products?.map((product, index) => {
 
-                                <ImageView
-                                        images={IMAGES.map(img => ({ uri: img }))}
-                                        imageIndex={imageIndex}
-                                        visible={showImageModal}
-                                        onRequestClose={() => setShowImageModal(false)}
-                                        swipeToCloseEnabled
-                                        keyExtractor={(_, index) => index.toString()}
-                                />
-                        }
-                        {/* </ScrollView> */}
-                       
-                </ScrollView>
-                <Modalize
+                                                        return (
+                                                                <Product
+                                                                        product={product}
+                                                                        index={index}
+                                                                        totalLength={products.length}
+                                                                        key={index}
+                                                                        fixMargins
+                                                                />
+                                                        )
+                                                })}
+                                                <View style={[styles.serviceContainer, { width: SERVICE_WIDTH, height: 290 }]}>
+                                                        <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} onPress={() => navigation.navigate("HomeAllServiceScreen")}>
+                                                                <View style={[styles.service]}>
+                                                                        <ImageBackground source={require("../../../assets/images/nouveau.png")} style={[styles.serviceBackgound]} borderRadius={10} resizeMode='cover' imageStyle={{ opacity: 0.8 }}>
+                                                                                <View style={{ position: 'absolute', width: "100%", height: "100%", backgroundColor: "rgba(0, 0, 0, 0.3)", borderRadius: 10 }} />
+                                                                                <View style={styles.serviceIcon}>
+                                                                                        <AntDesign name="plus" size={40} color="#F29558" />
+                                                                                </View>
+                                                                                <Text style={styles.serviceName}>Nouveau</Text>
+                                                                        </ImageBackground>
+                                                                </View>
+                                                        </TouchableNativeFeedback>
+                                                </View>
+                                        </View>
+                                }
+
+                                {showImageModal &&
+
+                                        <ImageView
+                                                images={IMAGES.map(img => ({ uri: img }))}
+                                                imageIndex={imageIndex}
+                                                visible={showImageModal}
+                                                onRequestClose={() => setShowImageModal(false)}
+                                                swipeToCloseEnabled
+                                                keyExtractor={(_, index) => index.toString()}
+                                        />
+                                }
+                                {/* </ScrollView> */}
+
+                        </ScrollView>
+                        <Modalize
                                 ref={productmodalizeRef}
                                 adjustToContentHeight
                                 handleStyle={{ marginTop: 10 }}
@@ -179,9 +232,9 @@ export default function EcommerceHomeScreen() {
                         <HomeMenuSkeletons />
                         <HomeMenuSkeletons />
                     </> : */}
-                                <ScrollView 
-                                 horizontal
-                                 showsHorizontalScrollIndicator={false}
+                                <ScrollView
+                                        horizontal
+                                        showsHorizontalScrollIndicator={false}
                                 >
 
                                         <View style={styles.products}>
@@ -199,10 +252,104 @@ export default function EcommerceHomeScreen() {
                                                 })}
                                         </View>
                                 </ScrollView>
-                                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate("ProduitFormulaireScreen", {product:false, partenaire:partenaire})}>
-                                <Text style={styles.addBtnText}>Nouveau produit</Text>
-                        </TouchableOpacity>
+                                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate("ProduitFormulaireScreen", { product: false, partenaire: partenaire })}>
+                                        <Text style={styles.addBtnText}>Nouveau produit</Text>
+                                </TouchableOpacity>
                                 {/* } */}
+                        </Modalize>
+
+
+                        <Modalize ref={uploadModaliseRef} handlePosition="inside" modalHeight={100} snapPoint={250}>
+                                <View style={styles.modalContent}>
+                                        <TouchableNativeFeedback >
+                                                {/* <TouchableNativeFeedback onPress={() => onImporterPhoto()}> */}
+                                                <View style={styles.modalAction}>
+                                                        <View style={styles.actionIcon}>
+                                                                <AntDesign name="folderopen" size={24} color="black" />
+                                                        </View>
+                                                        <View style={styles.actionLabels}>
+                                                                <Text style={styles.modalActionText}>
+                                                                        Importer une photo
+                                                                </Text>
+                                                        </View>
+                                                </View>
+                                        </TouchableNativeFeedback>
+                                </View>
+                        </Modalize>
+                        <Modalize ref={RestomodaliseRef} handlePosition="inside" modalHeight={180} snapPoint={250}>
+                                <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
+                                <View style={styles.searchSection1}>
+                                        {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
+                                        <TextInput
+                                                style={styles.input}
+                                                value={partenaire.produit.NOM_ORGANISATION}
+                                        // onChangeText={(newValue) => handleChange('menu', newValue)}
+                                        // placeholder="Rechercher "
+                                        />
+                                </View>
+                                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                                        <Text style={styles.addBtnText}>Modifier</Text>
+                                </TouchableOpacity>
+                        </Modalize>
+                        <Modalize ref={AdressemodaliseRef} handlePosition="inside" modalHeight={180} snapPoint={250}>
+                                <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
+                                <View style={styles.searchSection1}>
+                                        {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
+                                        <TextInput
+                                                style={styles.input}
+                                                value={partenaire.produit.NOM_ORGANISATION}
+                                        // onChangeText={(newValue) => handleChange('menu', newValue)}
+                                        // placeholder="Rechercher "
+                                        />
+                                </View>
+                                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                                        <Text style={styles.addBtnText}>Modifier</Text>
+                                </TouchableOpacity>
+                        </Modalize>
+                        <Modalize ref={OuvertmodaliseRef} handlePosition="inside" modalHeight={180} snapPoint={250}>
+                                <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
+                                <View style={styles.searchSection1}>
+                                        {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
+                                        <TextInput
+                                                style={styles.input}
+                                                value={partenaire.produit.NOM_ORGANISATION}
+                                        // onChangeText={(newValue) => handleChange('menu', newValue)}
+                                        // placeholder="Rechercher "
+                                        />
+                                </View>
+                                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                                        <Text style={styles.addBtnText}>Modifier</Text>
+                                </TouchableOpacity>
+                        </Modalize>
+                        <Modalize ref={TelemodaliseRef} handlePosition="inside" modalHeight={180} snapPoint={250}>
+                                <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
+                                <View style={styles.searchSection1}>
+                                        {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
+                                        <TextInput
+                                                style={styles.input}
+                                        value={partenaire.produit.TELEPHONE}
+                                        // onChangeText={(newValue) => handleChange('menu', newValue)}
+                                        // placeholder="Rechercher "
+                                        />
+                                </View>
+                                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                                        <Text style={styles.addBtnText}>Modifier</Text>
+                                </TouchableOpacity>
+                        </Modalize>
+                        <Modalize ref={DescriptionmodalizeRef} handlePosition="inside" modalHeight={180} snapPoint={250}>
+                                <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
+                                <View style={styles.searchSection1}>
+                                        {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
+                                        <TextInput
+                                                style={styles.input}
+                                                value={partenaire.produit.NOM_ORGANISATION}
+                                        // onChangeText={(newValue) => handleChange('menu', newValue)}
+                                        // placeholder="Rechercher "
+                                        />
+                                </View>
+                                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                                        <Text style={styles.addBtnText}>Modifier</Text>
+                                </TouchableOpacity>
                         </Modalize>
                 </>
         )
@@ -238,9 +385,83 @@ const styles = StyleSheet.create({
                 justifyContent: 'center',
                 flexDirection: "row",
                 justifyContent: "space-between",
-                top: "5%",
+                top: "4%",
                 left: "2%"
 
+        },
+        uploadImages: {
+                width: 50,
+                height: 50,
+                backgroundColor: "#D7D9E4",
+                borderRadius: 50,
+                borderWidth: 2,
+                borderColor: "#fff",
+                position: 'absolute',
+                left: "85%",
+                marginTop: 230,
+                justifyContent: "center",
+                alignItems: "center"
+        },
+        modalContent: {
+                marginTop: 20
+        },
+        modalAction: {
+                flexDirection: "row",
+                alignItems: "center",
+                padding: 10,
+                paddingVertical: 15
+        },
+        actionIcon: {
+                width: 30,
+                height: 30,
+                justifyContent: "center"
+        },
+        modalActionText: {
+                fontWeight: "bold"
+        },
+        services: {
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                justifyContent: 'center'
+        },
+        serviceContainer: {
+                maxWidth: 300,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: "-5%"
+        },
+        service: {
+                borderRadius: 10,
+                width: "90%",
+                height: "85%",
+                overflow: 'hidden'
+        },
+        serviceBackgound: {
+                width: "100%",
+                height: "100%",
+                justifyContent: 'space-between'
+        },
+        serviceIcon: {
+                width: 50,
+                height: 50,
+                backgroundColor: "#fff",
+                borderRadius: 100,
+                marginLeft: 10,
+                marginTop: 10,
+                justifyContent: 'center',
+                alignItems: 'center'
+        },
+        serviceName: {
+                textAlign: 'center',
+                color: '#F29558',
+                fontWeight: 'bold',
+                marginBottom: 20,
+                fontSize: 16
+        },
+        serviceIconImage: {
+                width: 40,
+                height: 40,
+                borderRadius: 10,
         },
         cartBtn: {
                 marginTop: 10,
@@ -254,7 +475,7 @@ const styles = StyleSheet.create({
         searchSection1: {
                 flexDirection: "row",
                 marginTop: -20,
-                marginBottom:"2%",
+                marginBottom: "2%",
                 padding: 5,
                 borderRadius: 10,
                 borderWidth: 1,
@@ -265,9 +486,9 @@ const styles = StyleSheet.create({
                 height: 50,
                 marginHorizontal: 10,
                 paddingHorizontal: 10
-        
-            },
-            searchSection: {
+
+        },
+        searchSection: {
                 flexDirection: "row",
                 marginTop: 10,
                 padding: 5,
@@ -280,11 +501,11 @@ const styles = StyleSheet.create({
                 width: "84%",
                 height: 50,
                 paddingHorizontal: 10
-            },
-            input: {
+        },
+        input: {
                 flex: 1,
                 marginLeft: 10
-            },
+        },
         cardHeader: {
                 flexDirection: 'row',
                 justifyContent: 'space-between',
@@ -403,11 +624,11 @@ const styles = StyleSheet.create({
                 // marginBottom: 10,
                 flexDirection: "row",
                 marginTop: "0%",
-                marginBottom:"2%",
+                marginBottom: "2%",
                 padding: 5,
                 borderRadius: 10,
                 alignItems: 'center',
-                backgroundColor:  COLORS.ecommerceOrange,
+                backgroundColor: COLORS.ecommerceOrange,
                 width: "95%",
                 height: 50,
                 marginHorizontal: 10,

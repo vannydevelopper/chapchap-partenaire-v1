@@ -414,7 +414,7 @@ const detail = async (product) => {
 const styles = StyleSheet.create({
   product: {
     maxWidth: 200,
-    height:500,
+    maxHeight:250,
     marginHorizontal: 10,
     elevation:10,
     backgroundColor:'white',

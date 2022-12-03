@@ -24,9 +24,6 @@ export default function MenuDetailScreen() {
     const DescriptionmodaliseRef = useRef()
     const categoriesModalizeRef = useRef()
     const repasModalizeRef = useRef()
-
-
-
     var IMAGES = [
         detail.IMAGE ? detail.IMAGE : undefined,
         detail.IMAGE2 ? detail.IMAGE2 : undefined,
@@ -195,7 +192,6 @@ export default function MenuDetailScreen() {
                             <Text style={styles.text} numberOfLines={2}>{detail.repas}</Text>
                         </View>
                     </TouchableOpacity>
-
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: "2%" }}>
                         <View style={{ flexDirection: "row" }}>
                             <AntDesign name="star" size={15} color="#EFC519" />
@@ -219,7 +215,6 @@ export default function MenuDetailScreen() {
                             <Text style={styles.text1} numberOfLines={2}>{detail.categorie}</Text>
                         </View>
                     </TouchableOpacity>
-
                     <TouchableOpacity onPress={onPressDescription}>
                         <View style={{ marginTop: 15 }} >
                             <Text style={styles.txtDisplay}>
@@ -227,7 +222,6 @@ export default function MenuDetailScreen() {
                             </Text>
                         </View>
                     </TouchableOpacity>
-
                     {/* <View>
                                         <View style={{ flexDirection: "row", justifyContent: 'space-around', marginTop: 40 }}>
 
@@ -434,8 +428,6 @@ export default function MenuDetailScreen() {
                                 )
                             })
                         }
-
-
                     </View>
                 </>
             </Modalize>
@@ -456,71 +448,9 @@ export default function MenuDetailScreen() {
                                 </TouchableOpacity>
                             )
                         })}
-
                     </View>
                 </>
             </Modalize>
-            {/* <Modalize ref={updateAllDetailRef} >
-                <View style={{ ...styles.modalContent, marginTop: 30 }}>
-                    <View style={{ marginHorizontal: 20, justifyContent: "center", alignItems: "center", marginBottom: 10 }}>
-                        <Text style={{ fontWeight: "bold", fontSize: 17 }}>Modification</Text>
-                    </View>
-                    <ScrollView>
-                        <View style={styles.inputCard}>
-                            <OutlinedTextField
-                                label="Produit"
-                                fontSize={14}
-                                value={produit}
-                                onChangeText={(pr) => setProduit(pr)}
-                                lineWidth={0.5}
-                                activeLineWidth={0.5}
-                                baseColor={COLORS.smallBrown}
-                                tintColor={COLORS.primary}
-                            />
-                        </View>
-                        <View style={styles.inputCard}>
-                            <OutlinedTextField
-                                label="Prix"
-                                fontSize={14}
-                                value={prix}
-                                onChangeText={(pri) => setPrix(pri)}
-                                lineWidth={0.5}
-                                activeLineWidth={0.5}
-                                baseColor={COLORS.smallBrown}
-                                tintColor={COLORS.primary}
-                            />
-                        </View>
-                        <View style={styles.inputCard}>
-                            <OutlinedTextField
-                                label="Categorie"
-                                fontSize={14}
-                                value={categorie}
-                                onChangeText={(cat) => setCategorie(cat)}
-                                lineWidth={0.5}
-                                activeLineWidth={0.5}
-                                baseColor={COLORS.smallBrown}
-                                tintColor={COLORS.primary}
-                            />
-                        </View>
-                        <View style={styles.inputCard}>
-                            <OutlinedTextField
-                                label="Description"
-                                fontSize={14}
-                                value={description}
-                                onChangeText={(descr) => setDescription(descr)}
-                                lineWidth={0.5}
-                                activeLineWidth={0.5}
-                                baseColor={COLORS.smallBrown}
-                                tintColor={COLORS.primary}
-                                multiline={true}
-                            />
-                        </View>
-                    </ScrollView>
-                    <TouchableOpacity style={styles.addBtn} onPress={()=>envoiModification()}>
-                        <Text style={styles.addBtnText}>Modifier</Text>
-                    </TouchableOpacity>
-                </View>
-            </Modalize> */}
         </>
     )
 }
