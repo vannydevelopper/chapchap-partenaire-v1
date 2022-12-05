@@ -11,6 +11,8 @@ import Product from "../../components/ecommerce/main/Product";
 import { CategoriesSkeletons, HomeProductsSkeletons, SubCategoriesSkeletons } from "../../components/ecommerce/skeletons/Skeletons";
 import ImageView from "react-native-image-viewing";
 import { Modalize } from "react-native-modalize";
+import { OutlinedTextField } from "rn-material-ui-textfield";
+import { useForm } from "../../hooks/useForm";
 
 export default function EcommerceHomeScreen() {
         const { width, height } = useWindowDimensions()
@@ -22,18 +24,27 @@ export default function EcommerceHomeScreen() {
         const [imageIndex, setImageIndex] = useState(0)
         const [showImageModal, setShowImageModal] = useState(false)
         const productmodalizeRef = useRef(null)
+
+        const [updateShop, setUpdateShop] = useState(false)
+        const [updateAdresse, setUpdateAdresse] = useState(false)
+        const [updateOuvert, setUpdateOuvert] = useState(false)
+        const [updateTele, setUpdateTele] = useState(false)
+        const [updateDescription, setUpdateDescription] = useState(false)
+        const [updatData, setUpdatData] = useState(null)
+
+
         const navigation = useNavigation()
         const route = useRoute()
         const { partenaire } = route.params
 
         const uploadModaliseRef = useRef()
-        const RestomodaliseRef = useRef()
+        const ShopmodaliseRef = useRef()
         const AdressemodaliseRef = useRef()
         const OuvertmodaliseRef = useRef()
         const TelemodaliseRef = useRef()
         const DescriptionmodalizeRef = useRef()
-        const onPressResto = () => {
-                RestomodaliseRef.current.open()
+        const onPressShop = () => {
+                ShopmodaliseRef.current.open()
         }
         const onPressAdresse = () => {
                 AdressemodaliseRef.current.open()
@@ -58,7 +69,42 @@ export default function EcommerceHomeScreen() {
                 partenaire.produit.LOGO ? partenaire.produit.LOGO : undefined,
                 partenaire.produit.BACKGROUND_IMAGE ? partenaire.produit.BACKGROUND_IMAGE : undefined,
         ]
+        const [data, handleChange, setValue] = useForm({
+               shop:partenaire.produit.NOM_ORGANISATION,
+               adresse:partenaire.produit.ADDRESSE,
+               ouvert:partenaire.produit.OUVERT,
+               tele:partenaire.produit.TELEPHONE,
+               description:partenaire.produit.PRESENTATION,
+        })
+        const UpdateData = async () => {
 
+                try {
+                        // setLoading(true)
+                        const form = new FormData()
+                                form.append("NOM_ORGANISATION",data.shop)
+                                form.append("ADRESSE",data.adresse)
+                                form.append("OUVERT",data.ouvert)
+                                form.append("TELEPHONE",data.tele)
+                                form.append("PRESENTATION",data.description)
+                        const updateNewMenu = await fetchApi(`/partenaire/Updateshop/${partenaire.produit.ID_PARTENAIRE_SERVICE}`, {
+                                method: "PUT",
+                                body: form
+                        })
+                        setUpdatData(updateNewMenu.result)
+                         ShopmodaliseRef.current.close()
+         AdressemodaliseRef.current.close()
+         OuvertmodaliseRef.current.close()
+        TelemodaliseRef.current.close()
+         DescriptionmodalizeRef.current.close()
+                // navigation.navigate("EcommerceHomeScreen", { partenaire: partenaire })
+
+                        // navigation.navigate("EcommerceHomeScreen",{partenaire:partenaire})
+                } catch (error) {
+                        console.log(error)
+                } finally {
+                        // setLoading(false)
+                }
+        }
         useFocusEffect(useCallback(() => {
                 (async () => {
                         try {
@@ -91,19 +137,19 @@ export default function EcommerceHomeScreen() {
                                 <TouchableOpacity onPress={() => onSelectPhoto()} style={styles.uploadImages}>
                                         <Feather name="image" size={24} color={COLORS.ecommercePrimaryColor} />
                                 </TouchableOpacity>
-                                
+
                                 <View style={{ marginHorizontal: "2%", marginTop: "2%", flexDirection: "row", justifyContent: 'space-between' }}>
-                                <TouchableOpacity onPress={onPressResto}>
-                                        <Text style={{ fontWeight: "bold" }}>{partenaire.produit.NOM_ORGANISATION}</Text>
+                                        <TouchableOpacity onPress={onPressShop}>
+                                                <Text style={{ fontWeight: "bold" }}>{partenaire.produit.NOM_ORGANISATION}</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={onPressAdresse}>
-                                        <View style={{ flexDirection: "row" }}>
-                                                <SimpleLineIcons name="location-pin" size={15} color="black" />
-                                                <Text style={{ fontSize: 12 }}> KIRIRI </Text>
-                                        </View>
+                                                <View style={{ flexDirection: "row" }}>
+                                                        <SimpleLineIcons name="location-pin" size={15} color="black" />
+                                                        <Text style={{ fontSize: 12 }}> {partenaire.produit.ADDRESSE} </Text>
+                                                </View>
                                         </TouchableOpacity>
                                 </View>
-                                
+
                                 <View style={{ flexDirection: "row", marginHorizontal: 10, marginTop: 10, justifyContent: "space-between" }}>
                                         <View style={{ flexDirection: "row" }}>
                                                 {/* {wishlistNumber ?
@@ -118,29 +164,25 @@ export default function EcommerceHomeScreen() {
 
                                         </View>
                                         <TouchableOpacity onPress={onPressOuvert}>
-                                        <View style={{ flexDirection: "row", marginHorizontal: 30 }}>
-                                                <AntDesign name="clockcircleo" size={15} color="#797E9A" style={{ marginTop: 5 }} />
-                                                {/* <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{shop.OUVERT}</Text> */}
-                                                <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>08h-18h</Text>
-                                        </View>
+                                                <View style={{ flexDirection: "row", marginHorizontal: 30 }}>
+                                                        <AntDesign name="clockcircleo" size={15} color="#797E9A" style={{ marginTop: 5 }} />
+                                                        {/* <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{shop.OUVERT}</Text> */}
+                                                        <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{partenaire.produit.OUVERT}</Text>
+                                                </View>
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={() => { Linking.openURL(`tel:${partenaire.produit.TELEPHONE}`); }} style={{ flexDirection: "row" }}>
                                                 <SimpleLineIcons name="call-end" size={15} color="#797E9A" style={{ marginTop: 5 }} />
                                                 <TouchableOpacity onPress={onPressTele}>
-                                                <Text style={{ fontSize: 15, marginLeft: 20, color: "#797E9A", right: 15 }}>{partenaire.produit.TELEPHONE}</Text>
+                                                        <Text style={{ fontSize: 15, marginLeft: 20, color: "#797E9A", right: 15 }}>{partenaire.produit.TELEPHONE}</Text>
                                                 </TouchableOpacity>
                                         </TouchableOpacity>
                                 </View>
                                 <TouchableOpacity onPress={onPressDescription}>
-                                <View style={{ marginTop: 10, marginHorizontal: 10 }} >
-                                        <Text style={{ color: "#797E9A" }}>
-                                                the {partenaire.produit.NOM_ORGANISATION} for me, I stayed there for two weeks
-                                                I really enjoyed its great location. I loved the character
-                                                of the hotel. The restaurant was fantastic and the staff was
-                                                friendly. Well maintained rooms, comfortable bed, and great Cafe.
-                                                the WEMA W
-                                        </Text>
-                                </View>
+                                        <View style={{ marginHorizontal: 10 }} >
+                                                <Text style={{ color: "#797E9A" }}>
+                                                        {partenaire.produit.PRESENTATION}
+                                                </Text>
+                                        </View>
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={productPress} style={styles.plus}>
                                         <View>
@@ -216,9 +258,9 @@ export default function EcommerceHomeScreen() {
                                 }}
                         >
                                 <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Mes produits</Text>
-                                <View style={styles.searchSection1}>
+                                <View style={styles.inputCard}>
                                         <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
-                                        <TextInput
+                                         <OutlinedTextField
                                                 style={styles.input}
                                                 // value={data.menu}
                                                 // onChangeText={(newValue) => handleChange('menu', newValue)}
@@ -276,78 +318,151 @@ export default function EcommerceHomeScreen() {
                                         </TouchableNativeFeedback>
                                 </View>
                         </Modalize>
-                        <Modalize ref={RestomodaliseRef} handlePosition="inside" modalHeight={180} snapPoint={250}>
+                        <Modalize ref={ShopmodaliseRef} adjustToContentHeight
+                                handlePosition='inside'
+                                modalStyle={{
+                                        borderTopRightRadius: 25,
+                                        borderTopLeftRadius: 25,
+                                        paddingVertical: 20
+                                }}
+                                handleStyle={{ marginTop: 10 }}
+                                scrollViewProps={{
+                                        keyboardShouldPersistTaps: "handled"
+                                }}>
                                 <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
-                                <View style={styles.searchSection1}>
+                                <View style={styles.inputCard}>
                                         {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
-                                        <TextInput
+                                         <OutlinedTextField
                                                 style={styles.input}
-                                                value={partenaire.produit.NOM_ORGANISATION}
-                                        // onChangeText={(newValue) => handleChange('menu', newValue)}
-                                        // placeholder="Rechercher "
+                                                label={"Modifier la Boutique"}
+                                                value={data.shop}
+                                                onChangeText={(newValue) => handleChange('shop', newValue)}
+                                                lineWidth={0.5}
+                                                activeLineWidth={0.5}
+                                                baseColor={COLORS.smallBrown}
+                                                tintColor={COLORS.primary}
                                         />
                                 </View>
-                                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                                <TouchableOpacity style={styles.addBtn} onPress={UpdateData}>
                                         <Text style={styles.addBtnText}>Modifier</Text>
                                 </TouchableOpacity>
                         </Modalize>
-                        <Modalize ref={AdressemodaliseRef} handlePosition="inside" modalHeight={180} snapPoint={250}>
+                        <Modalize ref={AdressemodaliseRef} adjustToContentHeight
+                                handlePosition='inside'
+                                modalStyle={{
+                                        borderTopRightRadius: 25,
+                                        borderTopLeftRadius: 25,
+                                        paddingVertical: 20
+                                }}
+                                handleStyle={{ marginTop: 10 }}
+                                scrollViewProps={{
+                                        keyboardShouldPersistTaps: "handled"
+                                }}>
                                 <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
-                                <View style={styles.searchSection1}>
+                                <View style={styles.inputCard}>
                                         {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
-                                        <TextInput
+                                         <OutlinedTextField
                                                 style={styles.input}
-                                                value={partenaire.produit.NOM_ORGANISATION}
-                                        // onChangeText={(newValue) => handleChange('menu', newValue)}
-                                        // placeholder="Rechercher "
+                                                label={"Modifier l'adresse"}
+                                                // adresse:partenaire.produit.ADDRESSE,
+                                                value={partenaire.produit.ADDRESSE}
+                                                onChangeText={(newValue) => handleChange('adresse', newValue)}
                                         />
                                 </View>
-                                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                                <TouchableOpacity style={styles.addBtn} onPress={UpdateData}>
                                         <Text style={styles.addBtnText}>Modifier</Text>
                                 </TouchableOpacity>
                         </Modalize>
-                        <Modalize ref={OuvertmodaliseRef} handlePosition="inside" modalHeight={180} snapPoint={250}>
+                        <Modalize ref={OuvertmodaliseRef} adjustToContentHeight
+                                handlePosition='inside'
+                                modalStyle={{
+                                        borderTopRightRadius: 25,
+                                        borderTopLeftRadius: 25,
+                                        paddingVertical: 20
+                                }}
+                                handleStyle={{ marginTop: 10 }}
+                                scrollViewProps={{
+                                        keyboardShouldPersistTaps: "handled"
+                                }}>
                                 <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
-                                <View style={styles.searchSection1}>
+                                <View style={styles.inputCard}>
                                         {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
-                                        <TextInput
+                                         <OutlinedTextField
                                                 style={styles.input}
-                                                value={partenaire.produit.NOM_ORGANISATION}
-                                        // onChangeText={(newValue) => handleChange('menu', newValue)}
-                                        // placeholder="Rechercher "
+                                                label={"Modifier le heure d travail"}
+                                                value={data.ouvert}
+                                                onChangeText={(newValue) => handleChange('ouvert', newValue)}
+                                                lineWidth={0.5}
+                                                activeLineWidth={0.5}
+                                                baseColor={COLORS.smallBrown}
+                                                tintColor={COLORS.primary}
                                         />
                                 </View>
-                                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                                <TouchableOpacity style={styles.addBtn} onPress={UpdateData}>
                                         <Text style={styles.addBtnText}>Modifier</Text>
                                 </TouchableOpacity>
                         </Modalize>
-                        <Modalize ref={TelemodaliseRef} handlePosition="inside" modalHeight={180} snapPoint={250}>
+                        <Modalize ref={TelemodaliseRef}
+                                adjustToContentHeight
+                                handlePosition='inside'
+                                modalStyle={{
+                                        borderTopRightRadius: 25,
+                                        borderTopLeftRadius: 25,
+                                        paddingVertical: 20
+                                }}
+                                handleStyle={{ marginTop: 10 }}
+                                scrollViewProps={{
+                                        keyboardShouldPersistTaps: "handled"
+                                }}
+                        >
                                 <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
-                                <View style={styles.searchSection1}>
+                                <View style={styles.inputCard}>
                                         {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
-                                        <TextInput
+                                         <OutlinedTextField
                                                 style={styles.input}
-                                        value={partenaire.produit.TELEPHONE}
-                                        // onChangeText={(newValue) => handleChange('menu', newValue)}
-                                        // placeholder="Rechercher "
+                                                label={"Modifier le telephone"}
+                                                // tele:partenaire.produit.TELEPHONE
+                                                value={partenaire.produit.TELEPHONE}
+                                                onChangeText={(newValue) => handleChange('tele', newValue)}
+                                                lineWidth={0.5}
+                                                activeLineWidth={0.5}
+                                                baseColor={COLORS.smallBrown}
+                                                tintColor={COLORS.primary}
                                         />
                                 </View>
-                                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                                <TouchableOpacity style={styles.addBtn} onPress={UpdateData}>
                                         <Text style={styles.addBtnText}>Modifier</Text>
                                 </TouchableOpacity>
                         </Modalize>
-                        <Modalize ref={DescriptionmodalizeRef} handlePosition="inside" modalHeight={180} snapPoint={250}>
+                        <Modalize ref={DescriptionmodalizeRef}
+                                adjustToContentHeight
+                                handlePosition='inside'
+                                modalStyle={{
+                                        borderTopRightRadius: 25,
+                                        borderTopLeftRadius: 25,
+                                        paddingVertical: 20
+                                }}
+                                handleStyle={{ marginTop: 10 }}
+                                scrollViewProps={{
+                                        keyboardShouldPersistTaps: "handled"
+                                }}
+                        >
                                 <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
-                                <View style={styles.searchSection1}>
-                                        {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
-                                        <TextInput
-                                                style={styles.input}
-                                                value={partenaire.produit.NOM_ORGANISATION}
-                                        // onChangeText={(newValue) => handleChange('menu', newValue)}
-                                        // placeholder="Rechercher "
+
+                                <View style={styles.inputCard}>
+                                        <OutlinedTextField
+                                                label={"Modifier la description"}
+                                                fontSize={14}
+                                                value={data.description}
+                                                onChangeText={(newValue) => handleChange('description', newValue)}
+                                                lineWidth={0.5}
+                                                activeLineWidth={0.5}
+                                                baseColor={COLORS.smallBrown}
+                                                tintColor={COLORS.primary}
+                                                multiline={true}
                                         />
                                 </View>
-                                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                                <TouchableOpacity style={styles.addBtn} onPress={UpdateData}>
                                         <Text style={styles.addBtnText}>Modifier</Text>
                                 </TouchableOpacity>
                         </Modalize>
@@ -366,6 +481,10 @@ const styles = StyleSheet.create({
                 alignSelf: 'center',
                 borderBottomLeftRadius: 60,
                 borderBottomRightRadius: 60,
+        },
+        inputCard: {
+                marginHorizontal: 10,
+                marginTop: '-5%',
         },
         back: {
                 padding: 10,
@@ -654,6 +773,7 @@ const styles = StyleSheet.create({
                 color: '#fff',
                 fontWeight: "bold",
                 textAlign: "center",
+                left:"300%"
                 // position: "absolute",
                 // marginTop: 25,
                 // marginLeft:8,

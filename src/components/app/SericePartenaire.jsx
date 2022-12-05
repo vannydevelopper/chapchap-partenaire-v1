@@ -29,8 +29,6 @@ export default function SericePartenaire() {
                         }
                 })()
         }, []))
-
-
         useEffect(() => {
                 modalizeRef.current?.open()
         }, [modalizeRef])
