@@ -19,6 +19,7 @@ import { useRef } from "react";
 import ProductImages from "../../components/ecommerce/details/ProductImages";
 import moment from "moment/moment";
 import Loading from "../../components/app/Loading";
+import Couleur from "../../components/ecommerce/main/Couleur";
 export default function ProductDetailsScreen() {
   const navigation = useNavigation()
   const route = useRoute()
@@ -34,14 +35,18 @@ export default function ProductDetailsScreen() {
   const user = useSelector(userSelector)
   //console.log(user.result.ID_USER)
   const { product } = route.params
+
   const modalizeRef = useRef(null)
+  const variantmodaliseRef = useRef()
+  const onPressVariante = () => {
+      variantmodaliseRef.current.open()
+}
   const [isOpen, setIsOpen] = useState(false)
   const [loadingForm, setLoadingForm] = useState(true)
   const [loading, setLoading] = useState(false)
   const [note, Setnote] = useState(null)
   const [commentaire, Setcommentaire] = useState(null)
   // const productInCart = useSelector(ecommerceProductSelector(product.produit_partenaire.ID_PARTENAIRE_SERVICE))
-  // console.log(product)
   const onCartPress = () => {
     setIsOpen(true)
     modalizeRef.current?.open()
@@ -203,7 +208,6 @@ export default function ProductDetailsScreen() {
             {/* <EcommerceBadge /> */}
           </View>
         </View>
-        <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled>
           <ProductImages images={IMAGES} />
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 10, marginTop: 10 }}>
             <View>
@@ -246,12 +250,21 @@ export default function ProductDetailsScreen() {
                   </View>
                 </TouchableOpacity>
               </View>
-              <MaterialIcons style={{marginTop:-40,marginLeft:-30}} name="navigate-next" size={24} color="black" />
-
+              <MaterialIcons style={{marginTop:"-15%",marginLeft:"-20%"}} name="navigate-next" size={24} color="black" />
             </View>
           </TouchableNativeFeedback>
-          
+        <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled>
 
+          {
+            product.taille_couleur.map((color,index)=>
+            {
+              return(
+                <>
+                <Couleur onPressVariante={onPressVariante } color={color}/>
+                </>
+              )
+            })
+          }
   
 
         </ScrollView>
@@ -272,30 +285,36 @@ export default function ProductDetailsScreen() {
           </>
         </TouchableOpacity>
       </View>
-      <Portal>
-        <GestureHandlerRootView style={{ height: isOpen ? '100%' : 0, opacity: isOpen ? 1 : 0, backgroundColor: 'rgba(0, 0, 0, 0)', position: 'absolute', width: '100%', zIndex: 1 }}>
-          <Modalize
-            ref={modalizeRef}
-            adjustToContentHeight
-            handlePosition='inside'
-            modalStyle={{
-              borderTopRightRadius: 25,
-              borderTopLeftRadius: 25,
-              paddingVertical: 20
-            }}
-            handleStyle={{ marginTop: 10 }}
-            scrollViewProps={{
-              keyboardShouldPersistTaps: "handled"
-            }}
-            onClosed={() => {
-              setIsOpen(false)
-              setLoadingForm(true)
-            }}
-          >
-            {/* <AddCart product={product} loadingForm={loadingForm} onClose={onCloseAddToCart} /> */}
-          </Modalize>
-        </GestureHandlerRootView>
-      </Portal>
+      <Modalize ref={variantmodaliseRef} adjustToContentHeight
+                                handlePosition='inside'
+                                modalStyle={{
+                                        borderTopRightRadius: 25,
+                                        borderTopLeftRadius: 25,
+                                        paddingVertical: 20
+                                }}
+                                handleStyle={{ marginTop: 10 }}
+                                scrollViewProps={{
+                                        keyboardShouldPersistTaps: "handled"
+                                }}>
+                                <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
+                                <View style={styles.inputCard}>
+                                        {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
+                                         <OutlinedTextField
+                                                style={styles.input}
+                                                label={"Modifier le heure d travail"}
+                                                // value={data.ouvert}
+                                                // onChangeText={(newValue) => handleChange('ouvert', newValue)}
+                                                lineWidth={0.5}
+                                                activeLineWidth={0.5}
+                                                baseColor={COLORS.smallBrown}
+                                                tintColor={COLORS.primary}
+                                        />
+                                </View>
+                                <TouchableOpacity style={styles.addBtn} >
+                                        <Text style={styles.addBtnText}>Modifier</Text>
+                                </TouchableOpacity>
+                        </Modalize>
+     
     </>
 
   )
@@ -371,7 +390,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     paddingVertical: 10,
     paddingHorizontal: 10,
-    marginBottom:-20
+    marginBottom:"-1%"
   },
   shopLeft: {
     flexDirection: "row",
@@ -389,10 +408,11 @@ const styles = StyleSheet.create({
   },
   shopOwner: {
     marginLeft: 10,
-    marginTop:-40
+    marginTop:"-6%",
   },
   productSeller: {
-    fontWeight: "bold"
+    fontWeight: "bold",
+    marginTop:"-30%",
   },
   shopAdress: {
     color: '#777',

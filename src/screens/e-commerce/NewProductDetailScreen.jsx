@@ -28,7 +28,6 @@ export default function NewProductDetailScreen() {
   const route = useRoute()
   const { width } = useWindowDimensions()
   const { product, index, totalLength, fixMargins } = route.params
-
   const PRODUCT_MARGIN = 10
   const PRODUCT_WIDTH = width / 2 - PRODUCT_MARGIN - 10
   const PRODUCT_HEIGHT = 270

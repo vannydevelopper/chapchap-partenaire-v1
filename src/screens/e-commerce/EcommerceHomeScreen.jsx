@@ -100,7 +100,7 @@ export default function EcommerceHomeScreen() {
 
                         // navigation.navigate("EcommerceHomeScreen",{partenaire:partenaire})
                 } catch (error) {
-                        console.log(error)
+                        console.lsog(error)
                 } finally {
                         // setLoading(false)
                 }
@@ -213,7 +213,8 @@ export default function EcommerceHomeScreen() {
                                                                         fixMargins
                                                                 />
                                                         )
-                                                })}
+                                                })
+                                                }
                                                 <View style={[styles.serviceContainer, { width: SERVICE_WIDTH, height: 290 }]}>
                                                         <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} onPress={() => navigation.navigate("HomeAllServiceScreen")}>
                                                                 <View style={[styles.service]}>
@@ -469,7 +470,6 @@ export default function EcommerceHomeScreen() {
                 </>
         )
 }
-
 const styles = StyleSheet.create({
         container: {
                 flex: 1

@@ -106,7 +106,8 @@ const styles = StyleSheet.create({
                     height: "100%",
           },
           productImage: {
-                    width: '70%',
+                    width: '95%',
+                    height:'100%',
                     minHeight: 150,
                     maxHeight: 200,
                     alignSelf: 'center',
