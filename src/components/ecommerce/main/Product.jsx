@@ -211,7 +211,7 @@ export default function Product({ product, index, totalLength, fixMargins = fals
 
   // const [SIZES, setSIZES] = useState([])
   const [SIZES, setSIZES] = useState([])
-
+// console.log(product)
   const [colors, SetColors] = useState([])
 const detail = async (product) => {
                 const details = product
@@ -382,6 +382,8 @@ const detail = async (product) => {
         </Text>
       </View>
       {product.produit_partenaire.PRIX ? <Text style={{ color: "#F29558", fontWeight: "bold" }}>{product.produit_partenaire.PRIX.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Fbu</Text> : null}
+      <Text numberOfLines={2} style={styles.productName}>Quantite:{product.Qte.RESTANTE?product.Qte.RESTANTE:0}</Text>
+     
       <Portal>
         <GestureHandlerRootView style={{ height: isOpen ? '100%' : 0, opacity: isOpen ? 1 : 0, backgroundColor: 'rgba(0, 0, 0, 0)', position: 'absolute', width: '100%', zIndex: 1 }}>
           <Modalize
@@ -414,7 +416,7 @@ const detail = async (product) => {
 const styles = StyleSheet.create({
   product: {
     maxWidth: 200,
-    maxHeight:250,
+    maxHeight:270,
     marginHorizontal: 10,
     elevation:10,
     backgroundColor:'white',
