@@ -38,7 +38,7 @@ export default function EcommerceHomeScreen() {
         const [loadingSubCategories, setLoadingSubCategories] = useState(false)
         const [sousCategories, SetSousCategories] = useState([])
         const [selectedsousCategories, setSelectedsousCategories] = useState(null)
-    
+
         const navigation = useNavigation()
         const route = useRoute()
         const { partenaire } = route.params
@@ -55,7 +55,7 @@ export default function EcommerceHomeScreen() {
         const plusCategories = () => {
                 // setIsOpen(true)
                 CategoriemodalizeRef.current?.open()
-            }
+        }
         const onPressShop = () => {
                 ShopmodaliseRef.current.open()
         }
@@ -81,11 +81,11 @@ export default function EcommerceHomeScreen() {
         const onCategoryPress = (categorie) => {
                 if (loadingSubCategories || loadingProducts) return false
                 if (categorie.ID_CATEGORIE_PRODUIT == selectedCategorie?.ID_CATEGORIE_PRODUIT) {
-                    return setSelectedCategorie(null)
+                        return setSelectedCategorie(null)
                 }
                 setSelectedCategorie(categorie)
                 setSelectedsousCategories(null)
-            }
+        }
         var IMAGES = [
                 partenaire.produit.LOGO ? partenaire.produit.LOGO : undefined,
                 partenaire.produit.BACKGROUND_IMAGE ? partenaire.produit.BACKGROUND_IMAGE : undefined,
@@ -97,7 +97,7 @@ export default function EcommerceHomeScreen() {
                 tele: partenaire.produit.TELEPHONE,
                 description: partenaire.produit.PRESENTATION,
         })
-        
+
         const fecthProduits = async () => {
                 try {
                         const response = await fetchApi(`/products/categorie/${partenaire.produit.ID_PARTENAIRE_SERVICE} `, {
@@ -181,34 +181,34 @@ export default function EcommerceHomeScreen() {
 
                                 <View style={{ marginHorizontal: "2%", marginTop: "2%", flexDirection: "row", justifyContent: 'space-between' }}>
                                         <TouchableOpacity onPress={onPressShop}>
-                                                <Text style={{ fontWeight: "bold" }}>{partenaire.produit.NOM_ORGANISATION}</Text>
+                                                <View style={{ flexDirection: "row" }}>
+                                                        <Text style={{ opacity: 0.5, fontWeight: "bold" }}>{partenaire.produit.NOM_ORGANISATION}</Text>
+                                                        <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
+                                                </View>
+
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={onPressAdresse}>
                                                 <View style={{ flexDirection: "row" }}>
                                                         <SimpleLineIcons name="location-pin" size={15} color="black" />
-                                                        <Text style={{ fontSize: 12 }}> {partenaire.produit.ADDRESSE} </Text>
+                                                        <Text style={{ fontWeight: "bold", ontSize: 12, opacity: 0.5 }}> {partenaire.produit.ADDRESSE} </Text>
+                                                        <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
                                                 </View>
                                         </TouchableOpacity>
                                 </View>
 
                                 <View style={{ flexDirection: "row", marginHorizontal: 10, marginTop: 10, justifyContent: "space-between" }}>
                                         <View style={{ flexDirection: "row" }}>
-                                                {/* {wishlistNumber ?
-                        <AntDesign name="star" size={20} color="#EFC519" /> :
-                        <AntDesign name="star" size={20} color="#EFC519" />} */}
-                                                {/* {shop.note.nbre==0 ? */}
+
                                                 <AntDesign name="staro" size={20} color="#EFC519" />
-                                                {/* : */}
-                                                {/* <AntDesign name="star" size={20} color="#EFC519" />} */}
-                                                {/* <Text style={{ fontSize: 15, marginLeft: 15, color: "#797E9A", right: 15 }}>{shop.note.nbre}.0</Text> */}
                                                 <Text style={{ fontSize: 15, marginLeft: 15, color: "#797E9A", right: 15 }}>5.0</Text>
 
                                         </View>
                                         <TouchableOpacity onPress={onPressOuvert}>
                                                 <View style={{ flexDirection: "row", marginHorizontal: 30 }}>
                                                         <AntDesign name="clockcircleo" size={15} color="#797E9A" style={{ marginTop: 5 }} />
-                                                        {/* <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{shop.OUVERT}</Text> */}
                                                         <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{partenaire.produit.OUVERT}</Text>
+                                                        <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
+
                                                 </View>
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={() => { Linking.openURL(`tel:${partenaire.produit.TELEPHONE}`); }} style={{ flexDirection: "row" }}>
@@ -216,12 +216,16 @@ export default function EcommerceHomeScreen() {
                                                 <TouchableOpacity onPress={onPressTele}>
                                                         <Text style={{ fontSize: 15, marginLeft: 20, color: "#797E9A", right: 15 }}>{partenaire.produit.TELEPHONE}</Text>
                                                 </TouchableOpacity>
+                                                <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
+
                                         </TouchableOpacity>
                                 </View>
                                 <TouchableOpacity onPress={onPressDescription}>
                                         <View style={{ marginHorizontal: 10 }} >
                                                 <Text style={{ color: "#797E9A" }}>
                                                         {partenaire.produit.PRESENTATION}
+                                                        <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="#797E9As" />
+
                                                 </Text>
                                         </View>
                                 </TouchableOpacity>
@@ -269,7 +273,7 @@ export default function EcommerceHomeScreen() {
                                                 </View>
                                         </View>
                                 </TouchableOpacity>
-                                
+
                                 {firstLoadingProducts ? <HomeProductsSkeletons wrap /> :
                                         products.length == 0 ? <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 100 }}>
                                                 <Feather name="check-square" size={24} color="#777" />
@@ -543,39 +547,39 @@ export default function EcommerceHomeScreen() {
                                 </TouchableOpacity>
                         </Modalize>
                         <Modalize
-                ref={CategoriemodalizeRef}
-                adjustToContentHeight
-                handlePosition='inside'
-                modalStyle={{
-                    borderTopRightRadius: 25,
-                    borderTopLeftRadius: 25,
-                    paddingVertical: 20
-                }}
-                handleStyle={{ marginTop: 10 }}
-                scrollViewProps={{
-                    keyboardShouldPersistTaps: "handled"
-                }}
-                // onClosed={() => {
-                //     setIsOpen(false)
-                //     setLoadingForm(true)
-                // }}
-            >
-                <ScrollView>
-                    <Text style={{ fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>catégories</Text>
-                    <View style={styles.cate}>
-                        {categories.map((categorie, index) => {
-                            return (
-                                <View style={{ ...styles.categoryModel, margin: 15 }} >
-                                    <View style={styles.actionIcon}>
-                                        <ImageBackground source={{ uri: categorie.IMAGE }} borderRadius={15} style={styles.categoryImage} />
-                                    </View>
-                                    <Text style={[{ fontSize: 10, fontWeight: "bold" }, { color: "#797E9A" }]}>{categorie.NOM}</Text>
-                                </View>
-                            )
-                        })}
-                    </View>
-                </ScrollView>
-            </Modalize>
+                                ref={CategoriemodalizeRef}
+                                adjustToContentHeight
+                                handlePosition='inside'
+                                modalStyle={{
+                                        borderTopRightRadius: 25,
+                                        borderTopLeftRadius: 25,
+                                        paddingVertical: 20
+                                }}
+                                handleStyle={{ marginTop: 10 }}
+                                scrollViewProps={{
+                                        keyboardShouldPersistTaps: "handled"
+                                }}
+                        // onClosed={() => {
+                        //     setIsOpen(false)
+                        //     setLoadingForm(true)
+                        // }}
+                        >
+                                <ScrollView>
+                                        <Text style={{ fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>catégories</Text>
+                                        <View style={styles.cate}>
+                                                {categories.map((categorie, index) => {
+                                                        return (
+                                                                <View style={{ ...styles.categoryModel, margin: 15 }} >
+                                                                        <View style={styles.actionIcon}>
+                                                                                <ImageBackground source={{ uri: categorie.IMAGE }} borderRadius={15} style={styles.categoryImage} />
+                                                                        </View>
+                                                                        <Text style={[{ fontSize: 10, fontWeight: "bold" }, { color: "#797E9A" }]}>{categorie.NOM}</Text>
+                                                                </View>
+                                                        )
+                                                })}
+                                        </View>
+                                </ScrollView>
+                        </Modalize>
                 </>
         )
 }
@@ -607,16 +611,16 @@ const styles = StyleSheet.create({
         cate: {
                 flexDirection: 'row',
                 flexWrap: 'wrap',
-            },
-            categoryModel: {
+        },
+        categoryModel: {
                 alignItems: 'center',
                 borderRadius: 10,
                 marginLeft: 20,
                 elevation: 10,
                 backgroundColor: 'white',
                 borderRadius: 10,
-            },
-            actionIcon: {
+        },
+        actionIcon: {
                 borderRadius: 15,
                 width: 80,
                 height: 80,
@@ -624,12 +628,12 @@ const styles = StyleSheet.create({
                 alignItems: 'center',
                 alignContent: 'center',
                 backgroundColor: '#fff',
-            },
-            categoryImage: {
+        },
+        categoryImage: {
                 width: '100%',
                 height: '100%',
-            },
-            
+        },
+
         cardBack: {
                 width: "100%",
                 position: 'absolute',
@@ -665,7 +669,7 @@ const styles = StyleSheet.create({
                 padding: 10,
                 paddingVertical: 15
         },
-        
+
         modalActionText: {
                 fontWeight: "bold"
         },
@@ -816,20 +820,20 @@ const styles = StyleSheet.create({
                 paddingHorizontal: 10,
                 backgroundColor: '#fff',
                 paddingBottom: 5
-            },
-            categoryPhoto: {
+        },
+        categoryPhoto: {
                 width: 80,
                 height: 70,
                 borderRadius: 8,
                 backgroundColor: COLORS.skeleton
-            },
-            categoryChecked: {
+        },
+        categoryChecked: {
                 width: 80,
                 height: 85,
                 borderRadius: 8,
                 marginTop: -80
-            },
-            category: {
+        },
+        category: {
                 alignItems: 'center',
                 borderRadius: 10,
                 marginLeft: 20,
@@ -837,12 +841,12 @@ const styles = StyleSheet.create({
                 marginRight: -12.6,
                 backgroundColor: 'white',
                 borderRadius: 10
-            },
-            DataImageCategorie: {
+        },
+        DataImageCategorie: {
                 width: '100%',
                 height: '100%',
                 borderRadius: 10,
-            },
+        },
         input: {
                 flex: 1,
                 marginLeft: 10
