@@ -6,7 +6,6 @@ export default function Couleur({ color,onPressVariante, index, totalLength }) {
   
 
     return (
-
         <View key={index} style={styles.color} >
             <TouchableOpacity onPress={onPressVariante}>
                 <View style={styles.cardColor}>

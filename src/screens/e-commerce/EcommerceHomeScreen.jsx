@@ -24,6 +24,9 @@ export default function EcommerceHomeScreen() {
         const [imageIndex, setImageIndex] = useState(0)
         const [showImageModal, setShowImageModal] = useState(false)
         const productmodalizeRef = useRef(null)
+        const [loadingProducts, setLoadingProducts] = useState(false)
+        const [categories, setCategories] = useState([])
+        const [selectedCategorie, setSelectedCategorie] = useState(null)
 
         const [updateShop, setUpdateShop] = useState(false)
         const [updateAdresse, setUpdateAdresse] = useState(false)
@@ -32,10 +35,14 @@ export default function EcommerceHomeScreen() {
         const [updateDescription, setUpdateDescription] = useState(false)
         const [updatData, setUpdatData] = useState(null)
 
-
+        const [loadingSubCategories, setLoadingSubCategories] = useState(false)
+        const [sousCategories, SetSousCategories] = useState([])
+        const [selectedsousCategories, setSelectedsousCategories] = useState(null)
+    
         const navigation = useNavigation()
         const route = useRoute()
         const { partenaire } = route.params
+        // console.log()
 
         const uploadModaliseRef = useRef()
         const ShopmodaliseRef = useRef()
@@ -43,6 +50,12 @@ export default function EcommerceHomeScreen() {
         const OuvertmodaliseRef = useRef()
         const TelemodaliseRef = useRef()
         const DescriptionmodalizeRef = useRef()
+        const CategoriemodalizeRef = useRef()
+
+        const plusCategories = () => {
+                // setIsOpen(true)
+                CategoriemodalizeRef.current?.open()
+            }
         const onPressShop = () => {
                 ShopmodaliseRef.current.open()
         }
@@ -65,38 +78,66 @@ export default function EcommerceHomeScreen() {
                 // setIsOpen(true)
                 productmodalizeRef.current?.open()
         }
+        const onCategoryPress = (categorie) => {
+                if (loadingSubCategories || loadingProducts) return false
+                if (categorie.ID_CATEGORIE_PRODUIT == selectedCategorie?.ID_CATEGORIE_PRODUIT) {
+                    return setSelectedCategorie(null)
+                }
+                setSelectedCategorie(categorie)
+                setSelectedsousCategories(null)
+            }
         var IMAGES = [
                 partenaire.produit.LOGO ? partenaire.produit.LOGO : undefined,
                 partenaire.produit.BACKGROUND_IMAGE ? partenaire.produit.BACKGROUND_IMAGE : undefined,
         ]
         const [data, handleChange, setValue] = useForm({
-               shop:partenaire.produit.NOM_ORGANISATION,
-               adresse:partenaire.produit.ADDRESSE,
-               ouvert:partenaire.produit.OUVERT,
-               tele:partenaire.produit.TELEPHONE,
-               description:partenaire.produit.PRESENTATION,
+                shop: partenaire.produit.NOM_ORGANISATION,
+                adresse: partenaire.produit.ADDRESSE,
+                ouvert: partenaire.produit.OUVERT,
+                tele: partenaire.produit.TELEPHONE,
+                description: partenaire.produit.PRESENTATION,
         })
+        
+        const fecthProduits = async () => {
+                try {
+                        const response = await fetchApi(`/products/categorie/${partenaire.produit.ID_PARTENAIRE_SERVICE} `, {
+                                method: "GET",
+                                headers: { "Content-Type": "application/json" },
+                        })
+                        setCategories(response.result)
+                        console.log(categories)
+
+                }
+                catch (error) {
+                        console.log(error)
+                } finally {
+                        setLoadingCatagories(false)
+                }
+        }
+        useFocusEffect(useCallback(() => {
+                fecthProduits()
+        }, []))
         const UpdateData = async () => {
 
                 try {
                         // setLoading(true)
                         const form = new FormData()
-                                form.append("NOM_ORGANISATION",data.shop)
-                                form.append("ADRESSE",data.adresse)
-                                form.append("OUVERT",data.ouvert)
-                                form.append("TELEPHONE",data.tele)
-                                form.append("PRESENTATION",data.description)
+                        form.append("NOM_ORGANISATION", data.shop)
+                        form.append("ADRESSE", data.adresse)
+                        form.append("OUVERT", data.ouvert)
+                        form.append("TELEPHONE", data.tele)
+                        form.append("PRESENTATION", data.description)
                         const updateNewMenu = await fetchApi(`/partenaire/Updateshop/${partenaire.produit.ID_PARTENAIRE_SERVICE}`, {
                                 method: "PUT",
                                 body: form
                         })
                         setUpdatData(updateNewMenu.result)
-                         ShopmodaliseRef.current.close()
-         AdressemodaliseRef.current.close()
-         OuvertmodaliseRef.current.close()
-        TelemodaliseRef.current.close()
-         DescriptionmodalizeRef.current.close()
-                // navigation.navigate("EcommerceHomeScreen", { partenaire: partenaire })
+                        ShopmodaliseRef.current.close()
+                        AdressemodaliseRef.current.close()
+                        OuvertmodaliseRef.current.close()
+                        TelemodaliseRef.current.close()
+                        DescriptionmodalizeRef.current.close()
+                        // navigation.navigate("EcommerceHomeScreen", { partenaire: partenaire })
 
                         // navigation.navigate("EcommerceHomeScreen",{partenaire:partenaire})
                 } catch (error) {
@@ -184,6 +225,39 @@ export default function EcommerceHomeScreen() {
                                                 </Text>
                                         </View>
                                 </TouchableOpacity>
+                                <TouchableOpacity onPress={plusCategories} style={styles.plus}>
+                                        <View>
+                                                <Text style={[styles.titlePrincipal, products.length == 0 && { textAlign: "center" }]}>Mes categories</Text>
+                                        </View>
+                                        <View style={{ marginLeft: 100 }}>
+                                                <View style={{ flexDirection: 'row' }}>
+                                                        <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommercePrimaryColor} style={{ marginRight: -15 }} />
+                                                        <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommercePrimaryColor} />
+                                                </View>
+                                        </View>
+                                </TouchableOpacity>
+                                <ScrollView
+                                        style={styles.shops}
+                                        horizontal
+                                        showsHorizontalScrollIndicator={false}
+                                >
+                                        <View style={styles.categories}>
+                                                {categories.map((categorie, index) => {
+                                                        return (
+
+                                                                <TouchableOpacity onPress={() => onCategoryPress(categorie)} style={[styles.category, index == 0 && { marginLeft: 0 }]} key={index}>
+                                                                        <View style={[styles.categoryPhoto, { backgroundColor: categorie.ID_CATEGORIE_PRODUIT == selectedCategorie?.ID_CATEGORIE_PRODUIT ? COLORS.handleColor : "#DFE1E9" }]}>
+                                                                                <Image source={{ uri: categorie.IMAGE }} style={[styles.DataImageCategorie, , { opacity: categorie.ID_CATEGORIE_PRODUIT == selectedCategorie?.ID_CATEGORIE_PRODUIT ? 0.2 : 1 }]} />
+                                                                        </View>
+                                                                        <Text style={[{ fontSize: 8, fontWeight: "bold" }, { color: COLORS.ecommercePrimaryColor }]}>{categorie.NOM}</Text>
+                                                                        {categorie.ID_CATEGORIE_PRODUIT == selectedCategorie?.ID_CATEGORIE_PRODUIT && <View style={[styles.categoryChecked, { backgroundColor: categorie.ID_CATEGORIE_PRODUIT == selectedCategorie?.ID_CATEGORIE_PRODUIT }]}>
+                                                                                <AntDesign style={{ marginTop: 20, marginLeft: 20, color: COLORS.ecommercePrimaryColor }} name="check" size={40} color='#000' />
+                                                                        </View>}
+                                                                </TouchableOpacity>
+                                                        )
+                                                })}
+                                        </View>
+                                </ScrollView>
                                 <TouchableOpacity onPress={productPress} style={styles.plus}>
                                         <View>
                                                 <Text style={[styles.titlePrincipal, products.length == 0 && { textAlign: "center" }]}>Mes produits</Text>
@@ -195,6 +269,7 @@ export default function EcommerceHomeScreen() {
                                                 </View>
                                         </View>
                                 </TouchableOpacity>
+                                
                                 {firstLoadingProducts ? <HomeProductsSkeletons wrap /> :
                                         products.length == 0 ? <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 100 }}>
                                                 <Feather name="check-square" size={24} color="#777" />
@@ -261,7 +336,7 @@ export default function EcommerceHomeScreen() {
                                 <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Mes produits</Text>
                                 <View style={styles.inputCard}>
                                         <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
-                                         <OutlinedTextField
+                                        <OutlinedTextField
                                                 style={styles.input}
                                                 // value={data.menu}
                                                 // onChangeText={(newValue) => handleChange('menu', newValue)}
@@ -333,7 +408,7 @@ export default function EcommerceHomeScreen() {
                                 <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
                                 <View style={styles.inputCard}>
                                         {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
-                                         <OutlinedTextField
+                                        <OutlinedTextField
                                                 style={styles.input}
                                                 label={"Modifier la Boutique"}
                                                 value={data.shop}
@@ -362,7 +437,7 @@ export default function EcommerceHomeScreen() {
                                 <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
                                 <View style={styles.inputCard}>
                                         {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
-                                         <OutlinedTextField
+                                        <OutlinedTextField
                                                 style={styles.input}
                                                 label={"Modifier l'adresse"}
                                                 // adresse:partenaire.produit.ADDRESSE,
@@ -388,7 +463,7 @@ export default function EcommerceHomeScreen() {
                                 <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
                                 <View style={styles.inputCard}>
                                         {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
-                                         <OutlinedTextField
+                                        <OutlinedTextField
                                                 style={styles.input}
                                                 label={"Modifier le heure d travail"}
                                                 value={data.ouvert}
@@ -419,7 +494,7 @@ export default function EcommerceHomeScreen() {
                                 <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
                                 <View style={styles.inputCard}>
                                         {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
-                                         <OutlinedTextField
+                                        <OutlinedTextField
                                                 style={styles.input}
                                                 label={"Modifier le telephone"}
                                                 // tele:partenaire.produit.TELEPHONE
@@ -467,6 +542,40 @@ export default function EcommerceHomeScreen() {
                                         <Text style={styles.addBtnText}>Modifier</Text>
                                 </TouchableOpacity>
                         </Modalize>
+                        <Modalize
+                ref={CategoriemodalizeRef}
+                adjustToContentHeight
+                handlePosition='inside'
+                modalStyle={{
+                    borderTopRightRadius: 25,
+                    borderTopLeftRadius: 25,
+                    paddingVertical: 20
+                }}
+                handleStyle={{ marginTop: 10 }}
+                scrollViewProps={{
+                    keyboardShouldPersistTaps: "handled"
+                }}
+                // onClosed={() => {
+                //     setIsOpen(false)
+                //     setLoadingForm(true)
+                // }}
+            >
+                <ScrollView>
+                    <Text style={{ fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>catégories</Text>
+                    <View style={styles.cate}>
+                        {categories.map((categorie, index) => {
+                            return (
+                                <View style={{ ...styles.categoryModel, margin: 15 }} >
+                                    <View style={styles.actionIcon}>
+                                        <ImageBackground source={{ uri: categorie.IMAGE }} borderRadius={15} style={styles.categoryImage} />
+                                    </View>
+                                    <Text style={[{ fontSize: 10, fontWeight: "bold" }, { color: "#797E9A" }]}>{categorie.NOM}</Text>
+                                </View>
+                            )
+                        })}
+                    </View>
+                </ScrollView>
+            </Modalize>
                 </>
         )
 }
@@ -495,6 +604,32 @@ const styles = StyleSheet.create({
                 borderRadius: 50,
 
         },
+        cate: {
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+            },
+            categoryModel: {
+                alignItems: 'center',
+                borderRadius: 10,
+                marginLeft: 20,
+                elevation: 10,
+                backgroundColor: 'white',
+                borderRadius: 10,
+            },
+            actionIcon: {
+                borderRadius: 15,
+                width: 80,
+                height: 80,
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignContent: 'center',
+                backgroundColor: '#fff',
+            },
+            categoryImage: {
+                width: '100%',
+                height: '100%',
+            },
+            
         cardBack: {
                 width: "100%",
                 position: 'absolute',
@@ -530,11 +665,7 @@ const styles = StyleSheet.create({
                 padding: 10,
                 paddingVertical: 15
         },
-        actionIcon: {
-                width: 30,
-                height: 30,
-                justifyContent: "center"
-        },
+        
         modalActionText: {
                 fontWeight: "bold"
         },
@@ -679,6 +810,39 @@ const styles = StyleSheet.create({
                 height: 50,
                 paddingHorizontal: 10
         },
+        categories: {
+                flexDirection: 'row',
+                alignItems: 'center',
+                paddingHorizontal: 10,
+                backgroundColor: '#fff',
+                paddingBottom: 5
+            },
+            categoryPhoto: {
+                width: 80,
+                height: 70,
+                borderRadius: 8,
+                backgroundColor: COLORS.skeleton
+            },
+            categoryChecked: {
+                width: 80,
+                height: 85,
+                borderRadius: 8,
+                marginTop: -80
+            },
+            category: {
+                alignItems: 'center',
+                borderRadius: 10,
+                marginLeft: 20,
+                elevation: 10,
+                marginRight: -12.6,
+                backgroundColor: 'white',
+                borderRadius: 10
+            },
+            DataImageCategorie: {
+                width: '100%',
+                height: '100%',
+                borderRadius: 10,
+            },
         input: {
                 flex: 1,
                 marginLeft: 10
@@ -694,11 +858,6 @@ const styles = StyleSheet.create({
                 alignItems: "center"
         },
 
-        DataImageCategorie: {
-                minWidth: 40,
-                minHeight: 40,
-                borderRadius: 10,
-        },
         cardPhoto1: {
                 marginTop: 10,
                 width: 50,
@@ -773,7 +932,7 @@ const styles = StyleSheet.create({
                 color: '#fff',
                 fontWeight: "bold",
                 textAlign: "center",
-                left:"300%"
+                left: "300%"
                 // position: "absolute",
                 // marginTop: 25,
                 // marginLeft:8,
