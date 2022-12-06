@@ -194,11 +194,11 @@ export default function RestaurantHomeScreen() {
 
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={plusCategories} style={styles.plus}>
+                <TouchableOpacity onPress={plusCategories} style={styles.plus1}>
                     <View>
                         <Text style={[styles.titlePrincipal, menus.length == 0 && { textAlign: "center" }]}>Mes categories</Text>
                     </View>
-                    <View style={{ marginLeft: "50%" }}>
+                    <View style={{ marginLeft: "45%" }}>
                         <View style={{ flexDirection: 'row' }}>
                             <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommercePrimaryColor} style={{ marginRight: -15 }} />
                             <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommercePrimaryColor} />
@@ -508,10 +508,10 @@ export default function RestaurantHomeScreen() {
                 scrollViewProps={{
                     keyboardShouldPersistTaps: "handled"
                 }}
-                onClosed={() => {
+            //     onClosed={() => {
 
-                    setLoadingForm(true)
-                }}
+            //         setLoadingForm(true)
+            //     }}
             >
                 <ScrollView>
                     <Text style={{ fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Nos catégories</Text>
@@ -735,6 +735,15 @@ const styles = StyleSheet.create({
 
     },
     plus: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+        marginBottom: "-6%",
+        marginTop: "-2%",
+    },
+    plus1: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
