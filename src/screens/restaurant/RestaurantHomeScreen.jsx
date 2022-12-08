@@ -247,6 +247,9 @@ export default function RestaurantHomeScreen() {
                         <Text style={{ color: '#777', paddingHorizontal: 50, textAlign: "center", marginTop: 10 }}>
                             Aucun menu trouvé. Cliquez sur le bouton en dessous pour ajouter un nouveau
                         </Text>
+                        <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                    <Text style={styles.addBtnText}>Nouveau menu</Text>
+                </TouchableOpacity>
                     </View> :
                         <View style={styles.products}>
                             {menus.map((menu, index) => {

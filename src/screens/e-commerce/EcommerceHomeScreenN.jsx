@@ -35,7 +35,6 @@ export default function EcommerceHomeScreen() {
         const [updateDescription, setUpdateDescription] = useState(false)
         const [updatData, setUpdatData] = useState(null)
 
-
         const [loadingSubCategories, setLoadingSubCategories] = useState(false)
         const [sousCategories, SetSousCategories] = useState([])
         const [selectedsousCategories, setSelectedsousCategories] = useState(null)
@@ -43,8 +42,6 @@ export default function EcommerceHomeScreen() {
         const navigation = useNavigation()
         const route = useRoute()
         const { partenaire } = route.params
-        const [partenaireUpdate, setPartenaireUpdate] = useState(partenaire)
-
         // console.log()
 
         const uploadModaliseRef = useRef()
@@ -130,12 +127,11 @@ export default function EcommerceHomeScreen() {
                         form.append("OUVERT", data.ouvert)
                         form.append("TELEPHONE", data.tele)
                         form.append("PRESENTATION", data.description)
-                        const updateProduct = await fetchApi(`/partenaire/Updateshop/${partenaire.produit.ID_PARTENAIRE_SERVICE}`, {
+                        const updateNewMenu = await fetchApi(`/partenaire/Updateshop/${partenaire.produit.ID_PARTENAIRE_SERVICE}`, {
                                 method: "PUT",
                                 body: form
                         })
-                        setPartenaireUpdate(updateProduct.result)
-                        // console.log(partenaireUpdate)
+                        setUpdatData(updateNewMenu.result)
                         ShopmodaliseRef.current.close()
                         AdressemodaliseRef.current.close()
                         OuvertmodaliseRef.current.close()
@@ -186,7 +182,7 @@ export default function EcommerceHomeScreen() {
                                 <View style={{ marginHorizontal: "2%", marginTop: "2%", flexDirection: "row", justifyContent: 'space-between' }}>
                                         <TouchableOpacity onPress={onPressShop}>
                                                 <View style={{ flexDirection: "row" }}>
-                                                        <Text style={{ fontWeight: "bold" ,color:COLORS.ecommerceOrange}}>{partenaire.produit.NOM_ORGANISATION}</Text>
+                                                        <Text style={{ opacity: 0.5, fontWeight: "bold" }}>{partenaire.produit.NOM_ORGANISATION}</Text>
                                                         <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
                                                 </View>
 
@@ -210,7 +206,7 @@ export default function EcommerceHomeScreen() {
                                         <TouchableOpacity onPress={onPressOuvert}>
                                                 <View style={{ flexDirection: "row", marginHorizontal: 30 }}>
                                                         <AntDesign name="clockcircleo" size={15} color="#797E9A" style={{ marginTop: 5 }} />
-                                                        <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{partenaireUpdate .produit.OUVERT}</Text>
+                                                        <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{partenaire.produit.OUVERT}</Text>
                                                         <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
 
                                                 </View>
@@ -220,15 +216,15 @@ export default function EcommerceHomeScreen() {
                                                 <TouchableOpacity onPress={onPressTele}>
                                                         <Text style={{ fontSize: 15, marginLeft: 20, color: "#797E9A", right: 15 }}>{partenaire.produit.TELEPHONE}</Text>
                                                 </TouchableOpacity>
-                                                {/* <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" /> */}
+                                                <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
 
                                         </TouchableOpacity>
                                 </View>
                                 <TouchableOpacity onPress={onPressDescription}>
-                                        <View style={{ marginHorizontal: 10 ,marginTop:"10%"}} >
-                                                <Text style={{color: "#797E9A" ,fontSize:11,}}>
+                                        <View style={{ marginHorizontal: 10 }} >
+                                                <Text style={{ color: "#797E9A" }}>
                                                         {partenaire.produit.PRESENTATION}
-                                                        {/* <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="#797E9As" /> */}
+                                                        <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="#797E9As" />
 
                                                 </Text>
                                         </View>
@@ -239,8 +235,8 @@ export default function EcommerceHomeScreen() {
                                         </View>
                                         <View style={{ marginLeft: 100 }}>
                                                 <View style={{ flexDirection: 'row' }}>
-                                                        <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} style={{ marginRight: -15 }} />
-                                                        <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} />
+                                                        <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommercePrimaryColor} style={{ marginRight: -15 }} />
+                                                        <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommercePrimaryColor} />
                                                 </View>
                                         </View>
                                 </TouchableOpacity>
@@ -272,8 +268,8 @@ export default function EcommerceHomeScreen() {
                                         </View>
                                         <View style={{ marginLeft: 100 }}>
                                                 <View style={{ flexDirection: 'row' }}>
-                                                        <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} style={{ marginRight: -15 }} />
-                                                        <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} />
+                                                        <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommercePrimaryColor} style={{ marginRight: -15 }} />
+                                                        <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommercePrimaryColor} />
                                                 </View>
                                         </View>
                                 </TouchableOpacity>
@@ -788,8 +784,8 @@ const styles = StyleSheet.create({
         cardOrginal: {
         },
         titlePrincipal: {
-                fontSize: 15,
-                // fontWeight: "bold",
+                fontSize: 18,
+                fontWeight: "bold",
                 marginTop: "1%",
                 marginBottom: "1%",
                 color: COLORS.ecommercePrimaryColor,
