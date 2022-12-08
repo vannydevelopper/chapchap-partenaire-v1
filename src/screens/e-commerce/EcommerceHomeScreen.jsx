@@ -163,6 +163,9 @@ export default function EcommerceHomeScreen() {
                         }
                 })()
         }, []))
+        function strUcFirst(a) {
+                return (a + '').charAt(0).toUpperCase() + a.substr(1);
+              }
         return (
                 <>
                         <ScrollView style={styles.container}>
@@ -186,7 +189,9 @@ export default function EcommerceHomeScreen() {
                                 <View style={{ marginHorizontal: "2%", marginTop: "2%", flexDirection: "row", justifyContent: 'space-between' }}>
                                         <TouchableOpacity onPress={onPressShop}>
                                                 <View style={{ flexDirection: "row" }}>
-                                                        <Text style={{ fontWeight: "bold" ,color:COLORS.ecommerceOrange}}>{partenaire.produit.NOM_ORGANISATION}</Text>
+                                                        <Text style={{ fontWeight: "bold" ,color:COLORS.ecommerceOrange}}>
+                                                        {strUcFirst(partenaire.produit.NOM_ORGANISATION.toLowerCase())}
+                                                        </Text>
                                                         <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
                                                 </View>
 
@@ -228,8 +233,6 @@ export default function EcommerceHomeScreen() {
                                         <View style={{ marginHorizontal: 10 ,marginTop:"10%"}} >
                                                 <Text style={{color: "#797E9A" ,fontSize:11,}}>
                                                         {partenaire.produit.PRESENTATION}
-                                                        {/* <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="#797E9As" /> */}
-
                                                 </Text>
                                         </View>
                                 </TouchableOpacity>
@@ -298,7 +301,7 @@ export default function EcommerceHomeScreen() {
                                                         )
                                                 })
                                                 }
-                                                <View style={[styles.serviceContainer, { width: SERVICE_WIDTH, height: 290 }]}>
+                                                <View style={[styles.serviceContainer, { width: SERVICE_WIDTH, height: 315 }]}>
                                                         <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} onPress={() => navigation.navigate("HomeAllServiceScreen")}>
                                                                 <View style={[styles.service]}>
                                                                         <ImageBackground source={require("../../../assets/images/nouveau.png")} style={[styles.serviceBackgound]} borderRadius={10} resizeMode='cover' imageStyle={{ opacity: 0.8 }}>
@@ -342,15 +345,15 @@ export default function EcommerceHomeScreen() {
                                 }}
                         >
                                 <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Mes produits</Text>
-                                <View style={styles.inputCard}>
-                                        <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
-                                        <OutlinedTextField
-                                                style={styles.input}
-                                                // value={data.menu}
-                                                // onChangeText={(newValue) => handleChange('menu', newValue)}
-                                                placeholder="Rechercher "
-                                        />
-                                </View>
+                                <View style={styles.searchSection1}>
+                    <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
+                    <TextInput
+                        style={styles.input}
+                        // value={data.menu}
+                        // onChangeText={(newValue) => handleChange('menu', newValue)}
+                        placeholder="Rechercher "
+                    />
+                </View>
                                 {/* {(firstLoadingMenus || loadingMenus) ?
                     <>
                         <HomeMenuSkeletons />
@@ -686,7 +689,7 @@ const styles = StyleSheet.create({
                 maxWidth: 300,
                 justifyContent: 'center',
                 alignItems: 'center',
-                marginTop: "-5%"
+                marginTop: "-6%"
         },
         service: {
                 borderRadius: 10,
@@ -764,6 +767,7 @@ const styles = StyleSheet.create({
                 flex: 1,
                 marginLeft: 10
         },
+        
         cardHeader: {
                 flexDirection: 'row',
                 justifyContent: 'space-between',

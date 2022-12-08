@@ -112,6 +112,9 @@ export default function RestaurantHomeScreen() {
     useFocusEffect(useCallback(() => {
         fecthCategories()
     }, []))
+    function strUcFirst(a) {
+        return (a + '').charAt(0).toUpperCase() + a.substr(1);
+    }
     return (
         <>
             <ScrollView style={styles.container}>
@@ -135,7 +138,9 @@ export default function RestaurantHomeScreen() {
                 <View style={{ marginHorizontal: "2%", marginTop: "2%", flexDirection: "row", justifyContent: 'space-between' }}>
                     <TouchableOpacity onPress={onPressResto}>
                         <View style={{ flexDirection: "row" }}>
-                            <Text style={{ fontWeight: "bold", opacity: 0.5 }}>{partenaire.partenaire.produit.NOM_ORGANISATION}</Text>
+                            <Text style={{ fontWeight: "bold", color: COLORS.ecommerceOrange }}>
+                                {strUcFirst(partenaire.partenaire.produit.NOM_ORGANISATION.toLowerCase())}
+                            </Text>
                             <EvilIcons style={{ marginLeft: "-5%", opacity: 0.5 }} name="pencil" size={22} color="black" />
                         </View>
                     </TouchableOpacity>
@@ -143,7 +148,7 @@ export default function RestaurantHomeScreen() {
                         <View style={{ marginLeft: "5%", flexDirection: "row" }}>
                             <View style={{ flexDirection: "row" }}>
                                 <SimpleLineIcons name="location-pin" size={15} color="black" />
-                                <Text style={{ fontSize: 12,opacity:0.5,fontWeight:"bold" }}> {partenaire.partenaire.produit.ADDRESSE} </Text>
+                                <Text style={{ fontSize: 12, opacity: 0.5, fontWeight: "bold" }}> {partenaire.partenaire.produit.ADDRESSE} </Text>
                                 <EvilIcons style={{ marginLeft: "-5%", opacity: 0.5 }} name="pencil" size={22} color="black" />
 
                             </View>
@@ -169,27 +174,24 @@ export default function RestaurantHomeScreen() {
                                 <AntDesign name="clockcircleo" size={15} color="#797E9A" style={{ marginTop: 5 }} />
                                 {/* <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{shop.OUVERT}</Text> */}
                                 <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{partenaire.partenaire.produit.OUVERT}</Text>
-                                <EvilIcons style={{  opacity: 0.5 }} name="pencil" size={22} color="black" />
+                                <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
                             </View>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => { Linking.openURL(`tel:${partenaire.partenaire.produit.TELEPHONE}`); }} style={{ flexDirection: "row" }}>
-                    <View style={{marginLeft:"5%", flexDirection: "row" }}>
+                        <View style={{ marginLeft: "5%", flexDirection: "row" }}>
 
-                        <SimpleLineIcons name="call-end" size={15} color="#797E9A" style={{ marginTop: 5 }} />
-                        <TouchableOpacity onPress={onPressTele}>
-                            <Text style={{ fontSize: 15, marginLeft: 20, color: "#797E9A", right: 15 }}>{partenaire.partenaire.produit.TELEPHONE}</Text>
-                        </TouchableOpacity>
-                        <EvilIcons style={{marginLeft:"-10%",  opacity: 0.5 }} name="pencil" size={22} color="black" />
-</View>
+                            <SimpleLineIcons name="call-end" size={15} color="#797E9A" style={{ marginTop: 5 }} />
+                            <TouchableOpacity onPress={onPressTele}>
+                                <Text style={{ fontSize: 15, marginLeft: 20, color: "#797E9A", right: 15 }}>{partenaire.partenaire.produit.TELEPHONE}</Text>
+                            </TouchableOpacity>
+                        </View>
                     </TouchableOpacity>
                 </View>
-                <View style={{ marginTop: 10, marginHorizontal: 10 }} >
+                <View style={{ marginTop: "10%", marginHorizontal: 10 }} >
                     <TouchableOpacity onPress={onPressDescription}>
-                        <Text style={{ color: "#797E9A" }}>
+                        <Text style={{ color: "#797E9A", fontSize: 11, }}>
                             {partenaire.partenaire.produit.PRESENTATION}
-                            <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="#797E9A" />
-
                         </Text>
 
                     </TouchableOpacity>
@@ -200,8 +202,8 @@ export default function RestaurantHomeScreen() {
                     </View>
                     <View style={{ marginLeft: "45%" }}>
                         <View style={{ flexDirection: 'row' }}>
-                            <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommercePrimaryColor} style={{ marginRight: -15 }} />
-                            <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommercePrimaryColor} />
+                            <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} style={{ marginRight: -15 }} />
+                            <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} />
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -235,8 +237,8 @@ export default function RestaurantHomeScreen() {
                     </View>
                     <View style={{ marginLeft: "50%" }}>
                         <View style={{ flexDirection: 'row' }}>
-                            <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommercePrimaryColor} style={{ marginRight: -15 }} />
-                            <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommercePrimaryColor} />
+                            <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} style={{ marginRight: -15 }} />
+                            <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} />
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -248,8 +250,8 @@ export default function RestaurantHomeScreen() {
                             Aucun menu trouvé. Cliquez sur le bouton en dessous pour ajouter un nouveau
                         </Text>
                         <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
-                    <Text style={styles.addBtnText}>Nouveau menu</Text>
-                </TouchableOpacity>
+                            <Text style={styles.addBtnText}>Nouveau menu</Text>
+                        </TouchableOpacity>
                     </View> :
                         <View style={styles.products}>
                             {menus.map((menu, index) => {
@@ -646,12 +648,12 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     titlePrincipal: {
-        fontSize: 20,
-        fontWeight: "bold",
-        marginBottom: 12,
-        opacity: 0.6,
+        fontSize: 15,
+        // fontWeight: "bold",
+        marginTop: "1%",
+        marginBottom: "1%",
         color: COLORS.ecommercePrimaryColor,
-        // marginHorizontal: 10
+        opacity: 0.7
     },
     searchSection: {
         flexDirection: "row",
@@ -752,8 +754,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 10,
         paddingHorizontal: 10,
-        marginBottom: "-6%",
-        marginTop: "-2%",
+        marginBottom: "-1%"
     },
     cartBtn: {
         marginTop: 10,
