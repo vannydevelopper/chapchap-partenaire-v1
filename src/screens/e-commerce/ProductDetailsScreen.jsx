@@ -8,7 +8,7 @@ import fetchApi from "../../helpers/fetchApi";
 import { useSelector } from "react-redux";
 import { userSelector } from "../../store/selectors/userSelector"
 import Product from "../../components/ecommerce/main/Product";
-import { Entypo } from '@expo/vector-icons';
+import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from "../../styles/COLORS";
 import { Portal } from "react-native-portalize";
 import { GestureHandlerRootView, TouchableWithoutFeedback } from "react-native-gesture-handler";
@@ -27,11 +27,14 @@ export default function ProductDetailsScreen() {
     const [descriptionUpdate, setDescriptionUpdate] = useState(null)
     const [approvisionnerUpdate, setApprovisionnerUpdate] = useState(null)
     const [prixUpdate, setPrixUpdate] = useState(null)
+    const [autreSize, setAutreSize] = useState(false)
+    const [autreColor, setAutreColor] = useState(false)
+
 
 
     //console.log(user.result.ID_USER)
     const { product } = route.params
-
+    console.log(product)
 
     const modalizeRef = useRef(null)
     const variantmodaliseRef = useRef()
@@ -44,11 +47,24 @@ export default function ProductDetailsScreen() {
     const [note, Setnote] = useState(null)
     const [commentaire, Setcommentaire] = useState(null)
     const [SIZES, setSIZES] = useState([])
-    // console.log(product)
+    const [SIZESUPDATE, setSIZESUPDATE] = useState([])
+
+    const [ALLSIZES, setALLSIZES] = useState([])
+    const [ALLCOLORS, setALLCOLORS] = useState([])
     const [colors, SetColors] = useState([])
+    const [colorsUpdate, SetColorsUpdate] = useState([])
+
     const [selectedSize, setSelectedSize] = useState(null)
     const [selectedColor, setSelectedColor] = useState(null)
-    // const productInCart = useSelector(ecommerceProductSelector(product.produit_partenaire.ID_PARTENAIRE_SERVICE))
+
+    const [quantite, setQuantite] = useState(null)
+    const [isFocused, setIsFocused] = useState(false)
+    const [ColorSelect, setColorSelect] = useState(false)
+    const [SizeSelect, setSizeSelect] = useState(false)
+
+   
+
+
     const onCartPress = () => {
         setIsOpen(true)
         modalizeRef.current?.open()
@@ -67,15 +83,20 @@ export default function ProductDetailsScreen() {
     const PricemodaliseRef = useRef()
     const ProductmodaliseRef = useRef()
     const DescriptionmodalizeRef = useRef()
-    const AllCategorieModalizeRef = useRef()
-
-
-
+    const allColorsModalizeRef = useRef()
+    const allSizesModalizeRef = useRef()
     const onPressAprovisionner = () => {
         approvisionneModaliseRef.current.open()
     }
-    const [quantite, setQuantite] = useState(null)
-    const [isFocused, setIsFocused] = useState(false)
+    const onColorSelect = (color) => {
+        setColorSelect(color)
+        setAutreSize(false)
+        allColorsModalizeRef.current.close()
+    }
+    const onSizeSelect = (size) => {
+        setSizeSelect(size)
+        allSizesModalizeRef.current.close()
+    }
     var IMAGES = [
         product.produit_partenaire.IMAGE_1 ? product.produit_partenaire.IMAGE_1 : undefined,
         product.produit_partenaire.IMAGE_2 ? product.produit_partenaire.IMAGE_2 : undefined,
@@ -122,8 +143,29 @@ export default function ProductDetailsScreen() {
         price: product.produit_partenaire.PRIX,
         product: product.produit.NOM,
         description: product.produit.DESCRIPTION,
+        newSize: "",
+        newColor: "",
 
     })
+    const onAutreSizeSelect = () => {
+        setAutreSize(true)
+        setSizeSelect(null)
+        setSelectedSize(null)
+        setQuantite(1)
+    }
+    const onAutreColorSelect = () => {
+        setAutreColor(true)
+        setColorSelect(null)
+        setSelectedColor(null)
+        setQuantite(1)
+
+    }
+    const TerminerSize = () => {
+        allSizesModalizeRef.current.close()
+    }
+    const TerminerColor = () => {
+        allColorsModalizeRef.current.close()
+    }
     const fecthProduits = async () => {
         try {
             const response = await fetchApi(`/products/products/${product.produit_partenaire.ID_PARTENAIRE_SERVICE}`, {
@@ -189,11 +231,6 @@ export default function ProductDetailsScreen() {
 
             })
 
-            // Setproduitnote(n => [res.result, ...n])
-            //navigation.navigate("produitDetailScreen")
-
-
-
         }
 
 
@@ -248,7 +285,6 @@ export default function ProductDetailsScreen() {
                     headers: { "Content-Type": "application/json" },
                 })
                 SetColors(color.result)
-
             }
         } catch (error) {
             console.log(error)
@@ -272,76 +308,130 @@ export default function ProductDetailsScreen() {
         fecthSizes()
     }, []))
 
+    const fecthAllSizes = async () => {
+        try {
+            const sizes = await fetchApi(`/products/tailles/`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+
+            })
+            setALLSIZES(sizes.result)
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
+    useFocusEffect(useCallback(() => {
+        fecthAllSizes()
+    }, []))
+
+    const fecthAllColors = async () => {
+        try {
+            const colors = await fetchApi(`/products/couleurs/`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+
+            })
+            setALLCOLORS(colors.result)
+
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
+    useFocusEffect(useCallback(() => {
+        fecthAllColors()
+    }, []))
     const UpdateNom = async () => {
         try {
-                // setLoading(true)
-                const form = new FormData()
-                form.append("NOM", data.product)
-                const updateProduct = await fetchApi(`/products/updateNom/${product.produit.ID_PRODUIT}`, {
-                        method: "PUT",
-                        body: form
-                })
-                setProductUpdate(updateProduct.result.NOM)
-                ProductmodaliseRef.current.close()
+            // setLoading(true)
+            const form = new FormData()
+            form.append("NOM", data.product)
+            const updateProduct = await fetchApi(`/products/updateNom/${product.produit.ID_PRODUIT}`, {
+                method: "PUT",
+                body: form
+            })
+            setProductUpdate(updateProduct.result.NOM)
+            ProductmodaliseRef.current.close()
         } catch (error) {
-                console.log(error)
+            console.log(error)
         } finally {
-                // setLoading(false)
+            // setLoading(false)
         }
-}
-const UpdateDescription = async () => {
+    }
+    const UpdateDescription = async () => {
 
-    try {
+        try {
             const form = new FormData()
             form.append("DESCRIPTION", data.description)
             const updateDescription = await fetchApi(`/products/updateDescription/${product.produit_partenaire.ID_PRODUIT_PARTENAIRE}`, {
-                    method: "PUT",
-                    body: form
+                method: "PUT",
+                body: form
             })
             setDescriptionUpdate(updateDescription.result.DESCRIPTION)
 
             DescriptionmodalizeRef.current.close()
-    } catch (error) {
+        } catch (error) {
             console.log(error)
-    } finally {
+        } finally {
             // setLoading(false)
+        }
     }
-}
-const aprovisionner= async () => {
-    try {
+    const aprovisionner = async () => {
+        try {
             const form = new FormData()
-            form.append("QUANTITE_RESTANTE",quantite)
-            form.append("ID_TAILLE",selectedSize.id)
-            form.append("ID_COULEUR",selectedColor.ID_COULEUR)
+            form.append("QUANTITE_RESTANTE", quantite)
+            form.append("ID_TAILLE", selectedSize?.id)
+            form.append("ID_COULEUR", selectedColor?.ID_COULEUR)
+            
+            if (autreSize) {
+                form.append("TAILLE", data.newSize)
+            }
+            else if(selectedSize.id!=SizeSelect.id)
+            {
+                form.append("ID_TAILLE_NEW", SizeSelect.id)
+            }
+        
+            if (autreColor) {
+                form.append("COULEUR", data.newColor)
+            }
+            else if(selectedColor.ID_COULEUR!=ColorSelect.ID_COULEUR)
+            {
+                form.append("ID_COULEUR_NEW", ColorSelect.ID_COULEUR)
+            }
             const updateDescription = await fetchApi(`/products/updateApprovisionner/${product.produit_partenaire.ID_PRODUIT_PARTENAIRE}`, {
-                    method: "PUT",
-                    body: form
+                method: "PUT",
+                body: form
             })
-            setApprovisionnerUpdate(updateDescription.result.QUANTITE_RESTANTE)
-            setSelectedColor(updateDescription.result)
+
+            setApprovisionnerUpdate(updateDescription.result.QUANTITE_RESTANTE?updateDescription.result.QUANTITE_RESTANTE:updateDescription.result.quantite)
+            // setSelectedSize(updateDescription.result)
+            // setSelectedColor(updateDescription.result)
+            setSIZESUPDATE(updateDescription.size_update)
+            SetColors(updateDescription.color_update)
             approvisionneModaliseRef.current.close()
-    } catch (error) {
+        } catch (error) {
             console.log(error)
-    } finally {
+        } finally {
             // setLoading(false)
+        }
     }
-}
-const UpdatePrice= async () => {
-    try {
+    const UpdatePrice = async () => {
+        try {
             const form = new FormData()
-            form.append("PRIX",data.price)
+            form.append("PRIX", data.price)
             const updateDescription = await fetchApi(`/products/updatePrice/${product.produit_partenaire.ID_PRODUIT_PARTENAIRE}`, {
-                    method: "PUT",
-                    body: form
+                method: "PUT",
+                body: form
             })
             setPrixUpdate(updateDescription.result.PRIX)
             PricemodaliseRef.current.close()
-    } catch (error) {
+        } catch (error) {
             console.log(error)
-    } finally {
+        } finally {
             // setLoading(false)
+        }
     }
-}
     return (
         <>
             {loading && <Loading />}
@@ -358,7 +448,7 @@ const UpdatePrice= async () => {
                         {/* <EcommerceBadge /> */}
                     </View>
                 </View>
-                <ProductImages images={IMAGES} product={product}  />
+                <ProductImages images={IMAGES} product={product} />
                 {/* <TouchableOpacity onPress={() => onSelectPhoto()} style={styles.uploadImages}>
                     <Feather name="image" size={24} color={COLORS.ecommercePrimaryColor} />
                 </TouchableOpacity> */}
@@ -369,13 +459,13 @@ const UpdatePrice= async () => {
                     <View style={styles.productNames}>
                         <TouchableOpacity onPress={onPressProduct}>
                             <Text style={styles.productName}>
-                                { productUpdate? productUpdate:  product.produit.NOM}</Text>
+                                {productUpdate ? productUpdate : product.produit.NOM}</Text>
                             <EvilIcons style={{ opacity: 0.5, marginLeft: "56%", marginTop: "-10%" }} name="pencil" size={22} color="black" />
                         </TouchableOpacity>
 
                         <View>
                             <TouchableOpacity onPress={onPressPrice}>
-                                <Text style={styles.productPrice}>BIF {prixUpdate?prixUpdate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "):product.produit_partenaire.PRIX.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                                <Text style={styles.productPrice}>BIF {prixUpdate ? prixUpdate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : product.produit_partenaire.PRIX.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
                                     <EvilIcons style={{ opacity: 0.5, marginLeft: "-20%", marginTop: "3%" }} name="pencil" size={22} color="black" />
                                 </Text>
                             </TouchableOpacity>
@@ -393,61 +483,95 @@ const UpdatePrice= async () => {
                             <>
                                 <View style={styles.moreDetails}>
                                     <Text style={styles.subTitle}>Taille</Text>
-                                    <View style={[styles.sizes]}>
-                                        {
-                                            SIZES?.map((size, index) =>
-                                                <TouchableOpacity style={[styles.size, index == 0 && { marginLeft: 0 }, size.id == selectedSize?.id && { backgroundColor: COLORS.ecommerceOrange }]} key={index} onPress={() => {
-                                                    setSelectedSize(size)
-                                                    setSelectedColor(null)
-                                                    // onChangeText(0)
-                                                    onSizePress(size)
-                                                }
-                                                }>
-                                                    <Text style={[styles.sizeText, size.id == selectedSize?.id && { color: '#FFF' }]}>{size.name}</Text>
-                                                </TouchableOpacity>)}
-                                    </View>
+                                    <ScrollView
+                                        horizontal
+                                        showsHorizontalScrollIndicator={false}
+                                    >
+                                        <View style={[styles.sizes]}>
+                                            {
+                                                SIZESUPDATE.length!=0?
+                                                SIZESUPDATE?.map((size, index) =>
+                                                    <TouchableOpacity style={[styles.size, index == 0 && { marginLeft: 0 }, size.id == selectedSize?.id && { backgroundColor: COLORS.ecommerceOrange }]} key={index} onPress={() => {
+                                                        setSelectedSize(size)
+                                                        // setSizeSelect(size)
+                                                        setSelectedColor(null)
+                                                        // onChangeText(0)
+                                                        onSizePress(size)
+                                                    }
+                                                    }>
+                                                        <Text style={[styles.sizeText, size.id == selectedSize?.id && { color: '#FFF' }]}>{size.name}</Text>
+                                                    </TouchableOpacity>)
+                                                    : SIZES?.map((size, index) =>
+                                                    <TouchableOpacity style={[styles.size, index == 0 && { marginLeft: 0 }, size.id == selectedSize?.id && { backgroundColor: COLORS.ecommerceOrange }]} key={index} onPress={() => {
+                                                        setSelectedSize(size)
+                                                        // setSizeSelect(size)
+                                                        setSelectedColor(null)
+                                                        // onChangeText(0)
+                                                        onSizePress(size)
+                                                    }
+                                                    }>
+                                                        <Text style={[styles.sizeText, size.id == selectedSize?.id && { color: '#FFF' }]}>{size.name}</Text>
+                                                    </TouchableOpacity>)
+                                                    }
+                                        </View>
+                                    </ScrollView>
                                 </View>
                                 {selectedSize && <View style={styles.moreDetails}>
                                     <Text style={styles.subTitle}>couleur</Text>
                                     <ScrollView
-                                        style={styles.shops}
                                         horizontal
                                         showsHorizontalScrollIndicator={false}
-                                >
-                                    <View style={[styles.sizes]}>
-                                        {colors.map((color, index) =>
-                                            <TouchableOpacity style={[styles.color, index == 0 && { marginLeft: 0 }, color.ID_COULEUR == selectedColor?.ID_COULEUR && { backgroundColor: COLORS.ecommerceOrange }]} key={index} onPress={() => {
-                                                setSelectedColor(color)
-                                                setQuantite(color.QUANTITE_RESTANTE)
-                                            }
-                                            }>
-                                                <Text style={[styles.colorText, color.ID_COULEUR == selectedColor?.ID_COULEUR && { color: '#FFF' }]}>{color.COULEUR}</Text>
-                                            </TouchableOpacity>)}
-                                    </View>
+                                    >
+                                        <View style={[styles.sizes]}>
+                                            {colorsUpdate.length!=0?
+                                            colorsUpdate.map((color, index) =>
+                                                <TouchableOpacity style={[styles.color, index == 0 && { marginLeft: 0 }, color.ID_COULEUR == selectedColor?.ID_COULEUR && { backgroundColor: COLORS.ecommerceOrange }]} key={index} onPress={() => {
+                                                    setSelectedColor(color)
+                                                    setQuantite(color.QUANTITE_RESTANTE)
+                                                }
+                                                }>
+                                                    <Text style={[styles.colorText, color.ID_COULEUR == selectedColor?.ID_COULEUR && { color: '#FFF' }]}>{color.COULEUR}</Text>
+                                                </TouchableOpacity>)
+                                                :
+                                                colors.map((color, index) =>
+                                                <TouchableOpacity style={[styles.color, index == 0 && { marginLeft: 0 }, color.ID_COULEUR == selectedColor?.ID_COULEUR && { backgroundColor: COLORS.ecommerceOrange }]} key={index} 
+                                                onLongPress={() => {
+                                                    console.log("onLongPress")
+                                                }
+                                                }
+                                                onPress={() => {
+                                                    setSelectedColor(color)
+                                                    setQuantite(color.QUANTITE_RESTANTE)
+                                                }
+                                                }>
+                                                    <Text style={[styles.colorText, color.ID_COULEUR == selectedColor?.ID_COULEUR && { color: '#FFF' }]}>{color.COULEUR}</Text>
+                                                </TouchableOpacity>)}
+                                        </View>
                                     </ScrollView>
                                 </View>}
                             </>
                         }
                         <View style={{ marginLeft: "70%" }}>
                             <Text style={[styles.subTitle,]}></Text>
-                            {selectedColor ? <Text style={{ fontSize: 12, color: '#777', marginBottom: 5 }}>
+                            {
+                            selectedColor ? <Text style={{ fontSize: 12, color: '#777', marginBottom: 5 }}>
                                 Quantité: {selectedColor.QUANTITE_RESTANTE}
                             </Text> : <Text style={{ fontSize: 12, color: '#777', marginBottom: 5 }}>
-                                Quantité: {selectedSize?selectedSize.quantite:0}
+                                Quantité: {selectedSize ? selectedSize.quantite : 0}
                             </Text>}
                         </View>
                         <View style={{ backgroundColor: "white" }}>
-                     <TouchableOpacity onPress={onPressDescription}>
-                        <Text style={{ marginHorizontal: "3%", marginBottom: "30%", marginTop: "-1%", color: "#797E9A" }}>
-                            {descriptionUpdate?descriptionUpdate:product.produit.DESCRIPTION}
-                            
-                            {product.produit.DESCRIPTION && <EvilIcons style={{ opacity: 0.5, marginLeft: "-10%", marginTop: "3%" }} name="pencil" size={22} color="#797E9A" />}
-                        </Text>
-                    </TouchableOpacity>
-                   
-                </View>
+                            <TouchableOpacity onPress={onPressDescription}>
+                                <Text style={{ marginHorizontal: "3%", marginBottom: "30%", marginTop: "-1%", color: "#797E9A" }}>
+                                    {descriptionUpdate ? descriptionUpdate : product.produit.DESCRIPTION}
+
+                                    {product.produit.DESCRIPTION && <EvilIcons style={{ opacity: 0.5, marginLeft: "-10%", marginTop: "3%" }} name="pencil" size={22} color="#797E9A" />}
+                                </Text>
+                            </TouchableOpacity>
+
+                        </View>
                     </ScrollView>
-                    <View style={{flexDirection:"row",marginTop:"-40%" ,marginLeft:"80%"}}>
+                    <View style={{ flexDirection: "row", marginTop: "-40%", marginLeft: "80%" }}>
                         <TouchableOpacity onPress={onPressAprovisionner} >
                             <View style={{ backgroundColor: COLORS.ecommerceOrange, borderRadius: 50, width: 50, height: 50, alignItems: "center", justifyContent: "center" }}>
                                 <Ionicons name="add" size={30} color="white" />
@@ -455,7 +579,7 @@ const UpdatePrice= async () => {
                         </TouchableOpacity>
                     </View>
                 </View>
-                
+
 
             </View>
             <Modalize ref={variantmodaliseRef} adjustToContentHeight
@@ -499,27 +623,44 @@ const UpdatePrice= async () => {
                 }}
             >
                 <Text style={{ marginBottom: "1%", marginBottom: "1%", fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Approvisionner</Text>
+
+                <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: "5%", marginBottom: "1%", marginTop: "1%" }}
+                    onPress={() => allSizesModalizeRef.current.open()}
+                // disabled={service.id_service == 2}
+                >
+                    <View >
+                        <Text style={[styles.inputText, { fontSize: 13 }]}>
+                            Tailles
+                        </Text>
+                        {SizeSelect ? <Text style={[styles.inputText, { color: '#000' }]}>
+                            {SizeSelect.name}
+                        </Text> :
+                            <Text style={[styles.inputText, { color: '#000' }]}>{selectedSize?.name}</Text>
+                        }
+
+                        {autreSize && <Text>{data.newSize}</Text>
+                        }
+                    </View>
+                    <AntDesign name="caretdown" size={20} color="#777" />
+                </TouchableOpacity>
+                <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: "5%", marginBottom: "1%", marginTop: "1%" }}
+                    onPress={() => allColorsModalizeRef.current.open()}
+                >
+                    <View >
+                        <Text style={[styles.inputText, { fontSize: 13 }]}>
+                            Couleurs
+                        </Text>
+                        {ColorSelect ? <Text style={[styles.inputText, { color: '#000' }]}>
+                            {ColorSelect.COULEUR}
+                        </Text> :
+                            <Text style={[styles.inputText, { color: '#000' }]}>{selectedColor?.COULEUR}</Text>
+                        }
+                        {autreColor && <Text>{data.newColor} </Text>
+                        }
+                    </View>
+                    <AntDesign name="caretdown" size={20} color="#777" />
+                </TouchableOpacity>
                 <View style={styles.inputCard}>
-                    <OutlinedTextField
-                        style={styles.input}
-                        label={"Taille"}
-                        value={selectedSize?.name}
-                        disabled={true}
-                        lineWidth={0.5}
-                        activeLineWidth={0.5}
-                        baseColor={COLORS.smallBrown}
-                        tintColor={COLORS.primary}
-                    />
-                    <OutlinedTextField
-                        style={styles.input}
-                        label={"Couleur"}
-                        value={selectedColor?.COULEUR}
-                        lineWidth={0.5}
-                        disabled={true}
-                        activeLineWidth={0.5}
-                        baseColor={COLORS.smallBrown}
-                        tintColor={COLORS.primary}
-                    />
                     <View style={styles.quantiteContainer}>
                         <TouchableOpacity style={[styles.quantiteChanger, (quantite <= 1 || !/^\d+$/.test(quantite)) && { opacity: 0.5 }]} onPress={onDecrement} disabled={quantite <= 1 || !/^\d+$/.test(quantite)}>
                             <Text style={styles.quantiteChangerText}>-</Text>
@@ -540,11 +681,11 @@ const UpdatePrice= async () => {
                         </TouchableOpacity>
                     </View>
                 </View>
-                <TouchableOpacity onPress={()=>aprovisionner()} style={styles.addBtn} >
+                <TouchableOpacity onPress={() => aprovisionner()} style={styles.addBtn} >
                     <Text style={styles.addBtnText}>Approvisionner</Text>
                 </TouchableOpacity>
             </Modalize>
-            
+
             <Modalize ref={PricemodaliseRef} adjustToContentHeight
                 handlePosition='inside'
                 modalStyle={{
@@ -566,7 +707,7 @@ const UpdatePrice= async () => {
                         onChangeText={(newValue) => handleChange('price', newValue)}
                     />
                 </View>
-                <TouchableOpacity onPress={()=>UpdatePrice()} style={styles.addBtn} >
+                <TouchableOpacity onPress={() => UpdatePrice()} style={styles.addBtn} >
                     <Text style={styles.addBtnText}>Modifier</Text>
                 </TouchableOpacity>
             </Modalize>
@@ -593,7 +734,7 @@ const UpdatePrice= async () => {
                 </View>
 
 
-                <TouchableOpacity onPress={()=>UpdateNom()} style={styles.addBtn} >
+                <TouchableOpacity onPress={() => UpdateNom()} style={styles.addBtn} >
                     <Text style={styles.addBtnText}>Modifier</Text>
                 </TouchableOpacity>
             </Modalize>
@@ -625,31 +766,112 @@ const UpdatePrice= async () => {
                         multiline={true}
                     />
                 </View>
-                <TouchableOpacity onPress={()=>UpdateDescription()} style={styles.addBtn} >
+                <TouchableOpacity onPress={() => UpdateDescription()} style={styles.addBtn} >
                     <Text style={styles.addBtnText}>Modifier</Text>
                 </TouchableOpacity>
             </Modalize>
-            <Modalize ref={AllCategorieModalizeRef} adjustToContentHeight handlePosition='inside'>
+            <Modalize ref={allSizesModalizeRef} adjustToContentHeight handlePosition='inside'>
                 <>
                     <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 15 }}>
-                        <Text style={{ fontSize: 17, fontWeight: "bold" }}>produits</Text>
+                        <Text style={{ fontSize: 17, fontWeight: "bold" }}>Tailles</Text>
                     </View>
                     <View>
-                        {/* {categories.map((categorie, index) => {
-                            return (
-                                <TouchableOpacity key={index} onPress={() => onCategorieSelect(categorie)}>
-                                    <View style={styles.modalItemModel2} >
-                                        {CategorieSelect?.ID_CATEGORIE_MENU == categorie.ID_CATEGORIE_MENU ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
-                                            <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
-                                        <Text>{categorie.NOM}</Text>
+                        <TouchableWithoutFeedback onPress={() => onAutreSizeSelect(true)}>
+
+                            <View style={styles.modalItemModel2} >
+                                {autreSize ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                    <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                <Text>Autre tailles</Text>
+                            </View>
+                        </TouchableWithoutFeedback>
+
+                        {autreSize ?
+                            <>
+                                <View style={styles.inputCard}>
+                                    <OutlinedTextField
+                                        label={"Nouvelle taille"}
+                                        fontSize={14}
+                                        value={data.newSize}
+                                        onChangeText={(newValue) => handleChange('newSize', newValue)}
+                                        lineWidth={0.5}
+                                        multiline={true}
+                                        activeLineWidth={0.5}
+                                        baseColor={COLORS.smallBrown}
+                                        tintColor={COLORS.primary}
+                                    />
+                                </View>
+                                <TouchableOpacity onPress={TerminerSize}>
+                                    <View style={styles.button}>
+                                        <Text style={styles.buttonText} >Ajouter</Text>
                                     </View>
                                 </TouchableOpacity>
-                            )
-                        })} */}
+                            </> :
+
+                            ALLSIZES.map((size, index) => {
+                                return (
+                                    <TouchableOpacity key={index} onPress={() => onSizeSelect(size)}>
+                                        <View style={styles.modalItemModel2} >
+                                            {SizeSelect?.id == size.id ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                            <Text>{size.name}</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                )
+                            })}
                     </View>
                 </>
             </Modalize>
-            
+            <Modalize ref={allColorsModalizeRef} adjustToContentHeight handlePosition='inside'>
+                <>
+                    <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 15 }}>
+                        <Text style={{ fontSize: 17, fontWeight: "bold" }}>Couleur</Text>
+                    </View>
+                    <View>
+                        <TouchableWithoutFeedback onPress={() => onAutreColorSelect(true)}>
+
+                            <View style={styles.modalItemModel2} >
+                                {autreColor ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                    <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                <Text>Autre couleur</Text>
+                            </View>
+                        </TouchableWithoutFeedback>
+
+                        {autreColor ?
+                            <>
+                                <View style={styles.inputCard}>
+                                    <OutlinedTextField
+                                        label={"Nouvelle couleur"}
+                                        fontSize={14}
+                                        value={data.newColor}
+                                        onChangeText={(newValue) => handleChange('newColor', newValue)}
+                                        lineWidth={0.5}
+                                        multiline={true}
+                                        activeLineWidth={0.5}
+                                        baseColor={COLORS.smallBrown}
+                                        tintColor={COLORS.primary}
+                                    />
+                                </View>
+                                <TouchableOpacity onPress={TerminerColor}>
+                                    <View style={styles.button}>
+                                        <Text style={styles.buttonText} >Ajouter</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            </> :
+                            ALLCOLORS.map((color, index) => {
+                                return (
+                                    <TouchableOpacity key={index} onPress={() => onColorSelect(color)}>
+                                        <View style={styles.modalItemModel2} >
+                                            {ColorSelect?.ID_COULEUR == color.ID_COULEUR ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                            <Text>{color.COULEUR}</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                )
+                            })}
+                    </View>
+                </>
+            </Modalize>
+
 
         </>
 
@@ -675,6 +897,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginTop: "2%",
         marginBottom: "2%"
+    },
+    modalItemModel2: {
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignContent: 'center'
     },
     inputApp: {
         borderRadius: 5,
@@ -780,11 +1009,11 @@ const styles = StyleSheet.create({
     productNames: {
         marginTop: "5%",
         flexDirection: "row",
-         marginHorizontal: "3%",
+        marginHorizontal: "3%",
         justifyContent: "space-between",
 
     },
-    
+
     modalContent: {
         marginTop: 20
     },
@@ -949,7 +1178,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         paddingVertical: 14,
         paddingHorizontal: 10,
-        backgroundColor: COLORS.primaryPicker,
+        backgroundColor: COLORS.ecommerceOrange,
         marginHorizontal: 20
     },
     addCartBtnTitle: {

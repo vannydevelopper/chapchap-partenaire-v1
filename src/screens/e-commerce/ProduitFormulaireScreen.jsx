@@ -22,7 +22,6 @@ export default function ProduitFormulaireScreen() {
         const navigation = useNavigation()
         const route = useRoute()
         const { product, partenaire } = route.params
-        // console.log(product)
 
         const couleurModalizeRef = useRef(null)
         const tailleModalizeRef = useRef(null)
@@ -46,6 +45,8 @@ export default function ProduitFormulaireScreen() {
         const [souscategories, setSouscategories] = useState([])
         const [couleurs, setCouleur] = useState([])
         const [tailles, setTaille] = useState([])
+        const [newProduct, setnewProduct] = useState([])
+
 
         const [detailData, setDetailData] = useState([])
         const [autreTailles, setAutreTailles] = useState("")
@@ -53,7 +54,6 @@ export default function ProduitFormulaireScreen() {
 
         const [loading, setLoading] = useState(false);
 
-        // console.log(detailData)
 
         const [data, handleChange, setValue] = useForm({
                 TailleSelect: null,
@@ -61,14 +61,12 @@ export default function ProduitFormulaireScreen() {
                 CategorieSelect: null,
                 selectedSousCategorie: null,
                 produit: "",
-                prix:"",
+                prix: "",
                 quantite: "",
                 logoImage: "",
                 autresTaille: "",
                 autresCouleur: ""
         })
-
-        // console.log(detailData)
 
         const { checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
                 quantite: {
@@ -247,74 +245,74 @@ export default function ProduitFormulaireScreen() {
                 setLoading(true)
                 try {
                         const form = new FormData()
-                        if (product) {
-                                form.append('PRODUIT', JSON.stringify(product))
-                                form.append('ID_PARTENAIRE_SERVICE', partenaire)
-                        } else {
-                                form.append('ID_CATEGORIE_PRODUIT', CategorieSelect.ID_CATEGORIE_PRODUIT)
-                                form.append('ID_PRODUIT_SOUS_CATEGORIE', selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE)
-                                form.append('NOM', data.produit)
-                                form.append('PRIX', data.prix)
-                                form.append('ID_PARTENAIRE_SERVICE', partenaire)
-                                if (logoImage) {
-                                        const manipResult = await manipulateAsync(
-                                                logoImage.uri,
-                                                [
-                                                        { resize: { width: 500 } }
-                                                ],
-                                                { compress: 0.8, format: SaveFormat.JPEG }
-                                        );
-                                        let localUri = manipResult.uri;
-                                        let filename = localUri.split('/').pop();
-                                        let match = /\.(\w+)$/.exec(filename);
-                                        let type = match ? `image/${match[1]}` : `image`;
-                                        form.append('IMAGE_1', {
-                                                uri: localUri, name: filename, type
-                                        })
+                        // if (product) {
+                        //         form.append('PRODUIT', JSON.stringify(product))
+                        //         form.append('ID_PARTENAIRE_SERVICE', partenaire.produit.ID_PARTENAIRE_SERVICE)
+                        // } else {
+                        form.append('ID_CATEGORIE_PRODUIT', CategorieSelect.ID_CATEGORIE_PRODUIT)
+                        form.append('ID_PRODUIT_SOUS_CATEGORIE', selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE)
+                        form.append('NOM', data.produit)
+                        form.append('PRIX', data.prix)
+                        form.append('ID_PARTENAIRE_SERVICE', partenaire.produit.ID_PARTENAIRE_SERVICE)
+                        if (logoImage) {
+                                const manipResult = await manipulateAsync(
+                                        logoImage.uri,
+                                        [
+                                                { resize: { width: 500 } }
+                                        ],
+                                        { compress: 0.8, format: SaveFormat.JPEG }
+                                );
+                                let localUri = manipResult.uri;
+                                let filename = localUri.split('/').pop();
+                                let match = /\.(\w+)$/.exec(filename);
+                                let type = match ? `image/${match[1]}` : `image`;
+                                form.append('IMAGE_1', {
+                                        uri: localUri, name: filename, type
+                                })
 
-                                }
-                                if (logoImage2) {
-                                        const manipResult = await manipulateAsync(
-                                                logoImage2.uri,
-                                                [
-                                                        { resize: { width: 500 } }
-                                                ],
-                                                { compress: 0.8, format: SaveFormat.JPEG }
-                                        );
-                                        let localUri = manipResult.uri;
-                                        let filename = localUri.split('/').pop();
-                                        let match = /\.(\w+)$/.exec(filename);
-                                        let type = match ? `image/${match[1]}` : `image`;
-                                        form.append('IMAGE_2', {
-                                                uri: localUri, name: filename, type
-                                        })
-                                }
-                                if (logoImage3) {
-                                        const manipResult = await manipulateAsync(
-                                                logoImage3.uri,
-                                                [
-                                                        { resize: { width: 500 } }
-                                                ],
-                                                { compress: 0.8, format: SaveFormat.JPEG }
-                                        );
-                                        let localUri = manipResult.uri;
-                                        let filename = localUri.split('/').pop();
-                                        let match = /\.(\w+)$/.exec(filename);
-                                        let type = match ? `image/${match[1]}` : `image`;
-                                        form.append('IMAGE_3', {
-                                                uri: localUri, name: filename, type
-                                        })
-                                }
+                        }
+                        if (logoImage2) {
+                                const manipResult = await manipulateAsync(
+                                        logoImage2.uri,
+                                        [
+                                                { resize: { width: 500 } }
+                                        ],
+                                        { compress: 0.8, format: SaveFormat.JPEG }
+                                );
+                                let localUri = manipResult.uri;
+                                let filename = localUri.split('/').pop();
+                                let match = /\.(\w+)$/.exec(filename);
+                                let type = match ? `image/${match[1]}` : `image`;
+                                form.append('IMAGE_2', {
+                                        uri: localUri, name: filename, type
+                                })
+                        }
+                        if (logoImage3) {
+                                const manipResult = await manipulateAsync(
+                                        logoImage3.uri,
+                                        [
+                                                { resize: { width: 500 } }
+                                        ],
+                                        { compress: 0.8, format: SaveFormat.JPEG }
+                                );
+                                let localUri = manipResult.uri;
+                                let filename = localUri.split('/').pop();
+                                let match = /\.(\w+)$/.exec(filename);
+                                let type = match ? `image/${match[1]}` : `image`;
+                                form.append('IMAGE_3', {
+                                        uri: localUri, name: filename, type
+                                })
+                                // }
                         }
                         form.append('DETAIL', JSON.stringify(detailData))
-
                         const res = await fetchApi("/produit/stock/create", {
                                 method: "POST",
                                 body: form
                         })
-                        navigation.navigate("EcommerceHomeScreen", { partenaire: false })
+                        setnewProduct(res.result)
+                        navigation.navigate("ProductDetailScreen", { product: newProduct })
+                        // navigation.navigate("EcommerceHomeScreen", { partenaire: false })
                 }
-
                 catch (error) {
                         console.log(error)
                 }
@@ -474,49 +472,49 @@ export default function ProduitFormulaireScreen() {
                                                         )
                                                 })}
 
-                                                {product == false ? 
-                                                <>
-                                                <View style={[styles.addImageContainer, { marginVertical: 10 }]}>
-                                                        <TouchableWithoutFeedback onPress={onImagesSelect}>
-                                                                <View style={styles.addImageItem}>
-                                                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                                                <Feather name="image" size={24} color="#777" />
-                                                                                <Text style={styles.addImageLabel}>
-                                                                                        Images
-                                                                                </Text>
-                                                                        </View>
-                                                                        {logoImage && <Image source={{ uri: logoImage.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
+                                                {product == false ?
+                                                        <>
+                                                                <View style={[styles.addImageContainer, { marginVertical: 10 }]}>
+                                                                        <TouchableWithoutFeedback onPress={onImagesSelect}>
+                                                                                <View style={styles.addImageItem}>
+                                                                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                                                                <Feather name="image" size={24} color="#777" />
+                                                                                                <Text style={styles.addImageLabel}>
+                                                                                                        Images
+                                                                                                </Text>
+                                                                                        </View>
+                                                                                        {logoImage && <Image source={{ uri: logoImage.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
+                                                                                </View>
+                                                                        </TouchableWithoutFeedback>
                                                                 </View>
-                                                        </TouchableWithoutFeedback>
-                                                </View> 
-                                                <View style={[styles.addImageContainer]}>
-                                                        <TouchableWithoutFeedback onPress={onImages2Select}>
-                                                                <View style={styles.addImageItem}>
-                                                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                                                <Feather name="image" size={24} color="#777" />
-                                                                                <Text style={styles.addImageLabel}>
-                                                                                        Images
-                                                                                </Text>
-                                                                        </View>
-                                                                        {logoImage2 && <Image source={{ uri: logoImage2.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
+                                                                <View style={[styles.addImageContainer]}>
+                                                                        <TouchableWithoutFeedback onPress={onImages2Select}>
+                                                                                <View style={styles.addImageItem}>
+                                                                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                                                                <Feather name="image" size={24} color="#777" />
+                                                                                                <Text style={styles.addImageLabel}>
+                                                                                                        Images
+                                                                                                </Text>
+                                                                                        </View>
+                                                                                        {logoImage2 && <Image source={{ uri: logoImage2.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
+                                                                                </View>
+                                                                        </TouchableWithoutFeedback>
                                                                 </View>
-                                                        </TouchableWithoutFeedback>
-                                                </View> 
-                                                <View style={[styles.addImageContainer,{ marginTop:10}]}>
-                                                        <TouchableWithoutFeedback onPress={onImages3Select}>
-                                                                <View style={styles.addImageItem}>
-                                                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                                                <Feather name="image" size={24} color="#777" />
-                                                                                <Text style={styles.addImageLabel}>
-                                                                                        Images
-                                                                                </Text>
-                                                                        </View>
-                                                                        {logoImage3 && <Image source={{ uri: logoImage3.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
+                                                                <View style={[styles.addImageContainer, { marginTop: 10 }]}>
+                                                                        <TouchableWithoutFeedback onPress={onImages3Select}>
+                                                                                <View style={styles.addImageItem}>
+                                                                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                                                                <Feather name="image" size={24} color="#777" />
+                                                                                                <Text style={styles.addImageLabel}>
+                                                                                                        Images
+                                                                                                </Text>
+                                                                                        </View>
+                                                                                        {logoImage3 && <Image source={{ uri: logoImage3.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
+                                                                                </View>
+                                                                        </TouchableWithoutFeedback>
                                                                 </View>
-                                                        </TouchableWithoutFeedback>
-                                                </View>
-                                                </>
-                                                :
+                                                        </>
+                                                        :
                                                         <View style={[styles.addImageContainer, { marginVertical: 30 }]}>
                                                                 <TouchableWithoutFeedback onPress={onImagesSelect}>
                                                                         <View style={styles.addImageItem}>

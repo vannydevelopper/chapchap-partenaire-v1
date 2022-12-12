@@ -283,7 +283,7 @@ export default function NewMenuScreen() {
                                         {RepasSelect && <Text style={[styles.inputText, { color: '#000' }]}>
                                             {RepasSelect.NOM}
                                         </Text>}
-                                        {autre && <Text>Autre repas</Text>
+                                        {autre && <Text>Autre tailles</Text>
                                         }
                                     </View>
                                     <AntDesign name="caretdown" size={20} color="#777" />

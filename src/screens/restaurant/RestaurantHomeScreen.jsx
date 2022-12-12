@@ -101,7 +101,6 @@ export default function RestaurantHomeScreen() {
                 headers: { "Content-Type": "application/json" },
             })
             setCategories(response.result)
-            // console.log(response)
         }
         catch (error) {
             console.log(error)

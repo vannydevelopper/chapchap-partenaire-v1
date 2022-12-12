@@ -16,7 +16,6 @@ import fetchApi from '../../../helpers/fetchApi'
 
 
 export default function ProductImages({ product,images }) {
-    console.log(images)
     const IMAGES = images.filter(img => img)
     const { width } = useWindowDimensions()
     const [activendex, setActiveIndex] = useState(0)
@@ -66,6 +65,7 @@ export default function ProductImages({ product,images }) {
                     method: "PUT",
                     body: form
                 })
+                console.log(imagepdate)
                 setImgeUpdate(imagepdate)
             }
            
