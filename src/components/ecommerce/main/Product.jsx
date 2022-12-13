@@ -196,7 +196,7 @@ export default function Product({ product, index, totalLength, fixMargins = fals
   const navigation = useNavigation()
   const { width } = useWindowDimensions()
   const PRODUCT_MARGIN = 10
-  const PRODUCT_WIDTH = (width / 2) - PRODUCT_MARGIN - 10
+  const PRODUCT_WIDTH = (width / 2) - 10
   const PRODUCT_HEIGHT = 270
   const additionStyles = {
     width: PRODUCT_WIDTH,
@@ -415,14 +415,21 @@ const detail = async (product) => {
 
 const styles = StyleSheet.create({
   product: {
-    maxWidth: 200,
-    maxHeight:270,
-    marginHorizontal: 10,
-    elevation:10,
-    backgroundColor:'white',
-    borderRadius:10,
-    padding:5,
-    marginBottom:'2%'
+    // maxWidth: 200,
+    // maxHeight:270,
+    // marginHorizontal: 10,
+    // elevation:10,
+    // backgroundColor:'white',
+    // borderRadius:10,
+    // padding:5,
+    // marginBottom:'2%'
+    maxWidth: 240,
+    marginHorizontal: 5,
+    backgroundColor: 'white',
+    elevation: 15,
+    borderRadius: 10,
+    padding: 5,
+    marginTop:"2%"
   },
   imageCard: {
     borderRadius: 8,

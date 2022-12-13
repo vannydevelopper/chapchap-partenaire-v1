@@ -165,7 +165,7 @@ export default function EcommerceHomeScreen() {
         }, []))
         function strUcFirst(a) {
                 return (a + '').charAt(0).toUpperCase() + a.substr(1);
-              }
+        }
         return (
                 <>
                         <ScrollView style={styles.container}>
@@ -189,8 +189,8 @@ export default function EcommerceHomeScreen() {
                                 <View style={{ marginHorizontal: "2%", marginTop: "2%", flexDirection: "row", justifyContent: 'space-between' }}>
                                         <TouchableOpacity onPress={onPressShop}>
                                                 <View style={{ flexDirection: "row" }}>
-                                                        <Text style={{ fontWeight: "bold" ,color:COLORS.ecommerceOrange}}>
-                                                        {strUcFirst(partenaire.produit.NOM_ORGANISATION.toLowerCase())}
+                                                        <Text style={{ fontWeight: "bold", color: COLORS.ecommerceOrange }}>
+                                                                {strUcFirst(partenaire.produit.NOM_ORGANISATION.toLowerCase())}
                                                         </Text>
                                                         <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
                                                 </View>
@@ -215,7 +215,7 @@ export default function EcommerceHomeScreen() {
                                         <TouchableOpacity onPress={onPressOuvert}>
                                                 <View style={{ flexDirection: "row", marginHorizontal: 30 }}>
                                                         <AntDesign name="clockcircleo" size={15} color="#797E9A" style={{ marginTop: 5 }} />
-                                                        <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{partenaireUpdate .produit.OUVERT}</Text>
+                                                        <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{partenaireUpdate.produit.OUVERT}</Text>
                                                         <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
 
                                                 </View>
@@ -230,8 +230,8 @@ export default function EcommerceHomeScreen() {
                                         </TouchableOpacity>
                                 </View>
                                 <TouchableOpacity onPress={onPressDescription}>
-                                        <View style={{ marginHorizontal: 10 ,marginTop:"10%"}} >
-                                                <Text style={{color: "#797E9A" ,fontSize:11,}}>
+                                        <View style={{ marginHorizontal: 10, marginTop: "10%" }} >
+                                                <Text style={{ color: "#797E9A", fontSize: 11, }}>
                                                         {partenaire.produit.PRESENTATION}
                                                 </Text>
                                         </View>
@@ -240,12 +240,12 @@ export default function EcommerceHomeScreen() {
                                         <View>
                                                 <Text style={[styles.titlePrincipal, products.length == 0 && { textAlign: "center" }]}>Mes categories</Text>
                                         </View>
-                                        <View style={{ marginLeft: 100 }}>
+                                       {categories.length>4 && <View style={{ marginLeft: 100 }}>
                                                 <View style={{ flexDirection: 'row' }}>
                                                         <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} style={{ marginRight: -15 }} />
                                                         <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} />
                                                 </View>
-                                        </View>
+                                        </View>}
                                 </TouchableOpacity>
                                 <ScrollView
                                         style={styles.shops}
@@ -271,14 +271,14 @@ export default function EcommerceHomeScreen() {
                                 </ScrollView>
                                 <TouchableOpacity onPress={productPress} style={styles.plus}>
                                         <View>
-                                                <Text style={[styles.titlePrincipal, products.length == 0 && { textAlign: "center" }]}>Mes produits</Text>
+                                                <Text style={[styles.titlePrincipal, products.length == 0 && { textAlign: "center" }]}>Mes articles</Text>
                                         </View>
-                                        <View style={{ marginLeft: 100 }}>
+                                        {products.length>4 &&<View style={{ marginLeft: 100 }}>
                                                 <View style={{ flexDirection: 'row' }}>
                                                         <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} style={{ marginRight: -15 }} />
                                                         <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} />
                                                 </View>
-                                        </View>
+                                        </View>}
                                 </TouchableOpacity>
 
                                 {firstLoadingProducts ? <HomeProductsSkeletons wrap /> :
@@ -301,19 +301,7 @@ export default function EcommerceHomeScreen() {
                                                         )
                                                 })
                                                 }
-                                                <View style={[styles.serviceContainer, { width: SERVICE_WIDTH, height: 315 }]}>
-                                                        <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} onPress={() => navigation.navigate("HomeAllServiceScreen")}>
-                                                                <View style={[styles.service]}>
-                                                                        <ImageBackground source={require("../../../assets/images/nouveau.png")} style={[styles.serviceBackgound]} borderRadius={10} resizeMode='cover' imageStyle={{ opacity: 0.8 }}>
-                                                                                <View style={{ position: 'absolute', width: "100%", height: "100%", backgroundColor: "rgba(0, 0, 0, 0.3)", borderRadius: 10 }} />
-                                                                                <View style={styles.serviceIcon}>
-                                                                                        <AntDesign name="plus" size={40} color="#F29558" />
-                                                                                </View>
-                                                                                <Text style={styles.serviceName}>Nouveau</Text>
-                                                                        </ImageBackground>
-                                                                </View>
-                                                        </TouchableNativeFeedback>
-                                                </View>
+
                                         </View>
                                 }
 
@@ -331,6 +319,9 @@ export default function EcommerceHomeScreen() {
                                 {/* </ScrollView> */}
 
                         </ScrollView>
+                        <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate("ProduitFormulaireScreen", { product: false, partenaire: partenaire })}>
+                                <Text style={styles.addBtnText}>Nouveau produit</Text>
+                        </TouchableOpacity>
                         <Modalize
                                 ref={productmodalizeRef}
                                 adjustToContentHeight
@@ -346,14 +337,14 @@ export default function EcommerceHomeScreen() {
                         >
                                 <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Mes produits</Text>
                                 <View style={styles.searchSection1}>
-                    <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
-                    <TextInput
-                        style={styles.input}
-                        // value={data.menu}
-                        // onChangeText={(newValue) => handleChange('menu', newValue)}
-                        placeholder="Rechercher "
-                    />
-                </View>
+                                        <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
+                                        <TextInput
+                                                style={styles.input}
+                                                // value={data.menu}
+                                                // onChangeText={(newValue) => handleChange('menu', newValue)}
+                                                placeholder="Rechercher "
+                                        />
+                                </View>
                                 {/* {(firstLoadingMenus || loadingMenus) ?
                     <>
                         <HomeMenuSkeletons />
@@ -362,6 +353,7 @@ export default function EcommerceHomeScreen() {
                         <HomeMenuSkeletons />
                     </> : */}
                                 <ScrollView
+
                                         horizontal
                                         showsHorizontalScrollIndicator={false}
                                 >
@@ -767,7 +759,7 @@ const styles = StyleSheet.create({
                 flex: 1,
                 marginLeft: 10
         },
-        
+
         cardHeader: {
                 flexDirection: 'row',
                 justifyContent: 'space-between',
@@ -844,9 +836,9 @@ const styles = StyleSheet.create({
         category: {
                 alignItems: 'center',
                 borderRadius: 10,
-                marginLeft: 20,
-                elevation: 10,
-                marginRight: -12.6,
+                marginLeft: 0,
+                elevation: 3,
+                marginRight: 5,
                 backgroundColor: 'white',
                 borderRadius: 10
         },
@@ -902,7 +894,8 @@ const styles = StyleSheet.create({
         },
         products: {
                 flexDirection: 'row',
-                flexWrap: 'wrap'
+                flexWrap: 'wrap',
+                marginBottom:"3%"
         },
         addBtn: {
                 // paddingVertical: 10,
