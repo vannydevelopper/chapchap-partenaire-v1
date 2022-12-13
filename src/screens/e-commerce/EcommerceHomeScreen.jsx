@@ -156,6 +156,7 @@ export default function EcommerceHomeScreen() {
                                 var url = `/partenaire/produit/${partenaire.produit.ID_PARTENAIRE_SERVICE}`
                                 const produits = await fetchApi(url)
                                 setProducts(produits.result)
+                                // console.log(produits.result)
                         } catch (error) {
                                 console.log(error)
                         } finally {

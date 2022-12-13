@@ -363,16 +363,16 @@ const detail = async (product) => {
         <TouchableOpacity>
           <View style={styles.cardLike}>
             <AntDesign name="like2" size={24} color="#F29558" />
-            <View style={styles.badge}>
-              <Text style={styles.badgeText} numberOfLines={1}>20</Text>
-            </View> 
+           { product.NbreCommande&&<View style={styles.badge}>
+              <Text style={styles.badgeText} numberOfLines={1}>{product.NbreCommande?.nbr}</Text>
+            </View> }
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.cartBtn} onPress={onCartPress}>
           <Fontisto name="shopping-basket" size={24} color="#F29558" />
-            <View style={styles.badge}>
-              <Text style={styles.badgeText} numberOfLines={1}>200</Text>
-            </View> 
+           { product.NbreLike&&<View style={styles.badge}>
+              <Text style={styles.badgeText} numberOfLines={1}>{product.NbreLike?.nbr} </Text>
+            </View> }
         </TouchableOpacity>
       </View>
       <View style={styles.productNames}>
