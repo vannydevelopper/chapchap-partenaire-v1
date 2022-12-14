@@ -321,9 +321,15 @@ export default function RestaurantHomeScreen() {
                         </View>}
 
             </ScrollView>
-            <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
-                <Text style={styles.addBtnText}>Nouveau menu</Text>
-            </TouchableOpacity>
+                
+            <View style={{ flexDirection: "row", marginTop: "-15%", marginLeft: "75%", marginBottom: "1%" }}>
+                                           <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+
+                                        <View style={{ backgroundColor: COLORS.ecommerceOrange, borderRadius: 50, width: 70, height: 70, alignItems: "center", justifyContent: "center" }}>
+                                                <Ionicons name="add" size={40} color="white" />
+                                        </View>
+                                </TouchableOpacity>
+                        </View>
             <Modalize
                 ref={menumodalizeRef}
                 adjustToContentHeight

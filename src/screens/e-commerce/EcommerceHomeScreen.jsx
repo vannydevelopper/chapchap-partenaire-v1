@@ -13,6 +13,7 @@ import ImageView from "react-native-image-viewing";
 import { Modalize } from "react-native-modalize";
 import { OutlinedTextField } from "rn-material-ui-textfield";
 import { useForm } from "../../hooks/useForm";
+import { useFormErrorsHandle } from "../../hooks/useFormErrorsHandle";
 
 export default function EcommerceHomeScreen() {
         const { width, height } = useWindowDimensions()
@@ -39,6 +40,19 @@ export default function EcommerceHomeScreen() {
         const [sousCategories, SetSousCategories] = useState([])
         const [selectedsousCategories, setSelectedsousCategories] = useState(null)
 
+        const [detailData, setDetailData] = useState([])
+        const [images, setImages] = useState([])
+
+
+        const [TailleSelect, setTailleSelect] = useState(null)
+        const [selectedCouleur, setselectedCouleur] = useState(null)
+        const [CategorieSelect, setCategorieSelect] = useState(null)
+        const [selectedSousCategorie, setselectedSousCategorie] = useState(null)
+
+        const [showAUtresTaille, setShowAUtresTaille] = useState(false)
+        const [showAUtresCouleur, setShowAUtresCouleur] = useState(false)
+
+
         const navigation = useNavigation()
         const route = useRoute()
         const { partenaire } = route.params
@@ -49,10 +63,16 @@ export default function EcommerceHomeScreen() {
         const TelemodaliseRef = useRef()
         const DescriptionmodalizeRef = useRef()
         const CategoriemodalizeRef = useRef()
+        const FormmodalizeRef = useRef()
+
 
         const plusCategories = () => {
                 // setIsOpen(true)
-                CategoriemodalizeRef.current?.open()
+                FormmodalizeRef.current?.open()
+        }
+        const addNew = () => {
+                // setIsOpen(true)
+                FormmodalizeRef.current?.open()
         }
         const onPressShop = () => {
                 ShopmodaliseRef.current.open()
@@ -84,6 +104,118 @@ export default function EcommerceHomeScreen() {
                 setSelectedCategorie(categorie)
                 setSelectedsousCategories(null)
         }
+
+        useEffect(() => {
+                (async () => {
+                        try {
+                                const catego = await fetchApi("/produit/categorie")
+                                setCategories(catego.result)
+                        } catch (error) {
+                                console.log(error)
+                        } finally {
+
+                        }
+                })()
+        }, [])
+
+        useEffect(() => {
+                (async () => {
+                        try {
+                                if (CategorieSelect != null) {
+                                        var sousCatego = await fetchApi(`/produit/sous_categorie/${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
+                                        setSouscategories(sousCatego.result)
+                                }
+                        }
+                        catch (error) {
+                                console.log(error)
+                        } finally {
+
+                        }
+                })()
+        }, [CategorieSelect])
+
+        useEffect(() => {
+                (async () => {
+                        try {
+                                var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
+                                if (selectedSousCategorie != null) {
+                                        var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE}`)
+                                        setTaille(taille.result)
+                                }
+                        }
+                        catch (error) {
+                                console.log(error)
+                        } finally {
+
+                        }
+                })()
+        }, [CategorieSelect, selectedSousCategorie])
+
+        useEffect(() => {
+                (async () => {
+                        try {
+                                var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
+                                if (selectedSousCategorie != null) {
+                                        var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE}`)
+                                        setCouleur(couleur.result)
+                                }
+                        }
+                        catch (error) {
+                                console.log(error)
+                        } finally {
+
+                        }
+
+                })()
+        }, [CategorieSelect, selectedSousCategorie])
+
+        const onCouleurSelect = (couleur) => {
+                setselectedCouleur(couleur)
+                setShowAUtresCouleur(false)
+                couleurModalizeRef.current.close()
+        }
+
+        const onTaillesSelect = (taille) => {
+                setTailleSelect(taille)
+                setShowAUtresTaille(false)
+                tailleModalizeRef.current.close()
+        }
+
+        const onCategorieSelect = (categorie) => {
+                setCategorieSelect(categorie)
+                categoriesModalizeRef.current.close()
+        }
+
+        const onSousCategorieSelect = (souscategorie) => {
+                setselectedSousCategorie(souscategorie)
+                SousCategoriesModalizeRef.current.close()
+        }
+
+        const AutresTypesTaille = () => {
+                setShowAUtresTaille(true)
+                setTailleSelect(null)
+        }
+
+        const AutresTypesCouleurs = () => {
+                setShowAUtresCouleur(true)
+                setselectedCouleur(false)
+
+        }
+
+        const onImageSelect = async () => {
+                const image = await ImagePicker.launchImageLibraryAsync({
+                        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                        quality: 0.6
+                });
+                if (!image.cancelled) {
+                        setImages(t => [...t, image])
+                }
+        }
+
+        const onRemoveImage = index => {
+                const newImages = images.filter((_, i) => i != index)
+                setImages(newImages)
+        }
         var IMAGES = [
                 partenaire.produit.LOGO ? partenaire.produit.LOGO : undefined,
                 partenaire.produit.BACKGROUND_IMAGE ? partenaire.produit.BACKGROUND_IMAGE : undefined,
@@ -94,6 +226,27 @@ export default function EcommerceHomeScreen() {
                 ouvert: partenaire.produit.OUVERT,
                 tele: partenaire.produit.TELEPHONE,
                 description: partenaire.produit.PRESENTATION,
+                TailleSelect: null,
+                selectedCouleur: null,
+                CategorieSelect: null,
+                selectedSousCategorie: null,
+                produit: "",
+                prix: "",
+                quantite: "",
+                logoImage: "",
+                autresTaille: "",
+                autresCouleur: ""
+        })
+
+        const { checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
+                quantite: {
+                        required: true,
+
+                },
+        }, {
+                quantite: {
+                        required: "Quantite est obligatoire"
+                },
         })
 
         const fecthProduits = async () => {
@@ -139,7 +292,7 @@ export default function EcommerceHomeScreen() {
                         OuvertmodaliseRef.current.close()
                         TelemodaliseRef.current.close()
                         DescriptionmodalizeRef.current.close()
-                        
+
                 } catch (error) {
                         console.log(error)
                 } finally {
@@ -162,12 +315,86 @@ export default function EcommerceHomeScreen() {
         function strUcFirst(a) {
                 return (a + '').charAt(0).toUpperCase() + a.substr(1);
         }
-        // const [updateShop, setUpdateShop] = useState(false)
-        // const [updateAdresse, setUpdateAdresse] = useState(false)
-        // const [updateOuvert, setUpdateOuvert] = useState(false)
-        // const [updateTele, setUpdateTele] = useState(false)
-        // const [updateDescription, setUpdateDescription] = useState(false)
-        // const [updatData, setUpdatData] = useState(null)
+        const SendData = async () => {
+                setLoading(true)
+                try {
+                        const form = new FormData()
+                        // if (product) {
+                        //         form.append('PRODUIT', JSON.stringify(product))
+                        //         form.append('ID_PARTENAIRE_SERVICE', partenaire.produit.ID_PARTENAIRE_SERVICE)
+                        // } else {
+                        form.append('ID_CATEGORIE_PRODUIT', CategorieSelect.ID_CATEGORIE_PRODUIT)
+                        form.append('ID_PRODUIT_SOUS_CATEGORIE', selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE)
+                        form.append('NOM', data.produit)
+                        form.append('PRIX', data.prix)
+                        form.append('ID_PARTENAIRE_SERVICE', partenaire.produit.ID_PARTENAIRE_SERVICE)
+                        if (logoImage) {
+                                const manipResult = await manipulateAsync(
+                                        logoImage.uri,
+                                        [
+                                                { resize: { width: 500 } }
+                                        ],
+                                        { compress: 0.8, format: SaveFormat.JPEG }
+                                );
+                                let localUri = manipResult.uri;
+                                let filename = localUri.split('/').pop();
+                                let match = /\.(\w+)$/.exec(filename);
+                                let type = match ? `image/${match[1]}` : `image`;
+                                form.append('IMAGE_1', {
+                                        uri: localUri, name: filename, type
+                                })
+
+                        }
+                        if (logoImage2) {
+                                const manipResult = await manipulateAsync(
+                                        logoImage2.uri,
+                                        [
+                                                { resize: { width: 500 } }
+                                        ],
+                                        { compress: 0.8, format: SaveFormat.JPEG }
+                                );
+                                let localUri = manipResult.uri;
+                                let filename = localUri.split('/').pop();
+                                let match = /\.(\w+)$/.exec(filename);
+                                let type = match ? `image/${match[1]}` : `image`;
+                                form.append('IMAGE_2', {
+                                        uri: localUri, name: filename, type
+                                })
+                        }
+                        if (logoImage3) {
+                                const manipResult = await manipulateAsync(
+                                        logoImage3.uri,
+                                        [
+                                                { resize: { width: 500 } }
+                                        ],
+                                        { compress: 0.8, format: SaveFormat.JPEG }
+                                );
+                                let localUri = manipResult.uri;
+                                let filename = localUri.split('/').pop();
+                                let match = /\.(\w+)$/.exec(filename);
+                                let type = match ? `image/${match[1]}` : `image`;
+                                form.append('IMAGE_3', {
+                                        uri: localUri, name: filename, type
+                                })
+                                // }
+                        }
+                        form.append('DETAIL', JSON.stringify(detailData))
+                        const res = await fetchApi("/produit/stock/create", {
+                                method: "POST",
+                                body: form
+                        })
+                        setnewProduct(res.result)
+                        navigation.navigate("ProductDetailScreen", { product: newProduct })
+                        // navigation.navigate("EcommerceHomeScreen", { partenaire: false })
+                }
+                catch (error) {
+                        console.log(error)
+                }
+                finally {
+                        setLoading(false);
+                }
+
+        }
         return (
                 <>
                         <StatusBar backgroundColor='#fff' barStyle='dark-content' />
@@ -194,7 +421,7 @@ export default function EcommerceHomeScreen() {
                                         <TouchableOpacity onPress={onPressShop}>
                                                 <View style={{ flexDirection: "row" }}>
                                                         <Text style={{ fontWeight: "bold", color: COLORS.ecommerceOrange }}>
-                                                                {updateShop?strUcFirst(updateShop.toLowerCase()):strUcFirst(partenaire.produit.NOM_ORGANISATION.toLowerCase())}
+                                                                {updateShop ? strUcFirst(updateShop.toLowerCase()) : strUcFirst(partenaire.produit.NOM_ORGANISATION.toLowerCase())}
                                                         </Text>
                                                         <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
                                                 </View>
@@ -203,7 +430,7 @@ export default function EcommerceHomeScreen() {
                                         <TouchableOpacity onPress={onPressAdresse}>
                                                 <View style={{ flexDirection: "row" }}>
                                                         <SimpleLineIcons name="location-pin" size={15} color="black" />
-                                                        <Text style={{ fontWeight: "bold", ontSize: 12, opacity: 0.5 }}> {updateAdresse?updateAdresse:partenaire.produit.ADDRESSE} </Text>
+                                                        <Text style={{ fontWeight: "bold", ontSize: 12, opacity: 0.5 }}> {updateAdresse ? updateAdresse : partenaire.produit.ADDRESSE} </Text>
                                                         <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
                                                 </View>
                                         </TouchableOpacity>
@@ -218,7 +445,7 @@ export default function EcommerceHomeScreen() {
                                         <TouchableOpacity onPress={onPressOuvert}>
                                                 <View style={{ flexDirection: "row", marginHorizontal: 30 }}>
                                                         <AntDesign name="clockcircleo" size={15} color="#797E9A" style={{ marginTop: 5 }} />
-                                                        <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{updateOuvert?updateOuvert:partenaire.produit.OUVERT}</Text>
+                                                        <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{updateOuvert ? updateOuvert : partenaire.produit.OUVERT}</Text>
                                                         <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
 
                                                 </View>
@@ -226,7 +453,7 @@ export default function EcommerceHomeScreen() {
                                         <TouchableOpacity onPress={() => { Linking.openURL(`tel:${partenaire.produit.TELEPHONE}`); }} style={{ flexDirection: "row" }}>
                                                 <SimpleLineIcons name="call-end" size={15} color="#797E9A" style={{ marginTop: 5 }} />
                                                 <TouchableOpacity onPress={onPressTele}>
-                                                        <Text style={{ fontSize: 15, marginLeft: 20, color: "#797E9A", right: 15 }}>{updateTele?updateTele:partenaire.produit.TELEPHONE}</Text>
+                                                        <Text style={{ fontSize: 15, marginLeft: 20, color: "#797E9A", right: 15 }}>{updateTele ? updateTele : partenaire.produit.TELEPHONE}</Text>
                                                 </TouchableOpacity>
                                                 {/* <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" /> */}
 
@@ -235,7 +462,7 @@ export default function EcommerceHomeScreen() {
                                 <TouchableOpacity onPress={onPressDescription}>
                                         <View style={{ marginHorizontal: 10, marginTop: "10%" }} >
                                                 <Text style={{ color: "#797E9A", fontSize: 11, }}>
-                                                        {updateDescription?updateDescription:partenaire.produit.PRESENTATION}
+                                                        {updateDescription ? updateDescription : partenaire.produit.PRESENTATION}
                                                 </Text>
                                         </View>
                                 </TouchableOpacity>
@@ -322,9 +549,16 @@ export default function EcommerceHomeScreen() {
                                 {/* </ScrollView> */}
 
                         </ScrollView>
-                        <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate("ProduitFormulaireScreen", { product: false, partenaire: partenaire })}>
+                        {/* <TouchableOpacity style={styles.addBtn} >
                                 <Text style={styles.addBtnText}>Nouveau produit</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
+                        <View style={{ flexDirection: "row", marginTop: "-15%", marginLeft: "75%", marginBottom: "1%" }}>
+                                <TouchableOpacity onPress={addNew} >
+                                        <View style={{ backgroundColor: COLORS.ecommerceOrange, borderRadius: 50, width: 70, height: 70, alignItems: "center", justifyContent: "center" }}>
+                                                <Ionicons name="add" size={40} color="white" />
+                                        </View>
+                                </TouchableOpacity>
+                        </View>
                         <Modalize
                                 ref={productmodalizeRef}
                                 adjustToContentHeight
@@ -376,7 +610,8 @@ export default function EcommerceHomeScreen() {
                                                 })}
                                         </View>
                                 </ScrollView>
-                                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate("ProduitFormulaireScreen", { product: false, partenaire: partenaire })}>
+                                <TouchableOpacity style={styles.addBtn} onPress={addNew}>
+                                        {/* <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate("ProduitFormulaireScreen", { product: false, partenaire: partenaire })}> */}
                                         <Text style={styles.addBtnText}>Nouveau produit</Text>
                                 </TouchableOpacity>
                                 {/* } */}
@@ -582,6 +817,140 @@ export default function EcommerceHomeScreen() {
                                         </View>
                                 </ScrollView>
                         </Modalize>
+                        <Modalize
+                                ref={FormmodalizeRef}
+                                adjustToContentHeight
+                                handlePosition='inside'
+                                modalStyle={{
+                                        borderTopRightRadius: 25,
+                                        borderTopLeftRadius: 25,
+                                        paddingVertical: 20
+                                }}
+                                handleStyle={{ marginTop: 10 }}
+                                scrollViewProps={{
+                                        keyboardShouldPersistTaps: "handled"
+                                }}
+                        >
+                                <Text style={styles.title}>Nouveau produit</Text>
+                                <ScrollView keyboardShouldPersistTaps="handled" style={{ marginBottom: 20 }}>
+                                        <View>
+
+                                                <View>
+                                                        <View style={styles.inputCard}>
+                                                                <OutlinedTextField
+                                                                        label={"Nom du produit"}
+                                                                        fontSize={14}
+                                                                        value={data.produit}
+                                                                        onChangeText={(newValue) => handleChange('produit', newValue)}
+                                                                        onBlur={() => checkFieldData('produit')}
+                                                                        error={hasError('produit') ? getError('produit') : ''}
+                                                                        lineWidth={0.5}
+                                                                        activeLineWidth={0.5}
+                                                                        baseColor={COLORS.smallBrown}
+                                                                        tintColor={COLORS.primary}
+                                                                />
+                                                        </View>
+                                                        <View>
+                                                                <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: 20 }}
+                                                                        onPress={() => categoriesModalizeRef.current.open()}
+                                                                // disabled={service.id_service == 2}
+                                                                >
+                                                                        <View >
+                                                                                <Text style={[styles.inputText, { fontSize: 13 }]}>
+                                                                                        Categorie
+                                                                                </Text>
+                                                                                {/* {CategorieSelect && <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                                {CategorieSelect.NOM}
+                                                                                        </Text>} */}
+                                                                        </View>
+                                                                        <AntDesign name="caretdown" size={20} color="#777" />
+                                                                </TouchableOpacity>
+                                                        </View>
+                                                        <View>
+                                                                <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: 20, marginTop: 10 }}
+                                                                        onPress={() => SousCategoriesModalizeRef.current.open()}
+                                                                // disabled={service.id_service == 2}
+                                                                >
+                                                                        <View >
+                                                                                <Text style={[styles.inputText, { fontSize: 13 }]}>
+                                                                                        Sous Categorie
+                                                                                </Text>
+                                                                                {/* {selectedSousCategorie && <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                                {selectedSousCategorie.NOM}
+                                                                                        </Text>} */}
+                                                                        </View>
+                                                                        <AntDesign name="caretdown" size={20} color="#777" />
+                                                                </TouchableOpacity>
+                                                        </View>
+                                                        <View style={styles.inputCard}>
+                                                                <OutlinedTextField
+                                                                        label={"Entrez votre prix"}
+                                                                        fontSize={14}
+                                                                        value={data.prix}
+                                                                        onChangeText={(newValue) => handleChange('prix', newValue)}
+                                                                        onBlur={() => checkFieldData('prix')}
+                                                                        error={hasError('prix') ? getError('prix') : ''}
+                                                                        lineWidth={0.5}
+                                                                        activeLineWidth={0.5}
+                                                                        baseColor={COLORS.smallBrown}
+                                                                        tintColor={COLORS.primary}
+                                                                />
+                                                        </View>
+                                                </View>
+                                                {/* <View style={{ flexDirection: "row", marginTop: "-1%",marginBottom:"-10%", marginLeft: "75%", marginBottom: "1%" }}>
+                                                        <TouchableOpacity onPress={addNew} >
+                                                                <View style={{flexDirection:"row", backgroundColor: COLORS.ecommerceOrange, borderRadius: 50, width: 60, height: 60, alignItems: "center", justifyContent: "center" }}>
+                                                                        <Ionicons name="add" size={20} color="white" />
+                                                                        <Text style={{color:"white",fontSize:10}}>Detail</Text>
+                                                                </View>
+                                                        </TouchableOpacity>
+                                                </View> */}
+                                                <TouchableOpacity
+                                                        onPress={() => ajoutDetailsModalizeRef.current.open()}
+                                                >
+                                                        <View style={styles.button1}>
+                                                                <Text style={styles.buttonText} >Ajout de details </Text>
+                                                        </View>
+                                                </TouchableOpacity>
+                                                {detailData.map((detail, index) => {
+                                                        return (
+                                                                <View key={index} style={{ marginHorizontal: 20, marginTop: 10, borderBottomWidth: 1, borderBottomColor: "#ddd" }}>
+                                                                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                                                                                <Text style={{ fontSize: 13, fontWeight: "bold" }}>Quantite {detail.quantite}</Text>
+                                                                                <Text style={{ fontSize: 13, fontWeight: "bold" }}>Taille {detail.TailleSelect.TAILLE}</Text>
+                                                                                <Text style={{ fontSize: 13, fontWeight: "bold" }}>Couleur {detail.selectedCouleur.COULEUR}</Text>
+                                                                        </View>
+                                                                </View>
+                                                        )
+                                                })}
+                                                <View style={styles.selectControl}>
+                                                        <Text style={styles.inputCard}>Images </Text>
+                                                        <View style={styles.images}>
+                                                                {images.map((image, index) => {
+                                                                        return (
+                                                                                <TouchableWithoutFeedback onPress={() => onRemoveImage(index)} key={index}>
+                                                                                        <Image style={[styles.addImager, index > 0 && { marginLeft: 10 }]} source={{ uri: image.uri }} />
+                                                                                </TouchableWithoutFeedback>
+                                                                        )
+                                                                })}
+                                                                {images.length < 3 ? <TouchableWithoutFeedback onPress={onImageSelect}>
+                                                                        <View style={[styles.addImager, images.length > 0 && { marginLeft: 10 }]}>
+                                                                                <Feather name="image" size={30} color="#777" />
+                                                                        </View>
+                                                                </TouchableWithoutFeedback> : null}
+                                                        </View>
+                                                </View>
+
+
+
+                                                <TouchableOpacity onPress={SendData}>
+                                                        <View style={styles.button}>
+                                                                <Text style={styles.buttonText} > Enregistrer</Text>
+                                                        </View>
+                                                </TouchableOpacity>
+                                        </View>
+                                </ScrollView>
+                        </Modalize>
                 </>
         )
 }
@@ -621,6 +990,26 @@ const styles = StyleSheet.create({
                 elevation: 10,
                 backgroundColor: 'white',
                 borderRadius: 10,
+        },
+        selectControl: {
+                paddingHorizontal: 20,
+                marginTop: 10
+        },
+        selectLabel: {
+                fontWeight: "bold",
+                marginLeft: 5
+        },
+        images: {
+                flexDirection: "row"
+        },
+        addImager: {
+                width: 100,
+                height: 100,
+                backgroundColor: '#F1F1F1',
+                borderRadius: 8,
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: 5
         },
         actionIcon: {
                 borderRadius: 15,
@@ -895,7 +1284,8 @@ const styles = StyleSheet.create({
                 paddingHorizontal: 10
         },
         title: {
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                textAlign: "center"
         },
         products: {
                 flexDirection: 'row',
@@ -938,5 +1328,129 @@ const styles = StyleSheet.create({
                 color: '#FFF',
                 fontWeight: "bold",
                 textAlign: "center",
+        },
+
+
+
+        // container: {
+        //         flex: 1,
+        // },
+        cardHeader: {
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                paddingHorizontal: 20,
+                height: 88
+        },
+        menuOpener: {
+                marginTop: 25
+        },
+        menuOpenerLine: {
+                height: 3,
+                width: 30,
+                backgroundColor: COLORS.primary,
+                marginTop: 5
+        },
+        logo: {
+                resizeMode: 'center',
+                height: "50%",
+                width: "50%",
+                marginTop: 25
+        },
+        imageContainer: {
+                height: "100%",
+                width: 100,
+                justifyContent: 'center',
+                alignItems: 'center'
+        },
+        title: {
+                fontWeight: 'bold',
+                fontSize: 25,
+                fontWeight: "bold",
+                marginBottom: 12,
+                color: COLORS.ecommercePrimaryColor,
+                margin: 20
+        },
+        modalCard: {
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                // marginHorizontal: 20,
+                backgroundColor: "#fff",
+                padding: 13,
+                borderRadius: 5,
+                borderWidth: 0.5,
+                borderColor: "#ddd"
+        },
+        inputText: {
+                color: '#777'
+        },
+        inputCard: {
+                marginHorizontal: 20,
+                marginTop: 10,
+
+        },
+        button: {
+                marginTop: 10,
+                borderRadius: 8,
+                paddingVertical: 14,
+                paddingHorizontal: 10,
+                backgroundColor: COLORS.primaryPicker,
+                marginHorizontal: 20
+        },
+        button1: {
+                marginTop: 10,
+                borderRadius: 8,
+                paddingVertical: 14,
+                paddingHorizontal: 10,
+                backgroundColor: COLORS.ecommerceOrange,
+                marginHorizontal: 20
+        },
+        buttonText: {
+                color: "#fff",
+                fontWeight: "bold",
+                // textTransform:"uppercase",
+                fontSize: 16,
+                textAlign: "center"
+        },
+        buttonModal: {
+                marginTop: 10,
+                borderRadius: 8,
+                paddingVertical: 14,
+                paddingHorizontal: 10,
+                backgroundColor: COLORS.primaryPicker,
+                marginBottom: 10
+        },
+        addImageContainer: {
+                paddingHorizontal: 20
+        },
+        addImageItem: {
+                borderWidth: 0.5,
+                borderColor: COLORS.smallBrown,
+                borderRadius: 5,
+                paddingHorizontal: 10,
+                paddingVertical: 15
+        },
+        modalItemModel2: {
+                paddingVertical: 15,
+                paddingHorizontal: 20,
+                flexDirection: 'row',
+                alignItems: 'center',
+                alignContent: 'center'
+        },
+        modalAutres: {
+                paddingHorizontal: 20,
+                flexDirection: 'row',
+                alignItems: 'center',
+                alignContent: 'center',
+        },
+        buttonModalSecond: {
+                marginTop: 10,
+                borderRadius: 8,
+                paddingVertical: 14,
+                paddingHorizontal: 10,
+                backgroundColor: COLORS.primaryPicker,
+                marginBottom: 10,
+                marginHorizontal: 20
         },
 })
