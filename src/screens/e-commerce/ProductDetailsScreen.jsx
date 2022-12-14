@@ -29,13 +29,7 @@ export default function ProductDetailsScreen() {
     const [prixUpdate, setPrixUpdate] = useState(null)
     const [autreSize, setAutreSize] = useState(false)
     const [autreColor, setAutreColor] = useState(false)
-
-
-
-    //console.log(user.result.ID_USER)
     const { product } = route.params
-    console.log(product)
-
     const modalizeRef = useRef(null)
     const variantmodaliseRef = useRef()
     const onPressVariante = () => {
@@ -102,12 +96,8 @@ export default function ProductDetailsScreen() {
         product.produit_partenaire.IMAGE_2 ? product.produit_partenaire.IMAGE_2 : undefined,
         product.produit_partenaire.IMAGE_3 ? product.produit_partenaire.IMAGE_3 : undefined,
     ]
-
     const onetoilePress = (note) => {
-
         Setnote(note)
-
-
     }
     const onDecrement = () => {
         if (parseInt(quantite) == 1) {
@@ -118,9 +108,7 @@ export default function ProductDetailsScreen() {
         }
         setQuantite(l => parseInt(l) - 1)
     }
-
     const onIncrement = () => {
-
         setQuantite(l => parseInt(l) + 1)
     }
 
@@ -192,8 +180,7 @@ export default function ProductDetailsScreen() {
             try {
                 var url = `/products?category=${product.categorie.ID_CATEGORIE_PRODUIT}`
                 const produits = await fetchApi(url)
-                // setSimilarProducts(produits.result)
-                //console.log(product)
+                
             } catch (error) {
                 console.log(error)
             } finally {
@@ -251,8 +238,7 @@ export default function ProductDetailsScreen() {
             try {
                 var url = `/products/note/liste/${product.produit.ID_PRODUIT_PARTENAIRE}`
                 const produitsNotes = await fetchApi(url)
-                // Setproduitnote(produitsNotes.result)
-                //console.log(produitsNotes)
+               
             } catch (error) {
                 console.log(error)
             }
@@ -267,8 +253,7 @@ export default function ProductDetailsScreen() {
             try {
                 var url = `/products/note/${product.produit.ID_PRODUIT_PARTENAIRE}`
                 const userNotes = await fetchApi(url)
-                // SetuserNote(userNotes.result)
-                //console.log(userNote)
+                
             } catch (error) {
                 console.log(error)
             }
@@ -310,7 +295,7 @@ export default function ProductDetailsScreen() {
 
     const fecthAllSizes = async () => {
         try {
-            const sizes = await fetchApi(`/products/tailles/`, {
+            const sizes = await fetchApi(`/products/tailles/${product.categorie.ID_CATEGORIE_PRODUIT}`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },
 
@@ -561,13 +546,19 @@ export default function ProductDetailsScreen() {
                             </Text>}
                         </View>
                         <View style={{ backgroundColor: "white" }}>
-                            <TouchableOpacity onPress={onPressDescription}>
+                            {descriptionUpdate || product.produit.DESCRIPTION?<TouchableOpacity onPress={onPressDescription}>
                                 <Text style={{ marginHorizontal: "3%", marginBottom: "30%", marginTop: "-1%", color: "#797E9A" }}>
                                     {descriptionUpdate ? descriptionUpdate : product.produit.DESCRIPTION}
 
                                     {product.produit.DESCRIPTION && <EvilIcons style={{ opacity: 0.5, marginLeft: "-10%", marginTop: "3%" }} name="pencil" size={22} color="#797E9A" />}
                                 </Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity>:
+                            <View style={{marginTop:"15%"}}>
+                                <TouchableOpacity onPress={onPressDescription}>
+                                 <Text style={{marginHorizontal: "3%", marginBottom: "30%", marginTop: "-1%", color: "#797E9A"}}><Ionicons name="add-sharp" size={20} color="#797E9A" />Clique pour ajouter une description</Text>
+                                 </TouchableOpacity>
+                            </View>
+                            }
 
                         </View>
                     </ScrollView>

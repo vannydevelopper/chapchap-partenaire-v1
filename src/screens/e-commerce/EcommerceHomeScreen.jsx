@@ -35,7 +35,6 @@ export default function EcommerceHomeScreen() {
         const [updateDescription, setUpdateDescription] = useState(false)
         const [updatData, setUpdatData] = useState(null)
 
-
         const [loadingSubCategories, setLoadingSubCategories] = useState(false)
         const [sousCategories, SetSousCategories] = useState([])
         const [selectedsousCategories, setSelectedsousCategories] = useState(null)
@@ -43,10 +42,6 @@ export default function EcommerceHomeScreen() {
         const navigation = useNavigation()
         const route = useRoute()
         const { partenaire } = route.params
-        const [partenaireUpdate, setPartenaireUpdate] = useState(partenaire)
-
-        // console.log()
-
         const uploadModaliseRef = useRef()
         const ShopmodaliseRef = useRef()
         const AdressemodaliseRef = useRef()
@@ -108,7 +103,6 @@ export default function EcommerceHomeScreen() {
                                 headers: { "Content-Type": "application/json" },
                         })
                         setCategories(response.result)
-                        console.log(categories)
 
                 }
                 catch (error) {
@@ -134,18 +128,20 @@ export default function EcommerceHomeScreen() {
                                 method: "PUT",
                                 body: form
                         })
-                        setPartenaireUpdate(updateProduct.result)
-                        // console.log(partenaireUpdate)
+
+                        setUpdateShop(updateProduct.result.NOM_ORGANISATION)
+                        setUpdateAdresse(updateProduct.result.ADRESSE_COMPLETE)
+                        setUpdateOuvert(updateProduct.result.OUVERT)
+                        setUpdateTele(updateProduct.result.TELEPHONE)
+                        setUpdateDescription(updateProduct.result.PRESENTATION)
                         ShopmodaliseRef.current.close()
                         AdressemodaliseRef.current.close()
                         OuvertmodaliseRef.current.close()
                         TelemodaliseRef.current.close()
                         DescriptionmodalizeRef.current.close()
-                        // navigation.navigate("EcommerceHomeScreen", { partenaire: partenaire })
-
-                        // navigation.navigate("EcommerceHomeScreen",{partenaire:partenaire})
+                        
                 } catch (error) {
-                        console.lsog(error)
+                        console.log(error)
                 } finally {
                         // setLoading(false)
                 }
@@ -156,7 +152,6 @@ export default function EcommerceHomeScreen() {
                                 var url = `/partenaire/produit/${partenaire.produit.ID_PARTENAIRE_SERVICE}`
                                 const produits = await fetchApi(url)
                                 setProducts(produits.result)
-                                // console.log(produits.result)
                         } catch (error) {
                                 console.log(error)
                         } finally {
@@ -167,8 +162,20 @@ export default function EcommerceHomeScreen() {
         function strUcFirst(a) {
                 return (a + '').charAt(0).toUpperCase() + a.substr(1);
         }
+        // const [updateShop, setUpdateShop] = useState(false)
+        // const [updateAdresse, setUpdateAdresse] = useState(false)
+        // const [updateOuvert, setUpdateOuvert] = useState(false)
+        // const [updateTele, setUpdateTele] = useState(false)
+        // const [updateDescription, setUpdateDescription] = useState(false)
+        // const [updatData, setUpdatData] = useState(null)
         return (
                 <>
+                        <StatusBar backgroundColor='#fff' barStyle='dark-content' />
+                        <View style={styles.cardBack}>
+                                <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()} >
+                                        <Ionicons name="ios-arrow-back-outline" size={30} color={COLORS.ecommercePrimaryColor} />
+                                </TouchableOpacity>
+                        </View>
                         <ScrollView style={styles.container}>
                                 <TouchableWithoutFeedback key={1} onPress={() => {
                                         setImageIndex(1)
@@ -178,11 +185,7 @@ export default function EcommerceHomeScreen() {
                                                 <  Image source={{ uri: partenaire.produit.LOGO }} style={{ ...styles.imagePrincipal }} />
                                         </View>
                                 </TouchableWithoutFeedback>
-                                <View style={styles.cardBack}>
-                                        <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()} >
-                                                <Ionicons name="ios-arrow-back-outline" size={30} color={COLORS.ecommercePrimaryColor} />
-                                        </TouchableOpacity>
-                                </View>
+
                                 <TouchableOpacity onPress={() => onSelectPhoto()} style={styles.uploadImages}>
                                         <Feather name="image" size={24} color={COLORS.ecommercePrimaryColor} />
                                 </TouchableOpacity>
@@ -191,7 +194,7 @@ export default function EcommerceHomeScreen() {
                                         <TouchableOpacity onPress={onPressShop}>
                                                 <View style={{ flexDirection: "row" }}>
                                                         <Text style={{ fontWeight: "bold", color: COLORS.ecommerceOrange }}>
-                                                                {strUcFirst(partenaire.produit.NOM_ORGANISATION.toLowerCase())}
+                                                                {updateShop?strUcFirst(updateShop.toLowerCase()):strUcFirst(partenaire.produit.NOM_ORGANISATION.toLowerCase())}
                                                         </Text>
                                                         <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
                                                 </View>
@@ -200,12 +203,11 @@ export default function EcommerceHomeScreen() {
                                         <TouchableOpacity onPress={onPressAdresse}>
                                                 <View style={{ flexDirection: "row" }}>
                                                         <SimpleLineIcons name="location-pin" size={15} color="black" />
-                                                        <Text style={{ fontWeight: "bold", ontSize: 12, opacity: 0.5 }}> {partenaire.produit.ADDRESSE} </Text>
+                                                        <Text style={{ fontWeight: "bold", ontSize: 12, opacity: 0.5 }}> {updateAdresse?updateAdresse:partenaire.produit.ADDRESSE} </Text>
                                                         <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
                                                 </View>
                                         </TouchableOpacity>
                                 </View>
-
                                 <View style={{ flexDirection: "row", marginHorizontal: 10, marginTop: 10, justifyContent: "space-between" }}>
                                         <View style={{ flexDirection: "row" }}>
 
@@ -216,7 +218,7 @@ export default function EcommerceHomeScreen() {
                                         <TouchableOpacity onPress={onPressOuvert}>
                                                 <View style={{ flexDirection: "row", marginHorizontal: 30 }}>
                                                         <AntDesign name="clockcircleo" size={15} color="#797E9A" style={{ marginTop: 5 }} />
-                                                        <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{partenaireUpdate.produit.OUVERT}</Text>
+                                                        <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{updateOuvert?updateOuvert:partenaire.produit.OUVERT}</Text>
                                                         <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
 
                                                 </View>
@@ -224,7 +226,7 @@ export default function EcommerceHomeScreen() {
                                         <TouchableOpacity onPress={() => { Linking.openURL(`tel:${partenaire.produit.TELEPHONE}`); }} style={{ flexDirection: "row" }}>
                                                 <SimpleLineIcons name="call-end" size={15} color="#797E9A" style={{ marginTop: 5 }} />
                                                 <TouchableOpacity onPress={onPressTele}>
-                                                        <Text style={{ fontSize: 15, marginLeft: 20, color: "#797E9A", right: 15 }}>{partenaire.produit.TELEPHONE}</Text>
+                                                        <Text style={{ fontSize: 15, marginLeft: 20, color: "#797E9A", right: 15 }}>{updateTele?updateTele:partenaire.produit.TELEPHONE}</Text>
                                                 </TouchableOpacity>
                                                 {/* <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" /> */}
 
@@ -233,7 +235,7 @@ export default function EcommerceHomeScreen() {
                                 <TouchableOpacity onPress={onPressDescription}>
                                         <View style={{ marginHorizontal: 10, marginTop: "10%" }} >
                                                 <Text style={{ color: "#797E9A", fontSize: 11, }}>
-                                                        {partenaire.produit.PRESENTATION}
+                                                        {updateDescription?updateDescription:partenaire.produit.PRESENTATION}
                                                 </Text>
                                         </View>
                                 </TouchableOpacity>
@@ -241,7 +243,7 @@ export default function EcommerceHomeScreen() {
                                         <View>
                                                 <Text style={[styles.titlePrincipal, products.length == 0 && { textAlign: "center" }]}>Mes categories</Text>
                                         </View>
-                                       {categories.length>4 && <View style={{ marginLeft: 100 }}>
+                                        {categories.length > 4 && <View style={{ marginLeft: 100 }}>
                                                 <View style={{ flexDirection: 'row' }}>
                                                         <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} style={{ marginRight: -15 }} />
                                                         <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} />
@@ -274,7 +276,7 @@ export default function EcommerceHomeScreen() {
                                         <View>
                                                 <Text style={[styles.titlePrincipal, products.length == 0 && { textAlign: "center" }]}>Mes articles</Text>
                                         </View>
-                                        {products.length>4 &&<View style={{ marginLeft: 100 }}>
+                                        {products.length > 4 && <View style={{ marginLeft: 100 }}>
                                                 <View style={{ flexDirection: 'row' }}>
                                                         <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} style={{ marginRight: -15 }} />
                                                         <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} />
@@ -502,7 +504,7 @@ export default function EcommerceHomeScreen() {
                                                 style={styles.input}
                                                 label={"Modifier le telephone"}
                                                 // tele:partenaire.produit.TELEPHONE
-                                                value={partenaire.produit.TELEPHONE}
+                                                value={data.tele}
                                                 onChangeText={(newValue) => handleChange('tele', newValue)}
                                                 lineWidth={0.5}
                                                 activeLineWidth={0.5}
@@ -636,16 +638,18 @@ const styles = StyleSheet.create({
 
         cardBack: {
                 width: "100%",
-                position: 'absolute',
+                height: 15,
+                zIndex: 1,
+                // position: 'absolute',
                 // marginRight: 10,
                 borderRadius: 40,
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexDirection: "row",
                 justifyContent: "space-between",
-                top: "4%",
+                // marginTop:20
+                top: "20%",
                 left: "2%"
-
         },
         uploadImages: {
                 width: 50,
@@ -896,24 +900,20 @@ const styles = StyleSheet.create({
         products: {
                 flexDirection: 'row',
                 flexWrap: 'wrap',
-                marginBottom:"3%"
+                marginBottom: "3%"
         },
         addBtn: {
-                // paddingVertical: 10,
-                // minWidth: "100%",
-                // alignSelf: "center",
-                // backgroundColor: COLORS.ecommerceOrange,
-                // borderRadius: 10,
-                // paddingVertical: 15,
-                // marginBottom: 10,
-                flexDirection: "row",
+                alignSelf: "center",
+                backgroundColor: COLORS.ecommerceOrange,
+                borderRadius: 15,
+                paddingVertical: 15,
                 marginTop: "0%",
-                marginBottom: "2%",
+                marginBottom: "0%",
                 padding: 5,
                 borderRadius: 10,
                 alignItems: 'center',
                 backgroundColor: COLORS.ecommerceOrange,
-                width: "95%",
+                width: "98%",
                 height: 50,
                 marginHorizontal: 10,
                 paddingHorizontal: 10
@@ -935,13 +935,8 @@ const styles = StyleSheet.create({
                 right: 0
         },
         addBtnText: {
-                color: '#fff',
+                color: '#FFF',
                 fontWeight: "bold",
                 textAlign: "center",
-                left: "300%"
-                // position: "absolute",
-                // marginTop: 25,
-                // marginLeft:8,
-                // fontSize:17
-        }
+        },
 })

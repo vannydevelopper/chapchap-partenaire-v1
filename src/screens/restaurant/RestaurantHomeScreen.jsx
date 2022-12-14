@@ -29,6 +29,13 @@ export default function RestaurantHomeScreen() {
     const DescriptionmodalizeRef = useRef()
     const CategoriemodalizeRef = useRef(null)
 
+    const [updateResto, setUpdateResto] = useState(null)
+    const [updateAdresse, setUpdateAdresse] = useState(null)
+    const [updateOuvert, setUpdateOuvert] = useState(null)
+    const [updateTele, setUpdateTele] = useState(null)
+    const [updateDescription, setUpdateDescription] = useState(null)
+    const [updatData, setUpdatData] = useState(null)
+
 
     const partenaire = route.params
     const [firstLoadingMenus, setFirstLoadingMenus] = useState(true)
@@ -114,8 +121,45 @@ export default function RestaurantHomeScreen() {
     function strUcFirst(a) {
         return (a + '').charAt(0).toUpperCase() + a.substr(1);
     }
+    const UpdateData = async () => {
+
+        try {
+            // setLoading(true)
+            const form = new FormData()
+            form.append("NOM_ORGANISATION", data.resto)
+            form.append("ADRESSE", data.adresse)
+            form.append("OUVERT", data.ouvert)
+            form.append("TELEPHONE", data.tele)
+            form.append("PRESENTATION", data.description)
+            const updateProduct = await fetchApi(`/partenaire/Updateshop/${partenaire.partenaire.produit.ID_PARTENAIRE_SERVICE}`, {
+                method: "PUT",
+                body: form
+            })
+            setUpdateResto(updateProduct.result.NOM_ORGANISATION)
+            setUpdateAdresse(updateProduct.result.ADRESSE_COMPLETE)
+            setUpdateOuvert(updateProduct.result.OUVERT)
+            setUpdateTele(updateProduct.result.TELEPHONE)
+            setUpdateDescription(updateProduct.result.PRESENTATION)
+
+            RestomodaliseRef.current.close()
+            AdressemodaliseRef.current.close()
+            OuvertmodaliseRef.current.close()
+            TelemodaliseRef.current.close()
+            DescriptionmodalizeRef.current.close()
+        } catch (error) {
+            console.log(error)
+        } finally {
+            // setLoading(false)
+        }
+    }
     return (
         <>
+            <StatusBar backgroundColor='#fff' barStyle='dark-content' />
+            <View style={styles.cardBack}>
+                <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()} >
+                    <Ionicons name="ios-arrow-back-outline" size={30} color={COLORS.ecommercePrimaryColor} />
+                </TouchableOpacity>
+            </View>
             <ScrollView style={styles.container}>
                 <TouchableWithoutFeedback key={1} onPress={() => {
                     setImageIndex(1)
@@ -125,11 +169,7 @@ export default function RestaurantHomeScreen() {
                         <  Image source={{ uri: partenaire.partenaire.produit.LOGO }} style={{ ...styles.imagePrincipal }} />
                     </View>
                 </TouchableWithoutFeedback>
-                <View style={styles.cardBack}>
-                    <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()} >
-                        <Ionicons name="ios-arrow-back-outline" size={30} color={COLORS.ecommercePrimaryColor} />
-                    </TouchableOpacity>
-                </View>
+
                 <TouchableOpacity onPress={() => onSelectPhoto()} style={styles.uploadImages}>
                     <Feather name="image" size={24} color={COLORS.ecommercePrimaryColor} />
                 </TouchableOpacity>
@@ -138,7 +178,7 @@ export default function RestaurantHomeScreen() {
                     <TouchableOpacity onPress={onPressResto}>
                         <View style={{ flexDirection: "row" }}>
                             <Text style={{ fontWeight: "bold", color: COLORS.ecommerceOrange }}>
-                                {strUcFirst(partenaire.partenaire.produit.NOM_ORGANISATION.toLowerCase())}
+                                {updateResto ? strUcFirst(updateResto.toLowerCase()) : strUcFirst(partenaire.partenaire.produit.NOM_ORGANISATION.toLowerCase())}
                             </Text>
                             <EvilIcons style={{ marginLeft: "-5%", opacity: 0.5 }} name="pencil" size={22} color="black" />
                         </View>
@@ -147,7 +187,7 @@ export default function RestaurantHomeScreen() {
                         <View style={{ marginLeft: "5%", flexDirection: "row" }}>
                             <View style={{ flexDirection: "row" }}>
                                 <SimpleLineIcons name="location-pin" size={15} color="black" />
-                                <Text style={{ fontSize: 12, opacity: 0.5, fontWeight: "bold" }}> {partenaire.partenaire.produit.ADDRESSE} </Text>
+                                <Text style={{ fontWeight: "bold", ontSize: 12, opacity: 0.5 }}> {updateAdresse ? updateAdresse : partenaire.partenaire.produit.ADDRESSE} </Text>
                                 <EvilIcons style={{ marginLeft: "-5%", opacity: 0.5 }} name="pencil" size={22} color="black" />
 
                             </View>
@@ -171,8 +211,7 @@ export default function RestaurantHomeScreen() {
                         <View style={{ flexDirection: "row" }}>
                             <View style={{ flexDirection: "row", marginHorizontal: 30 }}>
                                 <AntDesign name="clockcircleo" size={15} color="#797E9A" style={{ marginTop: 5 }} />
-                                {/* <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{shop.OUVERT}</Text> */}
-                                <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{partenaire.partenaire.produit.OUVERT}</Text>
+                                <Text style={{ fontSize: 15, marginLeft: 2, color: "#797E9A" }}>{updateOuvert ? updateOuvert : partenaire.partenaire.produit.OUVERT}</Text>
                                 <EvilIcons style={{ opacity: 0.5 }} name="pencil" size={22} color="black" />
                             </View>
                         </View>
@@ -182,7 +221,7 @@ export default function RestaurantHomeScreen() {
 
                             <SimpleLineIcons name="call-end" size={15} color="#797E9A" style={{ marginTop: 5 }} />
                             <TouchableOpacity onPress={onPressTele}>
-                                <Text style={{ fontSize: 15, marginLeft: 20, color: "#797E9A", right: 15 }}>{partenaire.partenaire.produit.TELEPHONE}</Text>
+                                <Text style={{ fontSize: 15, marginLeft: 20, color: "#797E9A", right: 15 }}>{updateTele ? updateTele : partenaire.partenaire.produit.TELEPHONE}</Text>
                             </TouchableOpacity>
                         </View>
                     </TouchableOpacity>
@@ -190,21 +229,23 @@ export default function RestaurantHomeScreen() {
                 <View style={{ marginTop: "10%", marginHorizontal: 10 }} >
                     <TouchableOpacity onPress={onPressDescription}>
                         <Text style={{ color: "#797E9A", fontSize: 11, }}>
-                            {partenaire.partenaire.produit.PRESENTATION}
+                            {updateDescription ? updateDescription : partenaire.partenaire.produit.PRESENTATION}
                         </Text>
-
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={plusCategories} style={styles.plus1}>
+                <TouchableOpacity style={styles.plus1}>
                     <View>
                         <Text style={[styles.titlePrincipal, menus.length == 0 && { textAlign: "center" }]}>Mes categories</Text>
                     </View>
-                    <View style={{ marginLeft: "45%" }}>
-                        <View style={{ flexDirection: 'row' }}>
-                            <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} style={{ marginRight: -15 }} />
-                            <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} />
-                        </View>
-                    </View>
+                    {categories.length > 4 &&
+                        <TouchableOpacity onPress={plusCategories} >
+                            <View style={{ marginLeft: "45%" }}>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} style={{ marginRight: -15 }} />
+                                    <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} />
+                                </View>
+                            </View>
+                        </TouchableOpacity>}
                 </TouchableOpacity>
                 {/* {(firstLoadingMenus || loadingCategories || loadingMenus || loadingSubCategories) ? <CategoriesMenuSkeletons /> : */}
                 <ScrollView
@@ -232,14 +273,14 @@ export default function RestaurantHomeScreen() {
                 {/* } */}
                 <TouchableOpacity onPress={menuPress} style={styles.plus}>
                     <View>
-                        <Text style={[styles.titlePrincipal, menus.length == 0 && { textAlign: "center" }]}>Mes menus</Text>
+                        <Text style={[styles.titlePrincipal1, menus.length == 0 && { textAlign: "center" }]}>Mes menus</Text>
                     </View>
-                    <View style={{ marginLeft: "50%" }}>
+                    {menus.length > 10 && <View style={{ marginLeft: "50%" }}>
                         <View style={{ flexDirection: 'row' }}>
                             <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} style={{ marginRight: -15 }} />
                             <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} />
                         </View>
-                    </View>
+                    </View>}
                 </TouchableOpacity>
 
                 {firstLoadingMenus ? <HomeProductsSkeletons wrap /> :
@@ -264,7 +305,7 @@ export default function RestaurantHomeScreen() {
                                     />
                                 )
                             })}
-                            <View style={[styles.serviceContainer, { width: SERVICE_WIDTH, height: 230 }]}>
+                            {/* <View style={[styles.serviceContainer, { width: SERVICE_WIDTH, height: 230 }]}>
                                 <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} onPress={() => navigation.navigate("NewMenuScreens")}>
                                     <View style={[styles.service]}>
                                         <ImageBackground source={require("../../../assets/images/nouveau.png")} style={[styles.serviceBackgound]} borderRadius={10} resizeMode='cover' imageStyle={{ opacity: 0.8 }}>
@@ -276,11 +317,13 @@ export default function RestaurantHomeScreen() {
                                         </ImageBackground>
                                     </View>
                                 </TouchableNativeFeedback>
-                            </View>
+                            </View> */}
                         </View>}
 
             </ScrollView>
-
+            <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                <Text style={styles.addBtnText}>Nouveau menu</Text>
+            </TouchableOpacity>
             <Modalize
                 ref={menumodalizeRef}
                 adjustToContentHeight
@@ -312,7 +355,6 @@ export default function RestaurantHomeScreen() {
                         <HomeMenuSkeletons />
                     </> : */}
                 <ScrollView
-                    horizontal
                     showsHorizontalScrollIndicator={false}
                 >
 
@@ -378,7 +420,7 @@ export default function RestaurantHomeScreen() {
                         tintColor={COLORS.primary}
                     />
                 </View>
-                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                <TouchableOpacity style={styles.addBtn} onPress={UpdateData}>
                     <Text style={styles.addBtnText}>Modifier</Text>
                 </TouchableOpacity>
             </Modalize>
@@ -407,7 +449,7 @@ export default function RestaurantHomeScreen() {
                         tintColor={COLORS.primary}
                     />
                 </View>
-                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                <TouchableOpacity style={styles.addBtn} onPress={UpdateData}>
                     <Text style={styles.addBtnText}>Modifier</Text>
                 </TouchableOpacity>
             </Modalize>
@@ -436,7 +478,7 @@ export default function RestaurantHomeScreen() {
                         tintColor={COLORS.primary}
                     />
                 </View>
-                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                <TouchableOpacity style={styles.addBtn} onPress={UpdateData}>
                     <Text style={styles.addBtnText}>Modifier</Text>
                 </TouchableOpacity>
             </Modalize>
@@ -465,7 +507,7 @@ export default function RestaurantHomeScreen() {
                         tintColor={COLORS.primary}
                     />
                 </View>
-                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                <TouchableOpacity style={styles.addBtn} onPress={UpdateData}>
                     <Text style={styles.addBtnText}>Modifier</Text>
                 </TouchableOpacity>
             </Modalize>
@@ -495,7 +537,7 @@ export default function RestaurantHomeScreen() {
                         tintColor={COLORS.primary}
                     />
                 </View>
-                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                <TouchableOpacity style={styles.addBtn} onPress={UpdateData}>
                     <Text style={styles.addBtnText}>Modifier</Text>
                 </TouchableOpacity>
             </Modalize>
@@ -526,11 +568,6 @@ export default function RestaurantHomeScreen() {
                                     <View style={styles.actionIcon}>
                                         <ImageBackground source={{ uri: categorie.IMAGE }} borderRadius={15} style={styles.categoryImage}>
 
-                                            {/* <View style={styles.disbaledContainer}>
-                                                    <View style={styles.checkIndicator}>
-                                                        <AntDesign name="check" size={24} color='#000' />
-                                                    </View>
-                                                </View> */}
                                         </ImageBackground>
                                     </View>
                                     <Text style={[{ fontSize: 10, fontWeight: "bold" }, { color: "#797E9A" }]}>{categorie.NOM}</Text>
@@ -646,6 +683,14 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 10,
     },
+    titlePrincipal1: {
+        fontSize: 15,
+        // fontWeight: "bold",
+        marginTop: "10%",
+        marginBottom: "10%",
+        color: COLORS.ecommercePrimaryColor,
+        opacity: 0.7
+    },
     titlePrincipal: {
         fontSize: 15,
         // fontWeight: "bold",
@@ -727,14 +772,17 @@ const styles = StyleSheet.create({
     },
     cardBack: {
         width: "100%",
-        position: 'absolute',
+        height: 15,
+        zIndex: 1,
+        // position: 'absolute',
         // marginRight: 10,
         borderRadius: 40,
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: "row",
         justifyContent: "space-between",
-        top: "3%",
+        // marginTop:20
+        top: "20%",
         left: "2%"
 
     },
@@ -773,13 +821,20 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 60,
     },
     addBtn: {
-        paddingVertical: 10,
-        minWidth: "90%",
         alignSelf: "center",
         backgroundColor: COLORS.ecommerceOrange,
-        borderRadius: 10,
+        borderRadius: 15,
         paddingVertical: 15,
-        marginBottom: 10,
+        marginTop: "0%",
+        marginBottom: "0%",
+        padding: 5,
+        borderRadius: 10,
+        alignItems: 'center',
+        backgroundColor: COLORS.ecommerceOrange,
+        width: "98%",
+        height: 50,
+        marginHorizontal: 10,
+        paddingHorizontal: 10
     },
     addBtnText: {
         color: '#FFF',
@@ -815,9 +870,9 @@ const styles = StyleSheet.create({
     category: {
         alignItems: 'center',
         borderRadius: 10,
-        marginLeft: 20,
-        elevation: 10,
-        marginRight: -12.6,
+        marginLeft: 0,
+        elevation: 3,
+        marginRight: 5,
         backgroundColor: 'white',
         borderRadius: 10
     },

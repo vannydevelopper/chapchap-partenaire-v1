@@ -16,7 +16,7 @@ export default function Menu({ menu, index, totalLength, fixMargins = false ,onR
     const navigation = useNavigation()
     const { width } = useWindowDimensions()
     const PRODUCT_MARGIN = 10
-    const PRODUCT_WIDTH = (width / 2) - PRODUCT_MARGIN - 10
+    const PRODUCT_WIDTH = (width / 2) - 10
     const PRODUCT_HEIGHT = 270
     const additionStyles = {
         width: PRODUCT_WIDTH,
@@ -44,16 +44,18 @@ export default function Menu({ menu, index, totalLength, fixMargins = false ,onR
         <TouchableOpacity>
           <View style={styles.cardLike}>
             <AntDesign name="like2" size={24} color="#F29558" />
-            <View style={styles.badge}>
-              <Text style={styles.badgeText} numberOfLines={1}>1</Text>
-            </View> 
+            {menu.NbreCommande&&<View style={styles.badge}>
+              <Text style={styles.badgeText} numberOfLines={1}>{menu.NbreCommande.nbr}</Text>
+            </View> }
           </View>
         </TouchableOpacity>
+        
         <TouchableOpacity style={styles.cartBtn}>
           <Fontisto name="shopping-basket" size={24} color="#F29558" />
-            <View style={styles.badge}>
-              <Text style={styles.badgeText} numberOfLines={1}>2</Text>
-            </View> 
+            {menu.NbreLike&&
+                <View style={styles.badge}>
+              <Text style={styles.badgeText} numberOfLines={1}>{menu.NbreLike.nbr}</Text>
+            </View>} 
         </TouchableOpacity>
       </View>
             {menu.PRIX ? <Text style={{ color: "#F29558", fontWeight: "bold" }}>{menu.PRIX.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Fbu</Text> : null}
@@ -76,14 +78,23 @@ const styles = StyleSheet.create({
          justifyContent: 'center',
     },
     product: {
-        maxWidth: 300,
+        // maxWidth: 300,
+        // maxHeight:200,
+        // marginHorizontal: 10,
+        // elevation:15,
+        // backgroundColor:'white',
+        // borderRadius:10,
+        // padding:5,
+        // marginBottom:'2%'
+        maxWidth: 240,
         maxHeight:200,
-        marginHorizontal: 10,
-        elevation:15,
-        backgroundColor:'white',
-        borderRadius:10,
-        padding:5,
-        marginBottom:'2%'
+    
+        marginHorizontal: 5,
+        backgroundColor: 'white',
+        elevation: 15,
+        borderRadius: 10,
+        padding: 5,
+        marginTop:"2%"
     },
     imageCard: {
         borderRadius: 8,
