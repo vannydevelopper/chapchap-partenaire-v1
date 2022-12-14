@@ -549,9 +549,6 @@ export default function EcommerceHomeScreen() {
                                 {/* </ScrollView> */}
 
                         </ScrollView>
-                        {/* <TouchableOpacity style={styles.addBtn} >
-                                <Text style={styles.addBtnText}>Nouveau produit</Text>
-                        </TouchableOpacity> */}
                         <View style={{ flexDirection: "row", marginTop: "-15%", marginLeft: "75%", marginBottom: "1%" }}>
                                 <TouchableOpacity onPress={addNew} >
                                         <View style={{ backgroundColor: COLORS.ecommerceOrange, borderRadius: 50, width: 70, height: 70, alignItems: "center", justifyContent: "center" }}>
