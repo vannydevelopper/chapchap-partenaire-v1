@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { Image, View, StyleSheet, Text, TouchableOpacity, TouchableNativeFeedback, TextInput, ScrollView, StatusBar, Modal, ActivityIndicator } from "react-native"
+import { Image, View, StyleSheet, Text, TouchableOpacity, TouchableNativeFeedback, TextInput, ScrollView, StatusBar, Modal, ActivityIndicator, Alert } from "react-native"
 import { Ionicons, AntDesign, Feather, EvilIcons, MaterialIcons } from '@expo/vector-icons';
 import { TextField, FilledTextField, InputAdornment, OutlinedTextField } from 'rn-material-ui-textfield'
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -25,16 +25,15 @@ export default function ProductDetailsScreen() {
     const route = useRoute()
     const [productUpdate, setProductUpdate] = useState(null)
     const [descriptionUpdate, setDescriptionUpdate] = useState(null)
-    const [approvisionnerUpdate, setApprovisionnerUpdate] = useState(null)
     const [prixUpdate, setPrixUpdate] = useState(null)
     const [autreSize, setAutreSize] = useState(false)
     const [autreColor, setAutreColor] = useState(false)
+    const [serviceUpdate, setServiceUpdate] = useState()
+
     const { product } = route.params
     const modalizeRef = useRef(null)
     const variantmodaliseRef = useRef()
-    const onPressVariante = () => {
-        variantmodaliseRef.current.open()
-    }
+
     const [isOpen, setIsOpen] = useState(false)
     const [loadingForm, setLoadingForm] = useState(true)
     const [loading, setLoading] = useState(false)
@@ -362,6 +361,7 @@ export default function ProductDetailsScreen() {
             // setLoading(false)
         }
     }
+
     const aprovisionner = async () => {
         try {
             const form = new FormData()
@@ -372,14 +372,14 @@ export default function ProductDetailsScreen() {
             if (autreSize) {
                 form.append("TAILLE", data.newSize)
             }
-            else if (selectedSize.id != SizeSelect.id) {
-                form.append("ID_TAILLE_NEW", SizeSelect.id)
+            else if (selectedSize?.id != selectedSize?.id) {
+                form.append("ID_TAILLE_NEW", selectedSize?.id)
             }
 
             if (autreColor) {
                 form.append("COULEUR", data.newColor)
             }
-            else if (selectedColor.ID_COULEUR != ColorSelect.ID_COULEUR) {
+            else if (selectedColor?.ID_COULEUR != ColorSelect.ID_COULEUR) {
                 form.append("ID_COULEUR_NEW", ColorSelect.ID_COULEUR)
             }
             const updateDescription = await fetchApi(`/products/updateApprovisionner/${product.produit_partenaire.ID_PRODUIT_PARTENAIRE}`, {
@@ -387,7 +387,7 @@ export default function ProductDetailsScreen() {
                 body: form
             })
 
-            setApprovisionnerUpdate(updateDescription.result.QUANTITE_RESTANTE ? updateDescription.result.QUANTITE_RESTANTE : updateDescription.result.quantite)
+            // setApprovisionnerUpdate(updateDescription.result.QUANTITE_RESTANTE ? updateDescription.result.QUANTITE_RESTANTE : updateDescription.result.quantite)
             // setSelectedSize(updateDescription.result)
             // setSelectedColor(updateDescription.result)
             setSIZESUPDATE(updateDescription.size_update)
@@ -397,6 +397,67 @@ export default function ProductDetailsScreen() {
             console.log(error)
         } finally {
             // setLoading(false)
+        }
+    }
+    const deleteProduct = async () => {
+        setLoading(true)
+        try {
+            Alert.alert("Supprimer un article", "Voulez-vous vraiment enlever cet article ?",
+            [
+                {
+                    text: "Annuler",
+                    style: "cancel"
+                },
+                {
+                    text: "Oui", onPress: async () => {
+                        const serviceUpdat = await fetchApi(`/partenaire/produit/delete/${product.produit_partenaire.ID_PRODUIT_PARTENAIRE}/${product.partenaire.ID_PARTENAIRE_SERVICE}`, {
+                            method: "DELETE",
+                        })
+                        setServiceUpdate(serviceUpdat.result)
+            console.log(serviceUpdat.result)
+            console.log(serviceUpdate)
+                    }
+                }
+            ])
+            
+            
+
+            //navigation.navigate("EcommerceHomeScreen", { partenaire: serviceUpdat.result[0]})
+        }
+        catch (error) {
+            console.log(error)
+        } finally {
+            setLoading(false)
+        }
+    }
+    const deleteSize = async (size) => {
+        console.log(product.stock.ID_PRODUIT_STOCK)
+        setLoading(true)
+        try {
+            Alert.alert("Enlever la taille", "Voulez-vous vraiment enlever cette taille ?",
+                [
+                    {
+                        text: "Annuler",
+                        style: "cancel"
+                    },
+                    {
+                        text: "Oui", onPress: async () => {
+                            await fetchApi(`/products/tailles/${size.id}/${product.stock.ID_PRODUIT_STOCK}`, {
+                                method: "DELETE",
+                            })
+                        }
+                    }
+                ])
+        }
+        // setServiceUpdate(serviceUpdat.result)
+        // console.log(serviceUpdat.result)
+        // console.log(serviceUpdate)
+
+        //navigation.navigate("EcommerceHomeScreen", { partenaire: serviceUpdat.result[0]})
+        catch (error) {
+            console.log(error)
+        } finally {
+            setLoading(false)
         }
     }
     const UpdatePrice = async () => {
@@ -472,7 +533,11 @@ export default function ProductDetailsScreen() {
                                     >
                                         <View style={[styles.sizes]}>
                                             {
-                                                SIZESUPDATE.length != 0 ?
+                                                SIZES.length== 0  &&
+                                                 <TouchableOpacity style={[styles.size, ]}>
+                                                 <Text style={[styles.sizeText]}>+</Text>
+                                             </TouchableOpacity>}
+                                               { SIZESUPDATE.length != 0 ?
                                                     SIZESUPDATE?.map((size, index) =>
                                                         <TouchableOpacity style={[styles.size, index == 0 && { marginLeft: 0 }, size.id == selectedSize?.id && { backgroundColor: COLORS.ecommerceOrange }]} key={index} onPress={() => {
                                                             setSelectedSize(size)
@@ -485,17 +550,18 @@ export default function ProductDetailsScreen() {
                                                             <Text style={[styles.sizeText, size.id == selectedSize?.id && { color: '#FFF' }]}>{size.name}</Text>
                                                         </TouchableOpacity>)
                                                     : SIZES?.map((size, index) =>
-                                                        <TouchableOpacity style={[styles.size, index == 0 && { marginLeft: 0 }, size.id == selectedSize?.id && { backgroundColor: COLORS.ecommerceOrange }]} key={index} onPress={() => {
-                                                            setSelectedSize(size)
-                                                            // setSizeSelect(size)
-                                                            setSelectedColor(null)
-                                                            // onChangeText(0)
-                                                            onSizePress(size)
-                                                        }
-                                                        }>
+                                                        <TouchableOpacity style={[styles.size, index == 0 && { marginLeft: 0 }, size.id == selectedSize?.id && { backgroundColor: COLORS.ecommerceOrange }]} key={index}
+                                                            onPress={() => {
+                                                                setSelectedSize(size)
+                                                                // setSizeSelect(size)
+                                                                setSelectedColor(null)
+                                                                // onChangeText(0)
+                                                                onSizePress(size)
+                                                            }
+                                                            }
+                                                            onLongPress={() => deleteSize(size)}>
                                                             <Text style={[styles.sizeText, size.id == selectedSize?.id && { color: '#FFF' }]}>{size.name}</Text>
-                                                        </TouchableOpacity>)
-                                            }
+                                                        </TouchableOpacity>)}
                                         </View>
                                     </ScrollView>
                                 </View>
@@ -518,10 +584,7 @@ export default function ProductDetailsScreen() {
                                                 :
                                                 colors.map((color, index) =>
                                                     <TouchableOpacity style={[styles.color, index == 0 && { marginLeft: 0 }, color.ID_COULEUR == selectedColor?.ID_COULEUR && { backgroundColor: COLORS.ecommerceOrange }]} key={index}
-                                                        onLongPress={() => {
-                                                            console.log("onLongPress")
-                                                        }
-                                                        }
+                                                        onLongPress={() => deleteSize(color)}
                                                         onPress={() => {
                                                             setSelectedColor(color)
                                                             setQuantite(color.QUANTITE_RESTANTE)
@@ -560,10 +623,16 @@ export default function ProductDetailsScreen() {
 
                         </View>
                     </ScrollView>
-                    <View style={{ flexDirection: "row", marginTop: "-40%", marginLeft: "80%" }}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: "-40%" }}>
                         <TouchableOpacity onPress={onPressAprovisionner} >
                             <View style={{ backgroundColor: COLORS.ecommerceOrange, borderRadius: 50, width: 50, height: 50, alignItems: "center", justifyContent: "center" }}>
                                 <Ionicons name="add" size={30} color="white" />
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={deleteProduct} >
+                            <View style={{ backgroundColor: COLORS.ecommerceOrange, borderRadius: 50, width: 50, height: 50, alignItems: "center", justifyContent: "center" }}>
+                                <MaterialIcons name="delete" size={24} color="white" />
+
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -765,14 +834,14 @@ export default function ProductDetailsScreen() {
                         <Text style={{ fontSize: 17, fontWeight: "bold" }}>Tailles</Text>
                     </View>
                     <View style={styles.searchSection1}>
-                    <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
-                    <TextInput
-                        style={styles.inputRearch}
-                        // value={data.menu}
-                        // onChangeText={(newValue) => handleChange('menu', newValue)}
-                        placeholder="Rechercher "
-                    />
-                </View>
+                        <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
+                        <TextInput
+                            style={styles.inputRearch}
+                            // value={data.menu}
+                            // onChangeText={(newValue) => handleChange('menu', newValue)}
+                            placeholder="Rechercher "
+                        />
+                    </View>
                     <View>
                         <TouchableWithoutFeedback onPress={() => onAutreSizeSelect(true)}>
 

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react"
-import { Image, View, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, TextInput, TouchableNativeFeedback, ScrollView } from "react-native"
+import { Image, View, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, TextInput, TouchableNativeFeedback, ScrollView, Alert } from "react-native"
 import { Ionicons, AntDesign, Entypo, Foundation, Feather, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import ProductImages from "../../components/restaurant/details/ProductImages"
@@ -11,16 +11,20 @@ import { TextField, FilledTextField, InputAdornment, OutlinedTextField } from 'r
 import { COLORS } from "../../styles/COLORS"
 import { useEffect } from "react";
 import { useCallback } from "react";
+import { useForm } from "../../hooks/useForm";
+import Loading from "../../components/app/Loading";
+import { set } from "react-native-reanimated";
+
 
 export default function MenuDetailScreen() {
     const route = useRoute()
-    const { detail } = route.params
+    const { detail, partenaire } = route.params
     const navigation = useNavigation()
-
     const uploadModaliseRef = useRef()
     const RepasmodaliseRef = useRef()
     const CategoriemodaliseRef = useRef()
     const PrixmodaliseRef = useRef()
+    const TempsmodaliseRef = useRef()
     const DescriptionmodaliseRef = useRef()
     const categoriesModalizeRef = useRef()
     const repasModalizeRef = useRef()
@@ -31,14 +35,24 @@ export default function MenuDetailScreen() {
     ]
     const [nombre, setNombre] = useState(0);
     const [menuImage, setMenuImage] = useState(null)
-    const [detailImage, setDetailImage] = useState(detail.IMAGE)
+    const [detailImage, setDetailImage] = useState([])
     const [categories, setCategories] = useState([])
     const [repass, setRepass] = useState([])
     const [CategorieSelect, setCategorieSelect] = useState(null)
     const [RepasSelect, setRepasSelect] = useState("")
     const [selectedSousCategorie, setselectedSousCategorie] = useState(null)
     const [autre, setAutre] = useState(false)
+    const [menuUpdate, setMenuUpdate] = useState(null)
+    const [loading, setLoading] = useState(null)
+    const [deletemenu, setDeletemenu] = useState(null)
 
+
+
+    const [data, handleChange, setValue] = useForm({
+        description: detail.DESCRIPTION,
+        price: detail.PRIX,
+        temps: detail.TEMPS_PREPARATION,
+    })
     const onCategorieSelect = (categorie) => {
         setCategorieSelect(categorie)
         categoriesModalizeRef.current.close()
@@ -55,6 +69,9 @@ export default function MenuDetailScreen() {
     }
     const onPressPrice = () => {
         PrixmodaliseRef.current.open()
+    }
+    const onPressTemps = () => {
+        TempsmodaliseRef.current.open()
     }
     const onPressRepas = () => {
         RepasmodaliseRef.current.open()
@@ -80,6 +97,8 @@ export default function MenuDetailScreen() {
         }
         setMenuImage(photo)
         try {
+            setLoading(true)
+
             const form = new FormData()
             if (menuImage) {
                 const manipResult = await manipulateAsync(
@@ -97,15 +116,19 @@ export default function MenuDetailScreen() {
                     uri: localUri, name: filename, type
                 })
             }
-            console.log(`/resto/menu/${detail.ID_RESTAURANT_MENU}`)
             const menuUpdate = await fetchApi(`/resto/menu/${detail.ID_RESTAURANT_MENU}`, {
                 method: "PUT",
                 body: form
             })
-            setDetailImage(menuUpdate.result[0].IMAGE)
+
+            setDetailImage(menuUpdate.result)
+
         }
         catch (error) {
             console.log(error)
+        }
+        finally{
+            setLoading(false)
         }
     }
     const fecthRepas = async () => {
@@ -132,7 +155,6 @@ export default function MenuDetailScreen() {
             try {
                 const catego = await fetchApi("/resto/menu/categories")
                 setCategories(catego.result)
-                // console.log(catego.result)
             } catch (error) {
                 console.log(error)
             } finally {
@@ -159,20 +181,83 @@ export default function MenuDetailScreen() {
             setNombre(0)
         }
     }
+    const UpdateData = async () => {
+
+        try {
+            setLoading(true)
+            const form = new FormData()
+            form.append("REPAS", RepasSelect ? RepasSelect.ID_REPAS : detail.ID_REPAS)
+            form.append("CATEGORIE", CategorieSelect ? CategorieSelect?.ID_CATEGORIE_MENU : detail.ID_CATEGORIE_MENU)
+            form.append("SOUSCATEGORIE", data.description)
+            form.append("TEMPS", data.temps)
+            form.append("PRIX", data.price)
+            form.append("DESCRIPTION", data.description)
+            const updateProduct = await fetchApi(`/resto/menu/update/${detail.ID_RESTAURANT_MENU}`, {
+                method: "PUT",
+                body: form
+            })
+            setMenuUpdate(updateProduct.result)
+            uploadModaliseRef.current.close()
+            RepasmodaliseRef.current.close()
+            CategoriemodaliseRef.current.close()
+            PrixmodaliseRef.current.close()
+            TempsmodaliseRef.current.close()
+            DescriptionmodaliseRef.current.close()
+            categoriesModalizeRef.current.close()
+            repasModalizeRef.current.close()
+            DescriptionmodaliseRef.current.close()
+
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const deleteMenu = async () => {
+        setLoading(true)
+        try {
+            Alert.alert("Supprimer un article", "Voulez-vous vraiment enlever cet article ?",
+                [
+                    {
+                        text: "Annuler",
+                        style: "cancel"
+                    },
+                    {
+                        text: "Oui", onPress: async () => {
+                            const serviceUpdat = await fetchApi(`/resto/menu/delete/${detail.ID_RESTAURANT_MENU}`, {
+                                method: "DELETE",
+                            })
+                            setDeletemenu(true)
+                            navigation.goBack()
+                        }
+                    }
+                ])
+        }
+        catch (error) {
+            console.log(error)
+        } finally {
+            setLoading(false)
+        }
+    }
     return (
         <>
-
+            {loading && <Loading />}
             <ScrollView>
                 <View style={{ marginLeft: 30, marginTop: 50, marginHorizontal: 20 }}>
-                    {!detail ? <View style={{ width: '100%', marginTop: 10 }}>
-                        <  Image source={{ uri: detailImage }} style={{ ...styles.imagePrincipal }} />
-                    </View> :
+                    {detailImage.length>0 ? 
+                    <View style={{ width: '100%', marginTop: 10 }}>
+                        <  Image source={{ uri: detailImage[0].IMAGE }} style={{ ...styles.imagePrincipal }} />
+                    </View> 
+                    :
                         <View style={{ width: '100%', marginTop: 10 }}>
                             <  Image source={{ uri: detail.IMAGE }} style={{ ...styles.imagePrincipal }} />
                         </View>}
 
                     {/* <ProductImages images={IMAGES} /> */}
-                    <Ionicons name="ios-arrow-back-outline" size={24} color="white" style={{ ...styles.icon, marginTop: 0 }} />
+                    <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()} >
+                        <Ionicons name="ios-arrow-back-outline" size={24} color="white" style={{ ...styles.icon, marginTop: 0 }} />
+                    </TouchableOpacity>
                     <Entypo name="shopping-cart" size={24} color="white" style={{ ...styles.icon1, marginTop: 0 }} />
                     <View style={styles.cardOK}>
                         <Text style={{ color: "white", fontSize: 5 }}>5</Text>
@@ -181,41 +266,91 @@ export default function MenuDetailScreen() {
                         <Feather name="image" size={24} color="black" />
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={onPressRepas}>
-                        <View style={{ marginTop: "2%" }} >
-                            <Text style={styles.text} numberOfLines={2}>{detail.repas}</Text>
-                        </View>
-                    </TouchableOpacity>
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: "2%" }}>
-                        <View style={{ flexDirection: "row" }}>
-                            <AntDesign name="star" size={15} color="#EFC519" />
-                            <AntDesign name="star" size={15} color="#EFC519" />
-                            <AntDesign name="star" size={15} color="#EFC519" />
-                            <AntDesign name="staro" size={15} color="#EFC519" />
-                        </View>
-                        <View style={{ flexDirection: "row" }}>
-                            <AntDesign name="clockcircleo" size={15} color="#797E9A" />
-                            <Text style={{ fontSize: 10, marginLeft: 10, color: "#797E9A" }}>30 Min</Text>
-                        </View>
-                        <TouchableOpacity onPress={onPressPrice}>
-                            <View style={{ marginTop: -5 }}>
-                                <Text style={styles.textFbu}>{detail.PRIX} Fbu</Text>
-                            </View>
-                        </TouchableOpacity>
+                    {menuUpdate != null ?
+                        <>
+                            <TouchableOpacity onPress={onPressRepas}>
+                                <View style={{ marginTop: "2%" }} >
+                                    <Text style={styles.text} numberOfLines={2}>{menuUpdate?.repas}</Text>
+                                </View>
+                            </TouchableOpacity>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: "2%" }}>
+                                <View style={{ flexDirection: "row" }}>
+                                    <AntDesign name="star" size={15} color="#EFC519" />
+                                    <AntDesign name="star" size={15} color="#EFC519" />
+                                    <AntDesign name="star" size={15} color="#EFC519" />
+                                    <AntDesign name="staro" size={15} color="#EFC519" />
+                                </View>
+                                <TouchableOpacity onPress={onPressTemps} style={{ flexDirection: "row" }}>
+                                    <AntDesign name="clockcircleo" size={15} color="#797E9A" />
+                                    <Text style={{ fontSize: 10, marginLeft: 10, color: "#797E9A" }}>{menuUpdate.TEMPS_PREPARATION} Min</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={onPressPrice}>
+                                    <View style={{ marginTop: -5 }}>
+                                        <Text style={styles.textFbu}>{menuUpdate.PRIX} Fbu</Text>
+                                    </View>
+                                </TouchableOpacity>
 
-                    </View>
-                    <TouchableOpacity onPress={onPressCategory}>
-                        <View style={{ marginTop: "2%" }} >
-                            <Text style={styles.text1} numberOfLines={2}>{detail.categorie}</Text>
-                        </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={onPressDescription}>
-                        <View style={{ marginTop: 15 }} >
-                            <Text style={styles.txtDisplay}>
-                                {detail.DESCRIPTION}
-                            </Text>
-                        </View>
-                    </TouchableOpacity>
+                            </View>
+                            <TouchableOpacity onPress={onPressCategory}>
+                                <View style={{ marginTop: "2%" }} >
+                                    <Text style={styles.text1} numberOfLines={2}>{menuUpdate.categorie}</Text>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={onPressDescription}>
+                                {menuUpdate.DESCRIPTION ? <View style={{ marginTop: 15 }} >
+                                    <Text style={styles.txtDisplay}>
+                                        {menuUpdate.DESCRIPTION}
+                                    </Text>
+                                </View> :
+                                    <View style={{ marginTop: "15%" }}>
+                                        <TouchableOpacity onPress={onPressDescription}>
+                                            <Text style={{ marginHorizontal: "3%", marginBottom: "30%", marginTop: "-1%", color: "#797E9A" }}><Ionicons name="add-sharp" size={20} color="#797E9A" />Clique pour ajouter une description</Text>
+                                        </TouchableOpacity>
+                                    </View>}
+                            </TouchableOpacity>
+                        </>
+                        : <>
+                            <TouchableOpacity onPress={onPressRepas}>
+                                <View style={{ marginTop: "2%" }} >
+                                    <Text style={styles.text} numberOfLines={2}>{detail.repas}</Text>
+                                </View>
+                            </TouchableOpacity>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: "2%" }}>
+                                <View style={{ flexDirection: "row" }}>
+                                    <AntDesign name="star" size={15} color="#EFC519" />
+                                    <AntDesign name="star" size={15} color="#EFC519" />
+                                    <AntDesign name="star" size={15} color="#EFC519" />
+                                    <AntDesign name="staro" size={15} color="#EFC519" />
+                                </View>
+                                <TouchableOpacity onPress={onPressTemps} style={{ flexDirection: "row" }}>
+                                    <AntDesign name="clockcircleo" size={15} color="#797E9A" />
+                                    <Text style={{ fontSize: 10, marginLeft: 10, color: "#797E9A" }}>{detail.TEMPS_PREPARATION} Min</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={onPressPrice}>
+                                    <View style={{ marginTop: -5 }}>
+                                        <Text style={styles.textFbu}>{detail.PRIX} Fbu</Text>
+                                    </View>
+                                </TouchableOpacity>
+
+                            </View>
+                            <TouchableOpacity onPress={onPressCategory}>
+                                <View style={{ marginTop: "2%" }} >
+                                    <Text style={styles.text1} numberOfLines={2}>{detail.categorie}</Text>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={onPressDescription}>
+                                {detail.DESCRIPTION ? <View style={{ marginTop: 15 }} >
+                                    <Text style={styles.txtDisplay}>
+                                        {detail.DESCRIPTION}
+                                    </Text>
+                                </View> :
+                                    <View style={{ marginTop: "15%" }}>
+                                        <TouchableOpacity onPress={onPressDescription}>
+                                            <Text style={{ marginHorizontal: "3%", marginBottom: "30%", marginTop: "-1%", color: "#797E9A" }}><Ionicons name="add-sharp" size={20} color="#797E9A" />Clique pour ajouter une description</Text>
+                                        </TouchableOpacity>
+                                    </View>}
+                            </TouchableOpacity>
+                        </>}
                     {/* <View>
                                         <View style={{ flexDirection: "row", justifyContent: 'space-around', marginTop: 40 }}>
 
@@ -238,7 +373,7 @@ export default function MenuDetailScreen() {
                               </View> */}
                 </View>
             </ScrollView >
-            <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+            <TouchableOpacity style={styles.addBtn} onPress={deleteMenu}>
                 <Text style={styles.addBtnText}>supprimer </Text>
             </TouchableOpacity>
             <Modalize ref={uploadModaliseRef} handlePosition="inside" modalHeight={100} snapPoint={250}>
@@ -257,18 +392,53 @@ export default function MenuDetailScreen() {
                     </TouchableNativeFeedback>
                 </View>
             </Modalize>
-            <Modalize ref={PrixmodaliseRef} handlePosition="inside" modalHeight={180} snapPoint={250}>
+
+
+            <Modalize ref={PrixmodaliseRef} adjustToContentHeight
+                handlePosition='inside'
+                modalStyle={{
+                    borderTopRightRadius: 25,
+                    borderTopLeftRadius: 25,
+                    paddingVertical: 20
+                }}
+                handleStyle={{ marginTop: 10 }}
+                scrollViewProps={{
+                    keyboardShouldPersistTaps: "handled"
+                }}>
                 <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
-                <View style={styles.searchSection1}>
-                    {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
-                    <TextInput
+                <View style={styles.inputCard}>
+                    <OutlinedTextField
                         style={styles.input}
-                        value={detail.PRIX}
-                    // onChangeText={(newValue) => handleChange('menu', newValue)}
-                    // placeholder="Rechercher "
+                        label={"Modifier le prix"}
+                        value={data.price}
+                        onChangeText={(newValue) => handleChange('price', newValue)}
                     />
                 </View>
-                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('NewMenuScreen')}>
+                <TouchableOpacity onPress={() => UpdateData()} style={styles.addBtn} >
+                    <Text style={styles.addBtnText}>Modifier</Text>
+                </TouchableOpacity>
+            </Modalize>
+            <Modalize ref={TempsmodaliseRef} adjustToContentHeight
+                handlePosition='inside'
+                modalStyle={{
+                    borderTopRightRadius: 25,
+                    borderTopLeftRadius: 25,
+                    paddingVertical: 20
+                }}
+                handleStyle={{ marginTop: 10 }}
+                scrollViewProps={{
+                    keyboardShouldPersistTaps: "handled"
+                }}>
+                <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
+                <View style={styles.inputCard}>
+                    <OutlinedTextField
+                        style={styles.input}
+                        label={"Modifier le temps de preparation en min"}
+                        value={data.temps}
+                        onChangeText={(newValue) => handleChange('temps', newValue)}
+                    />
+                </View>
+                <TouchableOpacity onPress={() => UpdateData()} style={styles.addBtn} >
                     <Text style={styles.addBtnText}>Modifier</Text>
                 </TouchableOpacity>
             </Modalize>
@@ -290,14 +460,14 @@ export default function MenuDetailScreen() {
                     </View>
                     <AntDesign name="caretdown" size={20} color="#777" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.addBtn1} onPress={() => navigation.navigate('NewMenuScreen')}>
+                <TouchableOpacity style={styles.addBtn1} onPress={() => UpdateData()}>
                     <Text style={styles.addBtnText}>Modifier</Text>
                 </TouchableOpacity>
             </Modalize>
             <Modalize ref={CategoriemodaliseRef} handlePosition="inside" modalHeight={180} snapPoint={250}>
                 <Text style={{ marginBottom: "-1%", fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
                 <TouchableOpacity style={{ ...styles.modalCard, marginHorizontal: "3%", marginTop: 10 }}
-                 onPress={() => categoriesModalizeRef.current.open()}
+                    onPress={() => categoriesModalizeRef.current.open()}
                 // disabled={service.id_service == 2}
                 >
                     <View >
@@ -305,44 +475,66 @@ export default function MenuDetailScreen() {
                             Categorie
                         </Text>
                         {CategorieSelect ? <Text style={[styles.inputText, { color: '#000' }]}>
-                            {CategorieSelect   .NOM}
+                            {CategorieSelect.NOM}
                         </Text> :
                             <Text style={[styles.inputText, { color: '#000' }]}>{detail.categorie}</Text>
                         }
                     </View>
                     <AntDesign name="caretdown" size={20} color="#777" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.addBtn1} onPress={() => navigation.navigate('NewMenuScreen')}>
+                <TouchableOpacity style={styles.addBtn1} onPress={() => UpdateData()}>
                     <Text style={styles.addBtnText}>Modifier</Text>
                 </TouchableOpacity>
             </Modalize>
-            <Modalize ref={DescriptionmodaliseRef} handlePosition="inside" modalHeight={260} snapPoint={250}>
+            {/* <Modalize ref={DescriptionmodaliseRef} handlePosition="inside" modalHeight={260} snapPoint={250}>
                 <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
-                {/* <View style={styles.searchSection1}> */}
-                {/* <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} /> */}
-                {/* <TextInput
-                        style={styles.input}
-                        multiline={true}
-                        value={detail.DESCRIPTION}
-                        lineWidth={0.5}
-                        activeLineWidth={0.5}
-                    // onChangeText={(newValue) => handleChange('menu', newValue)}
-                    // placeholder="Rechercher "
-                    /> */}
+               
                 <OutlinedTextField
                     label={"Modifier description"}
                     fontSize={14}
                     style={styles.input}
                     value={detail.DESCRIPTION}
-                    // onChangeText={(desc) => setDescription(desc)}
+                   
                     lineWidth={0.5}
                     activeLineWidth={0.5}
                     baseColor={COLORS.smallBrown}
                     tintColor={COLORS.primary}
                     multiline={true}
                 />
-                {/* </View> */}
-                <TouchableOpacity style={styles.addBtn1} onPress={() => navigation.navigate('NewMenuScreen')}>
+                
+                <TouchableOpacity style={styles.addBtn1} onPress={() => UpdateData()}>
+                    <Text style={styles.addBtnText}>Modifier</Text>
+                </TouchableOpacity>
+            </Modalize> */}
+            <Modalize ref={DescriptionmodaliseRef}
+                adjustToContentHeight
+                handlePosition='inside'
+                modalStyle={{
+                    borderTopRightRadius: 25,
+                    borderTopLeftRadius: 25,
+                    paddingVertical: 20
+                }}
+                handleStyle={{ marginTop: 10 }}
+                scrollViewProps={{
+                    keyboardShouldPersistTaps: "handled"
+                }}
+            >
+                <Text style={{ marginBottom: 10, marginBottom: 30, fontWeight: 'bold', color: COLORS.ecommercePrimaryColor, fontSize: 18, paddingVertical: 10, textAlign: 'center', opacity: 0.7 }}>Modification</Text>
+
+                <View style={styles.inputCard}>
+                    <OutlinedTextField
+                        label={"Modifier la description"}
+                        fontSize={14}
+                        value={data.description}
+                        onChangeText={(newValue) => handleChange('description', newValue)}
+                        lineWidth={0.5}
+                        activeLineWidth={0.5}
+                        baseColor={COLORS.smallBrown}
+                        tintColor={COLORS.primary}
+                        multiline={true}
+                    />
+                </View>
+                <TouchableOpacity onPress={() => UpdateData()} style={styles.addBtn} >
                     <Text style={styles.addBtnText}>Modifier</Text>
                 </TouchableOpacity>
             </Modalize>
@@ -661,15 +853,16 @@ const styles = StyleSheet.create({
     },
     inputCard: {
         marginHorizontal: 20,
-        marginTop: 10,
+        marginTop: 0,
 
     },
     addBtn: {
-        width: "95%",
+        width: "90%",
         alignSelf: "center",
         backgroundColor: COLORS.ecommerceOrange,
         borderRadius: 10,
         paddingVertical: 15,
+        paddingHorizontal: 20,
         marginBottom: 10,
         marginTop: "1%"
     },

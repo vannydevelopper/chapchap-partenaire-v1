@@ -191,6 +191,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import fetchApi from "../../../helpers/fetchApi";
 
 export default function Product({ product, index, totalLength, fixMargins = false, onRemove }) {
+
   const [wishlist, setWishlist] = useState(false)
   const [selectedSize, setSelectedSize] = useState(null)
   const navigation = useNavigation()
@@ -363,15 +364,15 @@ const detail = async (product) => {
         <TouchableOpacity>
           <View style={styles.cardLike}>
             <AntDesign name="like2" size={24} color="#F29558" />
-           { product.NbreCommande&&<View style={styles.badge}>
-              <Text style={styles.badgeText} numberOfLines={1}>{product.NbreCommande?.nbr}</Text>
+            { product.NbreLike&&<View style={styles.badge}>
+              <Text style={styles.badgeText} numberOfLines={1}>{product.NbreLike?.nbr} </Text>
             </View> }
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.cartBtn} onPress={onCartPress}>
           <Fontisto name="shopping-basket" size={24} color="#F29558" />
-           { product.NbreLike&&<View style={styles.badge}>
-              <Text style={styles.badgeText} numberOfLines={1}>{product.NbreLike?.nbr} </Text>
+          { product.NbreCommande&&<View style={styles.badge}>
+              <Text style={styles.badgeText} numberOfLines={1}>{product.NbreCommande?.nbr}</Text>
             </View> }
         </TouchableOpacity>
       </View>
@@ -382,7 +383,10 @@ const detail = async (product) => {
         </Text>
       </View>
       {product.produit_partenaire.PRIX ? <Text style={{ color: "#F29558", fontWeight: "bold" }}>{product.produit_partenaire.PRIX.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Fbu</Text> : null}
-      <Text numberOfLines={2} style={styles.productName}>Quantite:{product.Qte.RESTANTE?product.Qte.RESTANTE:0}</Text>
+      <Text numberOfLines={2} style={styles.productName}>
+        {product.Qte.RESTANTE?product.Qte.RESTANTE:0}/
+        {product.NbreCommande?(parseInt(product.NbreCommande.nbr)+parseInt(product.Qte.RESTANTE)):parseInt(product.Qte.RESTANTE)}
+        Restant</Text>
      
       <Portal>
         <GestureHandlerRootView style={{ height: isOpen ? '100%' : 0, opacity: isOpen ? 1 : 0, backgroundColor: 'rgba(0, 0, 0, 0)', position: 'absolute', width: '100%', zIndex: 1 }}>

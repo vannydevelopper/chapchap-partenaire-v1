@@ -12,7 +12,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useCallback } from 'react';
 import fetchApi from '../../../helpers/fetchApi';
 
-export default function Menu({ menu, index, totalLength, fixMargins = false ,onRemove }) {
+export default function Menu({ menu, index,partenaire, totalLength, fixMargins = false ,onRemove }) {
     const navigation = useNavigation()
     const { width } = useWindowDimensions()
     const PRODUCT_MARGIN = 10
@@ -26,7 +26,7 @@ export default function Menu({ menu, index, totalLength, fixMargins = false ,onR
     }
     const detail = async (menu) => {
         const details = menu
-        navigation.navigate("MenuDetailScreen", { detail: menu })
+        navigation.navigate("MenuDetailScreen", { detail: menu,partenaire:partenaire })
 }
 
     return (

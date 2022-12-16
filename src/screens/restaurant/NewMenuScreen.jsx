@@ -55,8 +55,6 @@ export default function NewMenuScreen() {
         logoImage2: "",
     })
 
-    // console.log(detailData)
-
     const { checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
         quantite: {
             required: true,
@@ -98,7 +96,6 @@ export default function NewMenuScreen() {
             try {
                 const catego = await fetchApi("/resto/menu/categories")
                 setCategories(catego.result)
-                // console.log(catego.result)
             } catch (error) {
                 console.log(error)
             } finally {
@@ -107,20 +104,6 @@ export default function NewMenuScreen() {
         })()
     }, [])
 
-    // useEffect(() => {
-    //     (async () => {
-    //         try {
-    //             const repas = await fetchApi("/resto/repas/")
-    //             setRepass(repas.result)
-    //             // console.log(catego.result)
-    //         } catch (error) {
-    //             console.log(error)
-    //         } finally {
-
-    //         }
-    //     })()
-    // }, [data.q])
-
     useEffect(() => {
         (async () => {
             try {
@@ -128,8 +111,6 @@ export default function NewMenuScreen() {
                     var sousCatego = await fetchApi(`/resto/menu/sous_categories/${CategorieSelect.ID_CATEGORIE_MENU}`)
                     setSouscategories(sousCatego.result)
                 }
-                // console.log(sousCatego.result)
-
             }
             catch (error) {
                 console.log(error)
@@ -242,7 +223,6 @@ export default function NewMenuScreen() {
                 method: "POST",
                 body: form
             })
-            console.log("newMenu")
             navigation.navigate("NewMenuDetailScreen", { menus: newMenu })
         } catch (error) {
             console.log(error)

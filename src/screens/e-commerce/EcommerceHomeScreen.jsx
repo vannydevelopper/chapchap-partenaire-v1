@@ -14,6 +14,11 @@ import { Modalize } from "react-native-modalize";
 import { OutlinedTextField } from "rn-material-ui-textfield";
 import { useForm } from "../../hooks/useForm";
 import { useFormErrorsHandle } from "../../hooks/useFormErrorsHandle";
+import * as ImagePicker from 'expo-image-picker';
+import Loading from "../../components/app/Loading";
+import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
+
+
 
 export default function EcommerceHomeScreen() {
         const { width, height } = useWindowDimensions()
@@ -27,7 +32,16 @@ export default function EcommerceHomeScreen() {
         const productmodalizeRef = useRef(null)
         const [loadingProducts, setLoadingProducts] = useState(false)
         const [categories, setCategories] = useState([])
+        const [categoriesProduits, setCategoriesProduits] = useState([])
+        const [imagUpdate, setimagUpdate] = useState([])
+
+
         const [selectedCategorie, setSelectedCategorie] = useState(null)
+
+        const [loadingAdd, setLoadingAdd] = useState(false)
+        const [loading, setLoading] = useState(false)
+        const [serviceImage, setServiceImage] = useState(null)
+
 
         const [updateShop, setUpdateShop] = useState(false)
         const [updateAdresse, setUpdateAdresse] = useState(false)
@@ -41,6 +55,8 @@ export default function EcommerceHomeScreen() {
         const [selectedsousCategories, setSelectedsousCategories] = useState(null)
 
         const [detailData, setDetailData] = useState([])
+        const [autreTailles, setAutreTailles] = useState("")
+        const [autreCouleurs, setAutreCouleurs] = useState("")
         const [images, setImages] = useState([])
 
 
@@ -48,9 +64,13 @@ export default function EcommerceHomeScreen() {
         const [selectedCouleur, setselectedCouleur] = useState(null)
         const [CategorieSelect, setCategorieSelect] = useState(null)
         const [selectedSousCategorie, setselectedSousCategorie] = useState(null)
-
         const [showAUtresTaille, setShowAUtresTaille] = useState(false)
         const [showAUtresCouleur, setShowAUtresCouleur] = useState(false)
+
+        const [souscategories, setSouscategories] = useState([])
+        const [couleurs, setCouleur] = useState([])
+        const [tailles, setTaille] = useState([])
+        const [newProduct, setnewProduct] = useState([])
 
 
         const navigation = useNavigation()
@@ -64,6 +84,12 @@ export default function EcommerceHomeScreen() {
         const DescriptionmodalizeRef = useRef()
         const CategoriemodalizeRef = useRef()
         const FormmodalizeRef = useRef()
+
+        const couleurModalizeRef = useRef(null)
+        const tailleModalizeRef = useRef(null)
+        const ajoutDetailsModalizeRef = useRef(null)
+        const categoriesModalizeRef = useRef(null)
+        const SousCategoriesModalizeRef = useRef(null)
 
 
         const plusCategories = () => {
@@ -104,6 +130,38 @@ export default function EcommerceHomeScreen() {
                 setSelectedCategorie(categorie)
                 setSelectedsousCategories(null)
         }
+        const Ajouter_detail = () => {
+                var taille = TailleSelect
+                var coul = selectedCouleur
+                if (showAUtresTaille) {
+                        taille = {
+                                ID_TAILLE: 'autre',
+                                TAILLE: autreTailles
+                        }
+                }
+                if (showAUtresCouleur) {
+                        coul = {
+                                ID_COULEUR: 'autre',
+                                COULEUR: autreCouleurs
+                        }
+                }
+                setDetailData(t => [...t, {
+                        quantite: data.quantite,
+                        TailleSelect: taille,
+                        selectedCouleur: coul
+                }])
+                ajoutDetailsModalizeRef.current.close()
+        }
+
+        const ajoutTailleInput = (autresTaille) => {
+                setAutreTailles(autresTaille)
+                tailleModalizeRef.current.close()
+        }
+
+        const autreCouleurInput = (autresCouleur) => {
+                setAutreCouleurs(autresCouleur)
+                couleurModalizeRef.current.close()
+        }
 
         useEffect(() => {
                 (async () => {
@@ -122,7 +180,7 @@ export default function EcommerceHomeScreen() {
                 (async () => {
                         try {
                                 if (CategorieSelect != null) {
-                                        var sousCatego = await fetchApi(`/produit/sous_categorie/${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
+                                        var sousCatego = await fetchApi(`/produit/sous_categorie/${CategorieSelect?.ID_CATEGORIE_PRODUIT}`)
                                         setSouscategories(sousCatego.result)
                                 }
                         }
@@ -137,11 +195,12 @@ export default function EcommerceHomeScreen() {
         useEffect(() => {
                 (async () => {
                         try {
-                                var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
+                                var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${CategorieSelect?.ID_CATEGORIE_PRODUIT}`)
                                 if (selectedSousCategorie != null) {
-                                        var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE}`)
+                                        var taille = await fetchApi(`/produit/taille?ID_CATEGORIE_PRODUIT=${CategorieSelect?.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE}`)
                                         setTaille(taille.result)
                                 }
+
                         }
                         catch (error) {
                                 console.log(error)
@@ -154,9 +213,9 @@ export default function EcommerceHomeScreen() {
         useEffect(() => {
                 (async () => {
                         try {
-                                var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}`)
+                                var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${CategorieSelect?.ID_CATEGORIE_PRODUIT}`)
                                 if (selectedSousCategorie != null) {
-                                        var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${CategorieSelect.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE}`)
+                                        var couleur = await fetchApi(`/produit/couleur?ID_CATEGORIE_PRODUIT=${CategorieSelect?.ID_CATEGORIE_PRODUIT}&ID_PRODUIT_SOUS_CATEGORIE=${selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE}`)
                                         setCouleur(couleur.result)
                                 }
                         }
@@ -211,7 +270,50 @@ export default function EcommerceHomeScreen() {
                         setImages(t => [...t, image])
                 }
         }
+        const onImporterPhoto = async () => {
+                uploadModaliseRef.current.close()
+                const photo = await ImagePicker.launchImageLibraryAsync({
+                    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                    allowsMultipleSelection: true
+                })
+                if (photo.cancelled) {
+                    return false
+                }
+                setServiceImage(photo)
+                try {
+                    setLoading(true)
+        
+                    const form = new FormData()
+                    if (serviceImage) {
+                        const manipResult = await manipulateAsync(
+                            serviceImage.uri,
+                            [
+                                { resize: { width: 500 } }
+                            ],
+                            { compress: 0.8, format: SaveFormat.JPEG }
+                        );
+                        let localUri = manipResult.uri;
+                        let filename = localUri.split('/').pop();
+                        let match = /\.(\w+)$/.exec(filename);
+                        let type = match ? `image/${match[1]}` : `image`;
+                        form.append('IMAGE', {
+                            uri: localUri, name: filename, type
+                        })
+                    }
 
+                    const menuUpdate = await fetchApi(`/service/updateImage/${partenaire.produit.ID_PARTENAIRE_SERVICE}`, {
+                        method: "PUT",
+                        body: form
+                    })
+                setimagUpdate(menuUpdate.result)
+                }
+                catch (error) {
+                    console.log(error)
+                }
+                finally{
+                    setLoading(false)
+                }
+            }
         const onRemoveImage = index => {
                 const newImages = images.filter((_, i) => i != index)
                 setImages(newImages)
@@ -255,7 +357,7 @@ export default function EcommerceHomeScreen() {
                                 method: "GET",
                                 headers: { "Content-Type": "application/json" },
                         })
-                        setCategories(response.result)
+                        setCategoriesProduits(response.result)
 
                 }
                 catch (error) {
@@ -268,9 +370,8 @@ export default function EcommerceHomeScreen() {
                 fecthProduits()
         }, []))
         const UpdateData = async () => {
-
                 try {
-                        // setLoading(true)
+                        setLoading(true)
                         const form = new FormData()
                         form.append("NOM_ORGANISATION", data.shop)
                         form.append("ADRESSE", data.adresse)
@@ -296,7 +397,7 @@ export default function EcommerceHomeScreen() {
                 } catch (error) {
                         console.log(error)
                 } finally {
-                        // setLoading(false)
+                setLoading(false)
                 }
         }
         useFocusEffect(useCallback(() => {
@@ -316,67 +417,26 @@ export default function EcommerceHomeScreen() {
                 return (a + '').charAt(0).toUpperCase() + a.substr(1);
         }
         const SendData = async () => {
-                setLoading(true)
+                setLoadingAdd(true)
                 try {
                         const form = new FormData()
-                        // if (product) {
-                        //         form.append('PRODUIT', JSON.stringify(product))
-                        //         form.append('ID_PARTENAIRE_SERVICE', partenaire.produit.ID_PARTENAIRE_SERVICE)
-                        // } else {
-                        form.append('ID_CATEGORIE_PRODUIT', CategorieSelect.ID_CATEGORIE_PRODUIT)
+                        form.append('ID_CATEGORIE_PRODUIT', CategorieSelect?.ID_CATEGORIE_PRODUIT)
                         form.append('ID_PRODUIT_SOUS_CATEGORIE', selectedSousCategorie.ID_PRODUIT_SOUS_CATEGORIE)
                         form.append('NOM', data.produit)
                         form.append('PRIX', data.prix)
                         form.append('ID_PARTENAIRE_SERVICE', partenaire.produit.ID_PARTENAIRE_SERVICE)
-                        if (logoImage) {
-                                const manipResult = await manipulateAsync(
-                                        logoImage.uri,
-                                        [
-                                                { resize: { width: 500 } }
-                                        ],
-                                        { compress: 0.8, format: SaveFormat.JPEG }
-                                );
-                                let localUri = manipResult.uri;
-                                let filename = localUri.split('/').pop();
-                                let match = /\.(\w+)$/.exec(filename);
-                                let type = match ? `image/${match[1]}` : `image`;
-                                form.append('IMAGE_1', {
-                                        uri: localUri, name: filename, type
-                                })
-
-                        }
-                        if (logoImage2) {
-                                const manipResult = await manipulateAsync(
-                                        logoImage2.uri,
-                                        [
-                                                { resize: { width: 500 } }
-                                        ],
-                                        { compress: 0.8, format: SaveFormat.JPEG }
-                                );
-                                let localUri = manipResult.uri;
-                                let filename = localUri.split('/').pop();
-                                let match = /\.(\w+)$/.exec(filename);
-                                let type = match ? `image/${match[1]}` : `image`;
-                                form.append('IMAGE_2', {
-                                        uri: localUri, name: filename, type
-                                })
-                        }
-                        if (logoImage3) {
-                                const manipResult = await manipulateAsync(
-                                        logoImage3.uri,
-                                        [
-                                                { resize: { width: 500 } }
-                                        ],
-                                        { compress: 0.8, format: SaveFormat.JPEG }
-                                );
-                                let localUri = manipResult.uri;
-                                let filename = localUri.split('/').pop();
-                                let match = /\.(\w+)$/.exec(filename);
-                                let type = match ? `image/${match[1]}` : `image`;
-                                form.append('IMAGE_3', {
-                                        uri: localUri, name: filename, type
-                                })
-                                // }
+                        if (images.length > 0) {
+                                await Promise.all(images.map(async (image, index) => {
+                                        const key = `IMAGE_${index + 1}`
+                                        const manipResult = image
+                                        let localUri = manipResult.uri;
+                                        let filename = localUri.split('/').pop();
+                                        let match = /\.(\w+)$/.exec(filename);
+                                        let type = match ? `image/${match[1]}` : `image`;
+                                        form.append(key, {
+                                                uri: localUri, name: filename, type
+                                        })
+                                }))
                         }
                         form.append('DETAIL', JSON.stringify(detailData))
                         const res = await fetchApi("/produit/stock/create", {
@@ -384,19 +444,29 @@ export default function EcommerceHomeScreen() {
                                 body: form
                         })
                         setnewProduct(res.result)
-                        navigation.navigate("ProductDetailScreen", { product: newProduct })
-                        // navigation.navigate("EcommerceHomeScreen", { partenaire: false })
+                        FormmodalizeRef.current?.close()
                 }
                 catch (error) {
                         console.log(error)
                 }
                 finally {
-                        setLoading(false);
+                        handleChange('produit', "")
+                        handleChange('prix', "")
+                        handleChange('quantite', "")
+                        setTailleSelect(null)
+                        setImages([]),
+                                setDetailData([])
+                        setAutreCouleurs(false)
+                        setselectedSousCategorie(null)
+                        setAutreTailles(false)
+                        setselectedCouleur(null)
+                        setCategorieSelect(null)
+                        setLoadingAdd(false)
                 }
-
         }
         return (
                 <>
+                        {loadingAdd||loading && <Loading />}
                         <StatusBar backgroundColor='#fff' barStyle='dark-content' />
                         <View style={styles.cardBack}>
                                 <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()} >
@@ -408,9 +478,14 @@ export default function EcommerceHomeScreen() {
                                         setImageIndex(1)
                                         setShowImageModal(true)
                                 }}>
+                                        {imagUpdate.length>0 ? 
+                                        <View style={{ width: '100%', marginTop: 10 }}>
+                                            <  Image source={{ uri: imagUpdate[0].LOGO }} style={{ ...styles.imagePrincipal }} />
+                                        </View> 
+                                        :
                                         <View style={{ width: '100%', maxHeight: "100%", marginTop: 10 }}>
                                                 <  Image source={{ uri: partenaire.produit.LOGO }} style={{ ...styles.imagePrincipal }} />
-                                        </View>
+                                        </View>}
                                 </TouchableWithoutFeedback>
 
                                 <TouchableOpacity onPress={() => onSelectPhoto()} style={styles.uploadImages}>
@@ -470,7 +545,7 @@ export default function EcommerceHomeScreen() {
                                         <View>
                                                 <Text style={[styles.titlePrincipal, products.length == 0 && { textAlign: "center" }]}>Mes categories</Text>
                                         </View>
-                                        {categories.length > 4 && <View style={{ marginLeft: 100 }}>
+                                        {categoriesProduits.length > 4 && <View style={{ marginLeft: 100 }}>
                                                 <View style={{ flexDirection: 'row' }}>
                                                         <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} style={{ marginRight: -15 }} />
                                                         <MaterialIcons name="navigate-next" size={24} color={COLORS.ecommerceOrange} />
@@ -483,7 +558,7 @@ export default function EcommerceHomeScreen() {
                                         showsHorizontalScrollIndicator={false}
                                 >
                                         <View style={styles.categories}>
-                                                {categories.map((categorie, index) => {
+                                                {categoriesProduits.map((categorie, index) => {
                                                         return (
 
                                                                 <TouchableOpacity onPress={() => onCategoryPress(categorie)} style={[styles.category, index == 0 && { marginLeft: 0 }]} key={index}>
@@ -527,6 +602,7 @@ export default function EcommerceHomeScreen() {
                                                                         totalLength={products.length}
                                                                         key={index}
                                                                         fixMargins
+                                                                        
                                                                 />
                                                         )
                                                 })
@@ -617,8 +693,8 @@ export default function EcommerceHomeScreen() {
 
                         <Modalize ref={uploadModaliseRef} handlePosition="inside" modalHeight={100} snapPoint={250}>
                                 <View style={styles.modalContent}>
-                                        <TouchableNativeFeedback >
-                                                {/* <TouchableNativeFeedback onPress={() => onImporterPhoto()}> */}
+                                        
+                                                <TouchableNativeFeedback onPress={() => onImporterPhoto()}>
                                                 <View style={styles.modalAction}>
                                                         <View style={styles.actionIcon}>
                                                                 <AntDesign name="folderopen" size={24} color="black" />
@@ -816,7 +892,7 @@ export default function EcommerceHomeScreen() {
                         </Modalize>
                         <Modalize
                                 ref={FormmodalizeRef}
-                                adjustToContentHeight
+                                // adjustToContentHeight
                                 handlePosition='inside'
                                 modalStyle={{
                                         borderTopRightRadius: 25,
@@ -828,8 +904,10 @@ export default function EcommerceHomeScreen() {
                                         keyboardShouldPersistTaps: "handled"
                                 }}
                         >
-                                <Text style={styles.title}>Nouveau produit</Text>
-                                <ScrollView keyboardShouldPersistTaps="handled" style={{ marginBottom: 20 }}>
+                               <Text style={styles.title}>Nouveau produit</Text>
+
+                                <ScrollView>
+                                        
                                         <View>
 
                                                 <View>
@@ -856,9 +934,9 @@ export default function EcommerceHomeScreen() {
                                                                                 <Text style={[styles.inputText, { fontSize: 13 }]}>
                                                                                         Categorie
                                                                                 </Text>
-                                                                                {/* {CategorieSelect && <Text style={[styles.inputText, { color: '#000' }]}>
-                                                                                                {CategorieSelect.NOM}
-                                                                                        </Text>} */}
+                                                                                {CategorieSelect && <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                        {CategorieSelect?.NOM}
+                                                                                </Text>}
                                                                         </View>
                                                                         <AntDesign name="caretdown" size={20} color="#777" />
                                                                 </TouchableOpacity>
@@ -872,9 +950,9 @@ export default function EcommerceHomeScreen() {
                                                                                 <Text style={[styles.inputText, { fontSize: 13 }]}>
                                                                                         Sous Categorie
                                                                                 </Text>
-                                                                                {/* {selectedSousCategorie && <Text style={[styles.inputText, { color: '#000' }]}>
-                                                                                                {selectedSousCategorie.NOM}
-                                                                                        </Text>} */}
+                                                                                {selectedSousCategorie && <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                        {selectedSousCategorie.NOM}
+                                                                                </Text>}
                                                                         </View>
                                                                         <AntDesign name="caretdown" size={20} color="#777" />
                                                                 </TouchableOpacity>
@@ -947,6 +1025,242 @@ export default function EcommerceHomeScreen() {
                                                 </TouchableOpacity>
                                         </View>
                                 </ScrollView>
+                        </Modalize>
+
+                        {/* LES CATEGORIES */}
+                        <Modalize ref={categoriesModalizeRef} adjustToContentHeight handlePosition='inside'>
+                                <>
+                                        <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 15 }}>
+                                                <Text style={{ fontSize: 17, fontWeight: "bold" }}>Categories</Text>
+                                        </View>
+                                        <View>
+                                        <TouchableOpacity style={styles.modalAutres} >
+                                                        {showAUtresTaille ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                                <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                                        <Text style={{ fontSize: 15, }}>Autres</Text>
+                                                </TouchableOpacity>
+                                                {categories.map((categorie, index) => {
+                                                        return (
+                                                                <TouchableOpacity key={index} onPress={() => onCategorieSelect(categorie)}>
+                                                                        <View style={styles.modalItemModel2} >
+                                                                                {CategorieSelect?.ID_CATEGORIE_PRODUIT == categorie.ID_CATEGORIE_PRODUIT ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                                                        <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                                                                <Text>{categorie.NOM}</Text>
+                                                                        </View>
+                                                                </TouchableOpacity>
+                                                        )
+                                                })}
+
+                                        </View>
+                                </>
+                        </Modalize>
+
+                        {/* LES SOUS CATEGORIES */}
+                        <Modalize ref={SousCategoriesModalizeRef} adjustToContentHeight handlePosition='inside'>
+                                <>
+                                        <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 15 }}>
+                                                <Text style={{ fontSize: 17, fontWeight: "bold" }}>Sous Categories</Text>
+                                        </View>
+                                        <View>
+                                        <TouchableOpacity style={styles.modalAutres} >
+                                                        {showAUtresTaille ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                                <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                                        <Text style={{ fontSize: 15, }}>Autres</Text>
+                                                </TouchableOpacity>
+                                                {souscategories.map((souscategorie, index) => {
+                                                        return (
+                                                                <TouchableOpacity key={index} onPress={() => onSousCategorieSelect(souscategorie)}>
+                                                                        <View style={styles.modalItemModel2} >
+                                                                                {selectedSousCategorie?.ID_PRODUIT_SOUS_CATEGORIE == souscategorie.ID_PRODUIT_SOUS_CATEGORIE ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                                                        <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                                                                <Text>{souscategorie.NOM}</Text>
+                                                                        </View>
+                                                                </TouchableOpacity>
+                                                        )
+                                                })}
+
+
+
+                                        </View>
+                                </>
+                        </Modalize>
+
+                        {/* DETAIL DES PRODUITS */}
+                        <Modalize ref={ajoutDetailsModalizeRef} adjustToContentHeight handlePosition='inside'>
+                                <>
+                                        <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 15 }}>
+                                                <Text style={{ fontSize: 17, fontWeight: "bold" }}>Details</Text>
+                                        </View>
+                                        <View>
+                                                <TouchableOpacity >
+                                                        <View style={styles.modalItem} >
+                                                                <View style={styles.inputCard}>
+                                                                        <OutlinedTextField
+                                                                                label={"Quantite Total"}
+                                                                                fontSize={14}
+                                                                                value={data.quantite}
+                                                                                onChangeText={(newValue) => handleChange('quantite', newValue)}
+                                                                                onBlur={() => checkFieldData('quantite')}
+                                                                                error={hasError('quantite') ? getError('quantite') : ''}
+                                                                                keyboardType='number-pad'
+                                                                                lineWidth={0.5}
+                                                                                activeLineWidth={0.5}
+                                                                                baseColor={COLORS.smallBrown}
+                                                                                tintColor={COLORS.primary}
+                                                                        />
+
+                                                                        <View>
+                                                                                <TouchableOpacity style={styles.modalCard}
+                                                                                        onPress={() => tailleModalizeRef.current.open()}
+                                                                                >
+                                                                                        <View >
+                                                                                                <Text style={[styles.inputText, { fontSize: 13 }]}>
+                                                                                                        Taille
+                                                                                                </Text>
+                                                                                                {TailleSelect ? <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                                        {TailleSelect.TAILLE}
+                                                                                                </Text> :
+                                                                                                        <Text style={[styles.inputText, { color: '#000' }]}>{autreTailles}</Text>}
+                                                                                        </View>
+                                                                                        <AntDesign name="caretdown" size={20} color="#777" />
+                                                                                </TouchableOpacity>
+                                                                        </View>
+
+                                                                        <View style={{ marginTop: 10 }}>
+                                                                                <TouchableOpacity style={styles.modalCard}
+                                                                                        onPress={() => couleurModalizeRef.current.open()}
+                                                                                >
+                                                                                        <View >
+                                                                                                <Text style={[styles.inputText, { fontSize: 13 }]}>
+                                                                                                        Couleur
+                                                                                                </Text>
+                                                                                                {selectedCouleur ? <Text style={[styles.inputText, { color: '#000' }]}>
+                                                                                                        {selectedCouleur.COULEUR}
+                                                                                                </Text> :
+                                                                                                        <Text style={[styles.inputText, { color: '#000' }]}>{autreCouleurs}</Text>}
+                                                                                        </View>
+                                                                                        <AntDesign name="caretdown" size={20} color="#777" />
+                                                                                </TouchableOpacity>
+                                                                        </View>
+
+                                                                        <TouchableOpacity onPress={Ajouter_detail}>
+                                                                                <View style={styles.buttonModal}>
+                                                                                        <Text style={styles.buttonText} >Ajouter</Text>
+                                                                                </View>
+                                                                        </TouchableOpacity>
+
+
+                                                                </View>
+                                                        </View>
+                                                </TouchableOpacity>
+
+                                        </View>
+                                </>
+                        </Modalize>
+
+                        {/* TAILLE */}
+                        <Modalize ref={tailleModalizeRef} adjustToContentHeight handlePosition='inside'>
+                                <>
+                                        <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 15 }}>
+                                                <Text style={{ fontSize: 17, fontWeight: "bold" }}>Tailles</Text>
+                                        </View>
+                                        <View>
+                                                <TouchableOpacity style={styles.modalAutres} onPress={AutresTypesTaille}>
+                                                        {showAUtresTaille ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                                <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                                        <Text style={{ fontSize: 15, fontWeight: "bold" }}>Autres</Text>
+                                                </TouchableOpacity>
+
+                                                {tailles.map((taille, index) => {
+                                                        return (
+                                                                <TouchableOpacity key={index} onPress={() => onTaillesSelect(taille)}>
+                                                                        <View style={styles.modalItemModel2} >
+                                                                                {TailleSelect?.ID_TAILLE == taille.ID_TAILLE ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                                                        <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                                                                <Text>{taille.TAILLE}</Text>
+                                                                        </View>
+
+                                                                </TouchableOpacity>
+                                                        )
+                                                })}
+
+
+                                                {showAUtresTaille && <View style={{ marginHorizontal: 20, marginTop: 10 }}>
+                                                        <OutlinedTextField
+                                                                label={"Autres Tailles"}
+                                                                fontSize={14}
+                                                                value={data.autresTaille}
+                                                                onChangeText={(newValue) => handleChange('autresTaille', newValue)}
+                                                                onBlur={() => checkFieldData('autresTaille')}
+                                                                error={hasError('autresTaille') ? getError('autresTaille') : ''}
+                                                                lineWidth={0.5}
+                                                                activeLineWidth={0.5}
+                                                                baseColor={COLORS.smallBrown}
+                                                                tintColor={COLORS.primary}
+                                                        />
+                                                </View>}
+
+                                                {showAUtresTaille && <TouchableOpacity onPress={() => ajoutTailleInput(data.autresTaille)}>
+                                                        <View style={styles.buttonModalSecond}>
+                                                                <Text style={styles.buttonText} >Ajouter</Text>
+                                                        </View>
+                                                </TouchableOpacity>}
+
+
+
+
+                                        </View>
+                                </>
+                        </Modalize>
+
+                        {/* COULEUR */}
+                        <Modalize ref={couleurModalizeRef} adjustToContentHeight handlePosition='inside'>
+                                <>
+                                        <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 15 }}>
+                                                <Text style={{ fontSize: 17, fontWeight: "bold" }}>Couleurs</Text>
+                                        </View>
+                                        <View>
+                                                <TouchableOpacity style={styles.modalAutres} onPress={AutresTypesCouleurs}>
+                                                        {showAUtresCouleur ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                                <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                                        <Text style={{ fontSize: 15, fontWeight: "bold" }}>Autres</Text>
+                                                </TouchableOpacity>
+
+                                                {couleurs.map((couleur, index) => {
+                                                        return (
+                                                                <TouchableOpacity key={index} onPress={() => onCouleurSelect(couleur)}>
+                                                                        <View style={styles.modalItemModel2} >
+                                                                                {selectedCouleur?.ID_COULEUR == couleur.ID_COULEUR ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                                                        <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                                                                <Text>{couleur.COULEUR}</Text>
+                                                                        </View>
+                                                                </TouchableOpacity>
+                                                        )
+                                                })}
+
+                                                {showAUtresCouleur && <View style={{ marginHorizontal: 20, marginTop: 10 }}>
+                                                        <OutlinedTextField
+                                                                label={"Autres Couleurs"}
+                                                                fontSize={14}
+                                                                value={data.autresCouleur}
+                                                                onChangeText={(newValue) => handleChange('autresCouleur', newValue)}
+                                                                onBlur={() => checkFieldData('autresCouleur')}
+                                                                error={hasError('autresCouleur') ? getError('autresCouleur') : ''}
+                                                                lineWidth={0.5}
+                                                                activeLineWidth={0.5}
+                                                                baseColor={COLORS.smallBrown}
+                                                                tintColor={COLORS.primary}
+                                                        />
+                                                </View>}
+
+                                                {showAUtresCouleur && <TouchableOpacity onPress={() => autreCouleurInput(data.autresCouleur)}>
+                                                        <View style={styles.buttonModalSecond}>
+                                                                <Text style={styles.buttonText} >Ajouter</Text>
+                                                        </View>
+                                                </TouchableOpacity>}
+
+                                        </View>
+                                </>
                         </Modalize>
                 </>
         )
