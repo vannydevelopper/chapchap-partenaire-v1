@@ -328,7 +328,7 @@ export default function ProductDetailsScreen() {
     }, []))
     const UpdateNom = async () => {
         try {
-            // setLoading(true)
+            setLoading(true)
             const form = new FormData()
             form.append("NOM", data.product)
             const updateProduct = await fetchApi(`/products/updateNom/${product.produit.ID_PRODUIT}`, {
@@ -340,12 +340,13 @@ export default function ProductDetailsScreen() {
         } catch (error) {
             console.log(error)
         } finally {
-            // setLoading(false)
+             setLoading(false)
         }
     }
     const UpdateDescription = async () => {
 
         try {
+            setLoading(true)
             const form = new FormData()
             form.append("DESCRIPTION", data.description)
             const updateDescription = await fetchApi(`/products/updateDescription/${product.produit_partenaire.ID_PRODUIT_PARTENAIRE}`, {
@@ -358,12 +359,13 @@ export default function ProductDetailsScreen() {
         } catch (error) {
             console.log(error)
         } finally {
-            // setLoading(false)
+            setLoading(false)
         }
     }
 
     const aprovisionner = async () => {
         try {
+            setLoading(true)
             const form = new FormData()
             form.append("QUANTITE_RESTANTE", quantite)
             form.append("ID_TAILLE", selectedSize?.id)
@@ -396,7 +398,7 @@ export default function ProductDetailsScreen() {
         } catch (error) {
             console.log(error)
         } finally {
-            // setLoading(false)
+            setLoading(false)
         }
     }
     const deleteProduct = async () => {
@@ -462,6 +464,7 @@ export default function ProductDetailsScreen() {
     }
     const UpdatePrice = async () => {
         try {
+            setLoading(true)
             const form = new FormData()
             form.append("PRIX", data.price)
             const updateDescription = await fetchApi(`/products/updatePrice/${product.produit_partenaire.ID_PRODUIT_PARTENAIRE}`, {
@@ -473,7 +476,7 @@ export default function ProductDetailsScreen() {
         } catch (error) {
             console.log(error)
         } finally {
-            // setLoading(false)
+         setLoading(false)
         }
     }
     return (
