@@ -283,7 +283,7 @@ export default function ProductDetailsScreen() {
             })
             setSIZES(sizes.result)
         }
-        catch (error) {
+        catch (error) { 
             console.log(error)
         }
     }
