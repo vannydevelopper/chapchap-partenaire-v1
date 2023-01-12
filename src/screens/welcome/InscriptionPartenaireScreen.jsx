@@ -138,7 +138,8 @@ export default function InscriptionPartenaireScreen() {
                                         method: "POST",
                                         body: form
                               })
-                              navigation.navigate('PaymentScreen', { partenaire:res ,service:service})
+                              navigation.navigate('HomeScreen')
+                              // navigation.navigate('PaymentScreen', { partenaire:res ,service:service})
                               // navigation.navigate('HomeScreen')
                               // navigation.navigate("EcommerceHomeScreen")
                     }
