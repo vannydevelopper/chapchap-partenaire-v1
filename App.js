@@ -7,6 +7,7 @@ import { Host } from 'react-native-portalize';
 import InscriptionPartenaireScreen from './src/screens/welcome/InscriptionPartenaireScreen';
 import HomeScreen from './src/screens/welcome/HomeScreen';
 import CommandeEmiseScreen from './src/screens/e-commerce/CommandeEmiseScreen';
+import { StatusBar } from 'expo-status-bar';
 
 
 export default function App() {

@@ -6,14 +6,11 @@ import {
           useWindowDimensions,
           TouchableOpacity
 } from "react-native";
-import { Feather, FontAwesome, EvilIcons, AntDesign, Octicons } from '@expo/vector-icons';
 import { StatusBar } from "expo-status-bar";
-import Animated from "react-native-reanimated";
-import Carousel from "../../components/app/Carousel";
-import ServicesCategories from "../../components/app/ServicesCategories";
 import { COLORS } from "../../styles/COLORS";
 import { DrawerActions, useNavigation, useRoute } from "@react-navigation/native";
-import SericePartenaire from "../../components/app/SericePartenaire";
+import ServicesPartenaire from "../../components/app/ServicesPartenaire";
+import Header from "../../components/app/Header";
 
 export default function HomeScreen() {
           const navigation = useNavigation()
@@ -22,57 +19,12 @@ export default function HomeScreen() {
                     <>
                               <StatusBar backgroundColor='#fff' barStyle='dark-content' />
                               <View style={styles.imgBackground}>
-                                        <View style={styles.cardHeader}>
-                                                  <TouchableOpacity style={styles.menuOpener} onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
-                                                            <View style={styles.menuOpenerLine} />
-                                                            <View style={[styles.menuOpenerLine, { width: 15 }]} />
-                                                            <View style={[styles.menuOpenerLine, { width: 25 }]} />
-                                                  </TouchableOpacity>
-                                                  <View style={styles.imageContainer}>
-                                                            <Image source={require('../../../assets/images/chapchap.png')} style={styles.logo} />
-                                                  </View>
-                                                  <View style={{ marginTop: 25 }}>
-                                                            <Octicons name="bell" size={24} color={COLORS.primary} />
-                                                  </View>
-                                        </View>
-                                        <ScrollView>
-                                        <Carousel />
-                                        {/* <ServicesCategories /> */}
-                                        <SericePartenaire/>
-                                        </ScrollView>
+                                        <ServicesPartenaire />
                               </View>
                     </>
           )
 }
 const styles = StyleSheet.create({
-          cardHeader: {
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    paddingHorizontal: 20,
-                    height: 88
-          },
-          imageContainer: {
-                    height: "100%",
-                    width: 100,
-                    justifyContent: 'center',
-                    alignItems: 'center'
-          },
-          logo: {
-                    resizeMode: 'center',
-                    height: "50%",
-                    width: "50%",
-                    marginTop: 25
-          },
-          menuOpener: {
-                    marginTop: 25
-          },
-          menuOpenerLine: {
-                    height: 3,
-                    width: 30,
-                    backgroundColor: COLORS.primary,
-                    marginTop: 5
-          },
           imgBackground: {
                     flex: 1,
                     width: '100%',

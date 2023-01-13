@@ -118,8 +118,6 @@ export default function InscriptionScreen() {
                                                                       <Text style={styles.Title}>Compte partenaire</Text>
                                                                       <Text style={styles.description}> Chap Chap</Text>
                                                             </View>
-
-
                                                             <View style={styles.inputCard}>
                                                                       <View>
                                                                                 <OutlinedTextField
@@ -144,9 +142,7 @@ export default function InscriptionScreen() {
                                                                                           blurOnSubmit={false}
                                                                                 />
                                                                       </View>
-
                                                             </View>
-
                                                             <View style={styles.inputCard}>
                                                                       <View>
                                                                                 <OutlinedTextField

@@ -11,16 +11,17 @@ import HomeAllServiceScreen from "../screens/home/HomeAllServiceScreen";
 import ProductDetailsScreen from "../screens/e-commerce/ProductDetailsScreen";
 import ApprovisionnementScreen from "../screens/e-commerce/ApprovisionnementScreen";
 import PaymentScreen from "../screens/home/PaymentScreen";
+import Header from "../components/app/Header";
 
 export default function HomeNavigator() {
           const Stack = createStackNavigator()
           return (
-                    <Stack.Navigator screenOptions={{ headerShown: false }}>
+                    <Stack.Navigator screenOptions={{ header: () => <Header  /> }}>
                               <Stack.Screen name='HomeScreen' component={HomeScreen} />
                               <Stack.Screen name="EcommerceHomeScreen" component={EcommerceHomeScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
                               <Stack.Screen name="HomeAllServiceScreen" component={HomeAllServiceScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
                               <Stack.Screen name="ServiceNotFoundScreen" component={ServiceNotFoundScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }} />
-                              <Stack.Screen name="InscriptionPartenaireScreen" component={InscriptionPartenaireScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }} />
+                              <Stack.Screen name="InscriptionPartenaireScreen" component={InscriptionPartenaireScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, headerShown: false }} />
                               <Stack.Screen name="AccueilSearchProduitScreen" component={AccueilSearchProduitScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
                               <Stack.Screen name="ProduitFormulaireScreen" component={ProduitFormulaireScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
                               <Stack.Screen name="ProductDetailScreen" component={ProductDetailsScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>

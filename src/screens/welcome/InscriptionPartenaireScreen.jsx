@@ -1,17 +1,14 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react'
-import { ScrollView, StyleSheet, Text, View, Image, TouchableWithoutFeedback, Button, TouchableOpacity, ImageBackground, TouchableNativeFeedback, TextInput, } from "react-native";
+import { ScrollView, StyleSheet, Text, View, Image, TouchableWithoutFeedback, Button, TouchableOpacity, ImageBackground, TouchableNativeFeedback, TextInput, StatusBar, ActivityIndicator, } from "react-native";
 import { TextField, FilledTextField, InputAdornment, OutlinedTextField } from 'rn-material-ui-textfield'
 import { useForm } from '../../hooks/useForm';
 import { Modalize } from 'react-native-modalize';
 import useFetch from "../../hooks/useFetch";
 import { DrawerActions, useFocusEffect, useNavigation, useNavigationBuilder, useRoute } from '@react-navigation/native';
 import fetchApi from '../../helpers/fetchApi';
-import { MaterialCommunityIcons, Octicons ,Ionicons} from '@expo/vector-icons';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { setUserAction } from "../../store/actions/userActions"
+import { MaterialCommunityIcons, Octicons, Ionicons } from '@expo/vector-icons';
 
 import { COLORS } from '../../styles/COLORS';
-// import {  useToast } from 'native-base';
 import { Feather, Entypo, AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
@@ -26,7 +23,7 @@ export default function InscriptionPartenaireScreen() {
           const navigation = useNavigation()
           const dispatch = useDispatch()
           const [services, setService] = useState([])
-          const [partenairetypes, setPartenairetype] = useState([])
+          const [loadingTypes, partenairetypes] = useFetch('/partenaire/type')
           const [location, setLocation] = useState(null)
           const servicesModalizeRef = useRef(null)
           const partenairetypesModalizeRef = useRef(null)
@@ -38,7 +35,7 @@ export default function InscriptionPartenaireScreen() {
           const [backgroundImage, setBackgroundImage] = useState(null)
           const [isLoading, setIsLoading] = useState(false)
           const [loading, setLoading] = useState(false);
-          const { id_service,service } = route.params
+          const { id_service, service } = route.params
           const user = useSelector(userSelector)
           const form = new FormData()
           const [data, handleChange, setValue] = useForm({
@@ -51,23 +48,26 @@ export default function InscriptionPartenaireScreen() {
                     adresse: "",
           })
 
-      //     console.log(data.typepartenaireselect)
-
-          const isValid = useCallback(() => {
-                    const basicValidation = selectedTypePartenaire !=null && data.email != "" && data.telephone != "" && logoImage != null
-                    if(selectedTypePartenaire && selectedTypePartenaire?.ID_PARTENAIRE_TYPE == 2) {
-                              return basicValidation && data.organisation != "" && data.adresse != "" && data.nif != ""
-                    }
-                    return basicValidation
-          }, [data, logoImage, selectedTypePartenaire])
           const { checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
+                    organisation: {
+                              required: true,
+                              length: [1, 200]
+                    },
+                    adresse: {
+                              required: true,
+                              length: [1, 200]
+                    },
+                    nif: {
+                              required: true,
+                              length: [1, 30]
+                    },
                     email: {
                               required: true,
                               email: true
                     },
                     telephone: {
                               required: true,
-
+                              length: [1, 15]
                     },
           }, {
                     email: {
@@ -75,23 +75,45 @@ export default function InscriptionPartenaireScreen() {
                               email: "Email invalide"
                     },
                     telephone: {
-                              required: "Telephone est obligatoire"
+                              required: "Le numéro de téléphone est obligatoire",
+                              length: "Numéro de téléphone invalide"
+                    },
+                    organisation: {
+                              required: "Le nom du service est obligatoire",
+                              length: "Nom du service invalide"
+                    },
+                    adresse: {
+                              required: "L'adresse est obligatoire",
+                              length:"Adresse incorrecte"
+                    },
+                    nif: {
+                              required: "Le NIF est obligatoire",
+                              length:"NIF incorrect"
                     },
           })
+
+          const isValid = useCallback(() => {
+                    const basicValidation = selectedTypePartenaire != null && data.email != "" && data.telephone != "" && logoImage != null && logoImage != null && backgroundImage != null
+                    // if (selectedTypePartenaire && selectedTypePartenaire?.ID_PARTENAIRE_TYPE == 2) {
+                    //           return basicValidation && data.organisation != "" && data.adresse != "" && data.nif != ""
+                    // }
+                    return basicValidation && isValidate()
+          }, [data, logoImage, selectedTypePartenaire, backgroundImage, isValidate])
+
           const sendData = async () => {
                     try {
                               setLoading(true)
                               form.append('ID_TYPE_PARTENAIRE', selectedTypePartenaire.ID_PARTENAIRE_TYPE)
-                              if(data.organisation){
-                                console.log("org")
-                                form.append('NOM_ORGANISATION', data.organisation)
+                              if (data.organisation) {
+                                        console.log("org")
+                                        form.append('NOM_ORGANISATION', data.organisation)
                               }
-                              else{
-                                console.log("user")
+                              else {
+                                        console.log("user")
 
-                                form.append('NOM_ORGANISATION', user.result.NOM)
+                                        form.append('NOM_ORGANISATION', user.result.NOM)
                               }
-                              
+
                               form.append('TELEPHONE', data.telephone)
                               form.append('NIF', data.nif)
                               form.append('EMAIL', data.email)
@@ -139,16 +161,13 @@ export default function InscriptionPartenaireScreen() {
                                         body: form
                               })
                               navigation.navigate('HomeScreen')
-                              // navigation.navigate('PaymentScreen', { partenaire:res ,service:service})
-                              // navigation.navigate('HomeScreen')
-                              // navigation.navigate("EcommerceHomeScreen")
                     }
                     catch (error) {
                               console.log(error)
                     } finally {
                               setLoading(false)
                     }
-                    
+
           }
           const onServiceSelect = (service) => {
                     setServiceSelect(service)
@@ -174,30 +193,13 @@ export default function InscriptionPartenaireScreen() {
                               }
                     })()
           }, [])
-          //fetch partenaires types
-          useEffect(() => {
-                    (async () => {
-                              try {
-                                        const partenaire = await fetchApi('/partenaire/type', {
-                                                  method: "GET",
-                                                  headers: { "Content-Type": "application/json" },
-                                        })
-                                        setPartenairetype(partenaire.result)
-                                        if(service.id_service == 2) {
-                                                  setSelectedTypePartenaire(partenaire.result.find(s => s.ID_PARTENAIRE_TYPE == 2 ))
-                                        }
-                              } catch (error) {
-                                        console.log(error)
-                              }
-                    })()
-          }, [])
 
           const onLogoSelect = async () => {
                     const photo = await ImagePicker.launchImageLibraryAsync({
                               mediaTypes: ImagePicker.MediaTypeOptions.Images,
                               allowsMultipleSelection: true
                     })
-                    if(photo.cancelled) {
+                    if (photo.cancelled) {
                               return false
                     }
                     setLogoImage(photo)
@@ -207,7 +209,7 @@ export default function InscriptionPartenaireScreen() {
                               mediaTypes: ImagePicker.MediaTypeOptions.Images,
                               allowsMultipleSelection: true
                     })
-                    if(image.cancelled) {
+                    if (image.cancelled) {
                               return false
                     }
                     setBackgroundImage(image)
@@ -215,94 +217,102 @@ export default function InscriptionPartenaireScreen() {
 
 
           const askLocationPermission = async () => {
-            let {
-                status: locationStatus,
-            } = await Location.requestForegroundPermissionsAsync()
-            if (locationStatus !== 'granted') {
-                console.log('Permission to access location was denied')
-                setLocation(false)
-                return
-            }
-            var locatio = await Location.getCurrentPositionAsync({})
-            setLocation(locatio)
-        }
-        useEffect(() => {
-            askLocationPermission()
-        }, [])
-        useEffect(() => {
-    
-        }, [])
-        if (location === false) {
-            return (
-                <View
-                    style={{
-                        alignContent: 'center',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        flex: 1,
-                    }}
-                >
-                    <Text style={{ fontWeight: 'bold', fontSize: 16, opacity: 0.8 }}>
-                        Pas d'accès à la localisation
-                    </Text>
-                    <Text
-                        style={{
-                            textAlign: 'center',
-                            color: '#0a5744',
-                            marginTop: 10,
-                            paddingHorizontal: 10,
-                        }}
-                    >
-                        L'application a besoin de votre localisation pour fonctionner
-                    </Text>
-                    <TouchableNativeFeedback
-                        background={TouchableNativeFeedback.Ripple('#ddd')}
-                        useForeground={true}
-                        onPress={() => askLocationPermission()}
-                    >
-                        <View
-                            style={{
-                                backgroundColor: '#fff',
-                                borderRadius: 10,
-                                padding: 10,
-                                marginTop: 20,
-                            }}
-                        >
-                            <Text>Autoriser l'accès</Text>
-                        </View>
-                    </TouchableNativeFeedback>
-                </View>
-            )
-        }
-    
+                    let {
+                              status: locationStatus,
+                    } = await Location.requestForegroundPermissionsAsync()
+                    if (locationStatus !== 'granted') {
+                              console.log('Permission to access location was denied')
+                              setLocation(false)
+                              return
+                    }
+                    var locatio = await Location.getCurrentPositionAsync({})
+                    setLocation(locatio)
+          }
+          useEffect(() => {
+                    askLocationPermission()
+          }, [])
+          useEffect(() => {
+                    if(partenairetypes.result) {
+                              const organisationType = partenairetypes.result.find(t => t.ID_PARTENAIRE_TYPE == 2)
+                              setSelectedTypePartenaire(organisationType)
+                    }
+          }, [partenairetypes])
+          if (location === false) {
+                    return (
+                              <View
+                                        style={{
+                                                  alignContent: 'center',
+                                                  justifyContent: 'center',
+                                                  alignItems: 'center',
+                                                  flex: 1,
+                                        }}
+                              >
+                                        <Text style={{ fontWeight: 'bold', fontSize: 16, opacity: 0.8 }}>
+                                                  Pas d'accès à la localisation
+                                        </Text>
+                                        <Text
+                                                  style={{
+                                                            textAlign: 'center',
+                                                            color: '#0a5744',
+                                                            marginTop: 10,
+                                                            paddingHorizontal: 10,
+                                                  }}
+                                        >
+                                                  L'application a besoin de votre localisation pour fonctionner
+                                        </Text>
+                                        <TouchableNativeFeedback
+                                                  background={TouchableNativeFeedback.Ripple('#ddd')}
+                                                  useForeground={true}
+                                                  onPress={() => askLocationPermission()}
+                                        >
+                                                  <View
+                                                            style={{
+                                                                      backgroundColor: '#fff',
+                                                                      borderRadius: 10,
+                                                                      padding: 10,
+                                                                      marginTop: 20,
+                                                            }}
+                                                  >
+                                                            <Text>Autoriser l'accès</Text>
+                                                  </View>
+                                        </TouchableNativeFeedback>
+                              </View>
+                    )
+          }
+
 
           return (
                     <>
                               {loading && <Loading />}
-
+                              {/* <StatusBar hidden /> */}
                               <View style={styles.container}>
-                                        <View style={styles.cardHeader}>
-                                                  <TouchableOpacity style={styles.menuOpener} onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
-                                                            <View style={styles.menuOpenerLine} />
-                                                            <View style={[styles.menuOpenerLine, { width: 15 }]} />
-                                                            <View style={[styles.menuOpenerLine, { width: 25 }]} />
-                                                  </TouchableOpacity>
-                                                  <View style={styles.imageContainer}>
-                                                            <Image source={require('../../../assets/images/chapchap.png')} style={styles.logo} />
+                                        <View style={styles.header}>
+                                                  <View style={styles.headerActions}>
+                                                            <TouchableNativeFeedback
+                                                                      accessibilityRole="button"
+                                                                      background={TouchableNativeFeedback.Ripple('#c9c5c5', true)}
+                                                                      onPress={() => navigation.goBack()}
+                                                            >
+                                                                      <View style={{ padding: 10 }}>
+                                                                                <AntDesign name="close" size={24} color="#FFF" />
+                                                                      </View>
+                                                            </TouchableNativeFeedback>
                                                   </View>
-                                                  <View style={{ marginTop: 25 }}>
-                                                            <Octicons name="bell" size={24} color={COLORS.primary} />
+                                                  <View style={styles.headerTitle}>
+                                                            <Text style={styles.title}>{service.NOM}</Text>
                                                   </View>
                                         </View>
-                                        <Text style={styles.title}>{service.title}</Text>
-                                        <ScrollView keyboardShouldPersistTaps="handled" style={{ marginBottom: 20 }}>
-                                                  <View>
-                                                            <View style={{ marginTop: 10 }}>
+                                        {loadingTypes ? <View style={{ marginTop: -15, flex: 1, justifyContent: "center", alignItems: "center", borderTopRightRadius: 15, borderTopLeftRadius: 15, backgroundColor: '#fff' }}>
+                                                  <ActivityIndicator color={"#777"} size="large" />
+                                        </View> :
+                                        <ScrollView keyboardShouldPersistTaps="handled" style={styles.scroll} contentInset={{ top: StatusBar.currentHeight }} contentOffset={{ y: -StatusBar.currentHeight }}>
+                                                  <View style={styles.inputs}>
+                                                            {false && <View style={{ marginTop: 10, marginBottom: 5 }}>
                                                                       <TouchableOpacity style={styles.modalCard}
                                                                                 onPress={() => partenairetypesModalizeRef.current.open()}
                                                                                 disabled={service.id_service == 2}
                                                                       >
-                                                                                <View style={[ service.id_service == 2 && { opacity: 0.5} ]}>
+                                                                                <View style={[service.id_service == 2 && { opacity: 0.5 }]}>
                                                                                           <Text style={[styles.inputText, { fontSize: 13 }]}>
                                                                                                     Le type de partenaire
                                                                                           </Text>
@@ -310,14 +320,12 @@ export default function InscriptionPartenaireScreen() {
                                                                                                     {selectedTypePartenaire.DESCRIPTION}
                                                                                           </Text>}
                                                                                 </View>
-                                                                                <AntDesign name="caretdown" size={20} color="#777" />
+                                                                                <Entypo name="chevron-small-down" size={24} color="#777" />
                                                                       </TouchableOpacity>
-                                                            </View>
-
-
-                                                            {selectedTypePartenaire != null && selectedTypePartenaire.ID_PARTENAIRE_TYPE == 2 && <View style={styles.inputCard}>
+                                                            </View>}
+                                                            {selectedTypePartenaire != null && selectedTypePartenaire.ID_PARTENAIRE_TYPE == 2 && <View style={[styles.inputCard, { }]}>
                                                                       <OutlinedTextField
-                                                                                label={service.id_service == 2 ? "Nom du restaurant" :"Nom de l'organisation"}
+                                                                                label={service.id_service == 2 ? "Nom du restaurant" : "Nom du boutique"}
                                                                                 fontSize={14}
                                                                                 value={data.organisation}
                                                                                 onChangeText={(newValue) => handleChange('organisation', newValue)}
@@ -387,50 +395,39 @@ export default function InscriptionPartenaireScreen() {
                                                                                 tintColor={COLORS.primary}
                                                                       />
                                                             </View>}
-                                                            <View style={[styles.addImageContainer, { marginVertical: 30 }]}>
+                                                            <View style={[styles.addImageContainer, { }]}>
                                                                       <TouchableWithoutFeedback onPress={onLogoSelect}>
                                                                                 <View style={[styles.addImageItem]}>
-                                                                                          <View style={{ flexDirection: "row", alignItems: "center"}}>
+                                                                                          <View style={{ flexDirection: "row", alignItems: "center" }}>
                                                                                                     <Feather name="image" size={24} color="#777" />
                                                                                                     <Text style={styles.addImageLabel}>
-                                                                                                              {service.id_service == 2 ? "Logo de votre restaurant": "Logo de votre boutique"}
+                                                                                                              {service.id_service == 2 ? "Logo de votre restaurant" : "Logo de votre boutique"}
                                                                                                     </Text>
                                                                                           </View>
-                                                                                {logoImage &&  <Image source={{ uri: logoImage.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
-                                                                               </View>
+                                                                                          {logoImage && <Image source={{ uri: logoImage.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
+                                                                                </View>
                                                                       </TouchableWithoutFeedback>
                                                                       <TouchableWithoutFeedback onPress={onBackgroundSelect}>
-                                                                                <View style={[styles.addImageItem, { marginTop: 10 }]}>
-                                                                                          <View style={{ flexDirection: "row", alignItems: "center"}}>
+                                                                                <View style={[styles.addImageItem, { marginTop: 20  }]}>
+                                                                                          <View style={{ flexDirection: "row", alignItems: "center" }}>
                                                                                                     <Feather name="image" size={24} color="#777" />
                                                                                                     <Text style={styles.addImageLabel}>Image de fond</Text>
                                                                                           </View>
-                                                                                {backgroundImage &&  <Image source={{ uri: backgroundImage.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
-                                                                               </View>
+                                                                                          {backgroundImage && <Image source={{ uri: backgroundImage.uri }} style={{ width: "100%", height: 200, marginTop: 10, borderRadius: 5 }} />}
+                                                                                </View>
                                                                       </TouchableWithoutFeedback>
                                                             </View>
                                                             <View style={styles.navigation}>
-                                                  <TouchableNativeFeedback useForeground onPress={() => navigation.goBack()}>
-                                                            <View style={styles.cancelBtn}>
-                                                                      <Ionicons name="close" size={30} color="#777" />
+                                                                      <TouchableOpacity onPress={sendData} disabled={!isValid()}>
+                                                                                <View style={[styles.nextBtn, !isValid() && { opacity: 0.5 }]}>
+                                                                                          <Text style={[styles.navigationBtnText]}>
+                                                                                                    Envoyer
+                                                                                          </Text>
+                                                                                </View>
+                                                                      </TouchableOpacity>
                                                             </View>
-                                                  </TouchableNativeFeedback>
-                                                  <TouchableOpacity  onPress={sendData} disabled={!isValid()}>
-                                                            <View style={[styles.nextBtn, !isValidate() && { opacity: 0.5 }]}>
-                                                                      <Text style={[styles.navigationBtnText]}>
-                                                                                Suivant
-                                                                      </Text>
-                                                            </View>
-                                                  </TouchableOpacity>
-                                        </View>
-
-                                                            {/* <TouchableOpacity onPress={sendData} disabled={!isValid()} >
-                                                                      <View style={[styles.button, !isValid() && { opacity: 0.5 }]}>
-                                                                                <Text style={styles.buttonText} >Envoyer</Text>
-                                                                      </View>
-                                                            </TouchableOpacity> */}
                                                   </View>
-                                        </ScrollView>
+                                        </ScrollView>}
                               </View>
                               <Modalize ref={servicesModalizeRef} adjustToContentHeight handlePosition='inside'>
                                         <>
@@ -457,13 +454,12 @@ export default function InscriptionPartenaireScreen() {
                               </Modalize>
 
                               <Modalize ref={partenairetypesModalizeRef} adjustToContentHeight handlePosition='inside'>
-
                                         <>
                                                   <View>
                                                             <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center", marginTop: 15 }}>
                                                                       <Text style={{ fontSize: 17, fontWeight: "bold" }}>Type de partenaire</Text>
                                                             </View>
-                                                            {partenairetypes.map((partenairetype, index) => {
+                                                            {partenairetypes.result ? partenairetypes.result.map((partenairetype, index) => {
                                                                       return (
                                                                                 <TouchableOpacity key={index} onPress={() => onTypePartenaireSelect(partenairetype)}>
                                                                                           <View style={styles.modalItem} >
@@ -473,7 +469,7 @@ export default function InscriptionPartenaireScreen() {
                                                                                           </View>
                                                                                 </TouchableOpacity>
                                                                       )
-                                                            })}
+                                                            }) : null}
                                                   </View>
                                         </>
                               </Modalize>
@@ -487,6 +483,18 @@ export default function InscriptionPartenaireScreen() {
 const styles = StyleSheet.create({
           container: {
                     flex: 1,
+                    marginTop: StatusBar.currentHeight
+          },
+          scroll: {
+                    marginTop: -15,
+                    backgroundColor: '#fff',
+                    borderTopLeftRadius: 15,
+                    borderTopRightRadius: 15
+          },
+          inputs:  {
+                    borderTopLeftRadius: 15,
+                    borderTopRightRadius: 15,
+                    marginTop: 10
           },
           cardHeader: {
                     flexDirection: 'row',
@@ -520,13 +528,25 @@ const styles = StyleSheet.create({
                     marginTop: 30,
                     alignSelf: "center",
           },
+          header: {
+                    backgroundColor: COLORS.ecommercePrimaryColor,
+                    minHeight: 160
+          },
           title: {
                     fontWeight: 'bold',
                     fontSize: 25,
                     fontWeight: "bold",
-                    marginBottom: 12,
-                    color: COLORS.ecommercePrimaryColor,
-                    margin: 20
+                    color: '#FFF',
+                    textAlign: "center"
+          },
+          headerActions: {
+                    padding: 10,
+                    flexDirection: "row",
+                    alignItems: "center",
+          },
+          headerTitle: {
+                    flex: 1,
+                    alignItems: "center",
           },
           button: {
                     marginTop: 10,
@@ -550,8 +570,7 @@ const styles = StyleSheet.create({
           },
           inputCard: {
                     marginHorizontal: 20,
-                    marginTop: 10,
-
+                    marginTop: 15,
           },
           ButtonCard: {
                     marginHorizontal: 20,
@@ -611,7 +630,8 @@ const styles = StyleSheet.create({
                     borderColor: COLORS.smallBrown,
                     borderRadius: 5,
                     paddingHorizontal: 10,
-                    paddingVertical: 15
+                    paddingVertical: 15,
+                    marginTop: 15
           },
           addImageLabel: {
                     fontWeight: "bold",
@@ -642,7 +662,7 @@ const styles = StyleSheet.create({
                     padding: 13,
                     borderRadius: 5,
                     borderWidth: 0.5,
-                    borderColor: "#ddd"
+                    borderColor: "#aaa"
           },
           selectControl: {
                     paddingHorizontal: 20,
@@ -665,35 +685,32 @@ const styles = StyleSheet.create({
                     marginTop: 5
           },
           navigation: {
-            flexDirection: "row",
-            justifyContent: 'center',
-            paddingHorizontal: 40,
-            marginVertical: 10,
-  },
-  nextBtn: {
-            paddingVertical: 20,
-            minWidth: 200,
-            overflow: "hidden",
-            backgroundColor: COLORS.primaryPicker,
-            borderRadius: 30,
-            marginLeft: 10
-  },
-  navigationBtnText: {
-    textAlign: "center",
-    fontWeight: "bold",
-    color: "#FFF"
-},
-  cancelBtn: {
-    width: 60,
-    height: 60,
-    borderRadius: 100,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: '#ddd',
-    overflow: "hidden"
-},
+                    paddingHorizontal: 20,
+                    marginTop: 10
+          },
+          nextBtn: {
+                    paddingVertical: 20,
+                    overflow: "hidden",
+                    backgroundColor: COLORS.primaryPicker,
+                    borderRadius: 8,
+                    marginBottom: 10
+          },
+          navigationBtnText: {
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    color: "#FFF"
+          },
+          cancelBtn: {
+                    width: 60,
+                    height: 60,
+                    borderRadius: 100,
+                    borderColor: '#ddd',
+                    borderWidth: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: '#ddd',
+                    overflow: "hidden"
+          },
           inputText: {
                     color: '#777'
           }
