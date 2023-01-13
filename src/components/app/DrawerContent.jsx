@@ -61,8 +61,8 @@ export default function DrawerContent({ state, navigation, descriptors }) {
                                                             <Image source={require('../../../assets/images/user.png')} style={styles.image} />
                                                   </View>
                                                   <View style={styles.userNames}>
-                                                            <Text style={styles.fullName} numberOfLines={1}>{user.result.NOM} {user.result.PRENOM}</Text>
-                                                            <Text style={styles.email}>{user.result.EMAIL}</Text>
+                                                            <Text style={styles.fullName} numberOfLines={1}>{user.NOM} {user.PRENOM}</Text>
+                                                            <Text style={styles.email}>{user.EMAIL}</Text>
                                                   </View>
                                         </View>
                               </TouchableNativeFeedback>

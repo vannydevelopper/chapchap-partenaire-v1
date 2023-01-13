@@ -5,20 +5,20 @@ import ProduitFormulaireScreen from "../screens/e-commerce/ProduitFormulaireScre
 import ServiceNotFoundScreen from "../screens/e-commerce/ServiceNotFoundScreen";
 import HomeScreen from "../screens/home/HomeScreen";
 import InscriptionPartenaireScreen from "../screens/welcome/InscriptionPartenaireScreen";
-import { Host } from "react-native-portalize";
 import EcommerceHomeScreen from "../screens/e-commerce/EcommerceHomeScreen";
 import HomeAllServiceScreen from "../screens/home/HomeAllServiceScreen";
 import ProductDetailsScreen from "../screens/e-commerce/ProductDetailsScreen";
 import ApprovisionnementScreen from "../screens/e-commerce/ApprovisionnementScreen";
 import PaymentScreen from "../screens/home/PaymentScreen";
 import Header from "../components/app/Header";
+import ShopHeader from "../components/ecommerce/home/ShopHeader";
 
 export default function HomeNavigator() {
           const Stack = createStackNavigator()
           return (
                     <Stack.Navigator screenOptions={{ header: () => <Header  /> }}>
                               <Stack.Screen name='HomeScreen' component={HomeScreen} />
-                              <Stack.Screen name="EcommerceHomeScreen" component={EcommerceHomeScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
+                              <Stack.Screen name="EcommerceHomeScreen" component={EcommerceHomeScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid, header: props => <ShopHeader {...props} /> }}/>
                               <Stack.Screen name="HomeAllServiceScreen" component={HomeAllServiceScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
                               <Stack.Screen name="ServiceNotFoundScreen" component={ServiceNotFoundScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }} />
                               <Stack.Screen name="InscriptionPartenaireScreen" component={InscriptionPartenaireScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, headerShown: false }} />
@@ -27,7 +27,6 @@ export default function HomeNavigator() {
                               <Stack.Screen name="ProductDetailScreen" component={ProductDetailsScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
                               <Stack.Screen name="ApprovisionnementScreen" component={ApprovisionnementScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
                               <Stack.Screen name='PaymentScreen' component={PaymentScreen}/>
-                   
                     </Stack.Navigator>
           )
 }

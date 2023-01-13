@@ -35,7 +35,7 @@ export default async function fetchApi(url, options = initialOptions) {
           if (user) {
                     options = {
                               ...options,
-                              headers: { ...options.headers, authorization: `bearer ${user.result.token}` },
+                              headers: { ...options.headers, authorization: `bearer ${user.token}` },
                     };
           }
           const response = await fetch(API_URL + url, {

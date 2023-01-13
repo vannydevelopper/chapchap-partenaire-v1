@@ -42,7 +42,7 @@ export default function InscriptionPartenaireScreen() {
                     ServiceSelect: null,
                     typepartenaireselect: null,
                     organisation: "",
-                    email: user.result.EMAIL,
+                    email: user.EMAIL,
                     telephone: "",
                     nif: "",
                     adresse: "",
@@ -105,13 +105,10 @@ export default function InscriptionPartenaireScreen() {
                               setLoading(true)
                               form.append('ID_TYPE_PARTENAIRE', selectedTypePartenaire.ID_PARTENAIRE_TYPE)
                               if (data.organisation) {
-                                        console.log("org")
                                         form.append('NOM_ORGANISATION', data.organisation)
                               }
                               else {
-                                        console.log("user")
-
-                                        form.append('NOM_ORGANISATION', user.result.NOM)
+                                        form.append('NOM_ORGANISATION', user.NOM)
                               }
 
                               form.append('TELEPHONE', data.telephone)
@@ -121,7 +118,6 @@ export default function InscriptionPartenaireScreen() {
                               form.append('LONGITUDE', location.coords.longitude)
                               form.append('LATITUDE', location.coords.latitude)
                               form.append('ID_SERVICE', id_service)
-
                               if (logoImage) {
                                         const manipResult = await manipulateAsync(
                                                   logoImage.uri,
@@ -181,8 +177,6 @@ export default function InscriptionPartenaireScreen() {
           useEffect(() => {
                     (async () => {
                               try {
-
-
                                         const response = await fetchApi('/service', {
                                                   method: "GET",
                                                   headers: { "Content-Type": "application/json" },

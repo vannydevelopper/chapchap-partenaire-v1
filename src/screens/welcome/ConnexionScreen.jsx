@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View, TextInput } from "react-native";
 import { TextField, FilledTextField, InputAdornment, OutlinedTextField } from 'rn-material-ui-textfield'
 import { FontAwesome, Fontisto, EvilIcons, AntDesign, Feather, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
@@ -30,8 +30,7 @@ export default function ConnexionScreen() {
                               email: true
                     },
                     password: {
-                              required: true,
-                              length: [8]
+                              required: true
                     }
           }, {
                     email: {
@@ -60,8 +59,8 @@ export default function ConnexionScreen() {
                                         body: JSON.stringify(user),
                                         headers: { "Content-Type": "application/json" },
                               });
-                              await AsyncStorage.setItem("user", JSON.stringify(userData));
-                              dispatch(setUserAction(userData))
+                              await AsyncStorage.setItem("user", JSON.stringify(userData.result));
+                              dispatch(setUserAction(userData.result))
                     }
 
                     catch (error) {
@@ -129,6 +128,7 @@ export default function ConnexionScreen() {
                                                                                           onBlur={() => checkFieldData('password')}
                                                                                           error={hasError('password') ? getError('password') : ''}
                                                                                           ref={passwordInputRef}
+                                                                                          secureTextEntry
                                                                                 />
                                                                       </View>
 

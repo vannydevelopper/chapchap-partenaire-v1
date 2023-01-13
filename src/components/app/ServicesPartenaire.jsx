@@ -6,6 +6,10 @@ import { COLORS } from "../../styles/COLORS";
 import Loading from './Loading'
 import { AntDesign, EvilIcons } from '@expo/vector-icons';
 import EmptyServiceFeeback from "../services/EmptyServiceFeeback";
+import { useSelector } from "react-redux";
+import { userSelector } from "../../store/selectors/userSelector";
+import AvailableServices from "../services/AvailableServices";
+import ServicesIDS from "../../constants/ServicesIDS";
 
 export default function ServicesPartenaire() {
           const { width, height } = useWindowDimensions()
@@ -15,12 +19,20 @@ export default function ServicesPartenaire() {
           const modalizeRef = useRef(null)
           const [services, setServices] = useState([])
           const [loading, setLoading] = useState(false)
+          const user = useSelector(userSelector)
+          
+          const handleServicePress = service => {
+                    if(service.ID_SERVICE == ServicesIDS.ecommerce) {
+                              navigation.navigate('EcommerceHomeScreen', { shop: service })
+                    }
+          }
+
           useFocusEffect(useCallback(() => {
                     (async () => {
-                              setLoading(true)
                               try {
-                                        const partenaire = await fetchApi("/service/partenaire")
-                                        setServices(partenaire.result)
+                                        setLoading(true)
+                                        const res = await fetchApi(`/services/partenaires/${user.ID_PARTENAIRE}`)
+                                        setServices(res.result)
                               } catch (error) {
                                         console.log(error)
                               } finally {
@@ -40,79 +52,32 @@ export default function ServicesPartenaire() {
                                         {loading ? <View style={styles.loadingContainer}>
                                                   <ActivityIndicator size={"large"} color="#000" />
                                         </View> :
-                                        <View style={styles.servicesContainer}>
+                                        <ScrollView style={styles.servicesContainer}>
                                                   {services.length == 0 ? <EmptyServiceFeeback /> :
                                                   <>
-                                                  <Text style={styles.title}>Vos services</Text>
-                                                  <View style={styles.services}>
-                                                            {services.map((service, index) => {
-                                                                      return (
-                                                                                (service.produit.ID_SERVICE == 1 ?
+                                                            <Text style={styles.title}>Vos services</Text>
+                                                            <View style={styles.services}>
+                                                                      {services.map((service, index) => {
+                                                                                return (
                                                                                           <View style={[styles.serviceContainer, { width: SERVICE_WIDTH, height: SERVICE_WIDTH }]} key={index}>
-                                                                                                    <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} onPress={() => navigation.navigate("EcommerceHomeScreen", { partenaire: service })}>
+                                                                                                    <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} onPress={() => handleServicePress(service)}>
                                                                                                               <View style={[styles.service]}>
-                                                                                                                        <ImageBackground source={{ uri: service.produit.BACKGROUND_IMAGE }} style={[styles.serviceBackgound]} borderRadius={10} resizeMode='cover' imageStyle={{ opacity: 0.8 }}>
+                                                                                                                        <ImageBackground source={{ uri: service.BACKGROUND_IMAGE }} style={[styles.serviceBackgound]} borderRadius={10} resizeMode='cover' imageStyle={{ opacity: 0.8 }}>
                                                                                                                                   <View style={{ position: 'absolute', width: "100%", height: "100%", backgroundColor: "rgba(0, 0, 0, 0.3)", borderRadius: 10 }} />
                                                                                                                                   <View style={styles.serviceIcon}>
-
-                                                                                                                                            <Image source={{ uri: service.produit.LOGO }} style={styles.serviceIconImage} />
+                                                                                                                                            <Image source={{ uri: service.LOGO }} style={styles.serviceIconImage} />
                                                                                                                                   </View>
-                                                                                                                                  <Text style={styles.serviceName}>{service.produit.NOM_ORGANISATION}</Text>
+                                                                                                                                  <Text style={styles.serviceName}>{service.NOM_ORGANISATION}</Text>
                                                                                                                         </ImageBackground>
                                                                                                               </View>
                                                                                                     </TouchableNativeFeedback>
                                                                                           </View>
-                                                                                          : service.produit.ID_SERVICE == 2 ?
-                                                                                                    <View style={[styles.serviceContainer, { width: SERVICE_WIDTH, height: SERVICE_WIDTH }]} key={index}>
-                                                                                                              <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} onPress={() => navigation.navigate("RestaurantNavigator", { partenaire: service })}>
-                                                                                                                        <View style={[styles.service]}>
-                                                                                                                                  <ImageBackground source={{ uri: service.produit.BACKGROUND_IMAGE }} style={[styles.serviceBackgound]} borderRadius={10} resizeMode='cover' imageStyle={{ opacity: 0.8 }}>
-                                                                                                                                            <View style={{ position: 'absolute', width: "100%", height: "100%", backgroundColor: "rgba(0, 0, 0, 0.3)", borderRadius: 10 }} />
-                                                                                                                                            <View style={styles.serviceIcon}>
-
-                                                                                                                                                      <Image source={{ uri: service.produit.LOGO }} style={styles.serviceIconImage} />
-                                                                                                                                            </View>
-                                                                                                                                            <Text style={styles.serviceName}>{service.produit.NOM_ORGANISATION}</Text>
-                                                                                                                                  </ImageBackground>
-                                                                                                                        </View>
-                                                                                                              </TouchableNativeFeedback>
-                                                                                                    </View> : <View style={[styles.serviceContainer, { width: SERVICE_WIDTH, height: SERVICE_WIDTH }]} key={index}>
-                                                                                                              <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} onPress={() => searchProduit(service)}>
-                                                                                                                        <View style={[styles.service]}>
-                                                                                                                                  <ImageBackground source={{ uri: service.produit.BACKGROUND_IMAGE }} style={[styles.serviceBackgound]} borderRadius={10} resizeMode='cover' imageStyle={{ opacity: 0.8 }}>
-                                                                                                                                            <View style={{ position: 'absolute', width: "100%", height: "100%", backgroundColor: "rgba(0, 0, 0, 0.3)", borderRadius: 10 }} />
-                                                                                                                                            <View style={styles.serviceIcon}>
-
-                                                                                                                                                      <Image source={{ uri: service.produit.LOGO }} style={styles.serviceIconImage} />
-                                                                                                                                            </View>
-                                                                                                                                            <Text style={styles.serviceName}>{service.produit.NOM_ORGANISATION}</Text>
-                                                                                                                                  </ImageBackground>
-                                                                                                                        </View>
-                                                                                                              </TouchableNativeFeedback>
-                                                                                                    </View>
-
                                                                                 )
-
-                                                                      )
-                                                            })}
-
-                                                            <View style={[styles.serviceContainer, { width: SERVICE_WIDTH, height: SERVICE_WIDTH }]}>
-                                                                      <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple("#C4C4C4")} onPress={() => navigation.navigate("HomeAllServiceScreen")}>
-                                                                                <View style={[styles.service]}>
-                                                                                          <ImageBackground source={require("../../../assets/images/nouveau.png")} style={[styles.serviceBackgound]} borderRadius={10} resizeMode='cover' imageStyle={{ opacity: 0.8 }}>
-                                                                                                    <View style={{ position: 'absolute', width: "100%", height: "100%", backgroundColor: "rgba(0, 0, 0, 0.3)", borderRadius: 10 }} />
-                                                                                                    <View style={styles.serviceIcon}>
-                                                                                                              <AntDesign name="plus" size={40} color="black" />
-                                                                                                    </View>
-                                                                                                    <Text style={styles.serviceName}>Demander le service</Text>
-                                                                                          </ImageBackground>
-                                                                                </View>
-                                                                      </TouchableNativeFeedback>
+                                                                      })}
                                                             </View>
-
-                                                  </View>
+                                                            <AvailableServices title="Autres services" />
                                                   </>}
-                                        </View>}
+                                        </ScrollView>}
                               </View>
                     </>
           )
@@ -130,13 +95,12 @@ const styles = StyleSheet.create({
           title: {
                     fontWeight: "bold",
                     fontSize: 20,
-                    textAlign: 'center',
-                    marginTop: 20
+                    paddingHorizontal: 10
           },
           services: {
                     flexDirection: 'row',
                     flexWrap: 'wrap',
-                    justifyContent: 'center'
+                    marginBottom: 10
           },
           serviceContainer: {
                     maxWidth: 300,
@@ -175,23 +139,5 @@ const styles = StyleSheet.create({
                     width: 40,
                     height: 40,
                     borderRadius: 10,
-          },
-          addBtn: {
-                    paddingVertical: 15,
-                    backgroundColor: COLORS.ecommerceOrange,
-                    borderRadius: 10,
-                    marginBottom: 10,
-                    marginTop: 10,
-                    flexDirection: "row",
-                    marginHorizontal: 20,
-                    paddingHorizontal: 30,
-                    alignSelf: "center",
-                    overflow: "hidden"
-          },
-          addBtnText: {
-                    color: '#FFF',
-                    fontWeight: "bold",
-          },
-          servicesContainer:  {
-          },
+          }
 })
