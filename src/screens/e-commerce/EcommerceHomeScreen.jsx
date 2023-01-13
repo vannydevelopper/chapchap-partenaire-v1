@@ -68,7 +68,7 @@ export default function EcommerceHomeScreen() {
         const [showAUtresTaille, setShowAUtresTaille] = useState(false)
         const [showAUtresCouleur, setShowAUtresCouleur] = useState(false)
         const [autreCategorie, setAutreCategorie] = useState(false)
-        const [autreSousCategore, setAutreSousCategore] = useState(false)
+        const [autreSousCategore, setAutreSousCategorie] = useState(false)
 
 
         const [souscategories, setSouscategories] = useState([])
@@ -94,8 +94,19 @@ export default function EcommerceHomeScreen() {
         const ajoutDetailsModalizeRef = useRef(null)
         const categoriesModalizeRef = useRef(null)
         const SousCategoriesModalizeRef = useRef(null)
+        const [imageCategorie, setImageCategorie] = useState(null)
 
 
+        const onImagesSelect = async () => {
+                const photo = await ImagePicker.launchImageLibraryAsync({
+                        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                        allowsMultipleSelection: true
+                })
+                if (photo.cancelled) {
+                        return false
+                }
+                setImageCategorie(photo)
+        }
         const plusCategories = () => {
                 // setIsOpen(true)
                 FormmodalizeRef.current?.open()
@@ -179,12 +190,29 @@ export default function EcommerceHomeScreen() {
                 produit: "",
                 prix: "",
                 quantite: "",
-                logoImage: "",
                 autresTaille: "",
                 autresCouleur: "",
                 searchCatgorie: "",
                 searchSousCatgorie: "",
                 nomCategorie: "",
+
+        })
+        const { checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
+                quantite: {
+                        required: true,
+                },
+                // nomCategorie: {
+                //         required: true,
+                //         length: [1,15]
+                // },
+        }, {
+                quantite: {
+                        required: "Quantite est obligatoire"
+                },
+                // nomCategorie: {
+                //         required: "Nom est obligatoire",
+                //         length: "taille invalide"
+                // },
         })
         useEffect(() => {
                 (async () => {
@@ -210,7 +238,7 @@ export default function EcommerceHomeScreen() {
                         try {
                                 setLoadingCatagories(true)
                                 if (CategorieSelect != null) {
-                                        var url =`/produit/sous_categorie/${CategorieSelect?.ID_CATEGORIE_PRODUIT}`
+                                        var url = `/produit/sous_categorie/${CategorieSelect?.ID_CATEGORIE_PRODUIT}`
                                         if (data.searchSousCatgorie) {
                                                 url = `/produit/sous_categorie/${CategorieSelect?.ID_CATEGORIE_PRODUIT}?q=${data.searchSousCatgorie}`
                                         }
@@ -225,7 +253,7 @@ export default function EcommerceHomeScreen() {
 
                         }
                 })()
-        }, [CategorieSelect,data.searchCatgorie])
+        }, [CategorieSelect, data.searchCatgorie])
 
         useEffect(() => {
                 (async () => {
@@ -277,6 +305,7 @@ export default function EcommerceHomeScreen() {
 
         const onCategorieSelect = (categorie) => {
                 setCategorieSelect(categorie)
+                setAutreCategorie(false)
                 categoriesModalizeRef.current.close()
         }
 
@@ -289,13 +318,19 @@ export default function EcommerceHomeScreen() {
                 setShowAUtresTaille(true)
                 setTailleSelect(null)
         }
-
+        const autreCategoriePress = () => {
+                setAutreCategorie(true)
+                setCategorieSelect(null)
+        }
+        const autreSousCategoriePress = () => {
+                setAutreSousCategorie(true)
+                setselectedSousCategorie(null)
+        }
         const AutresTypesCouleurs = () => {
                 setShowAUtresCouleur(true)
                 setselectedCouleur(false)
 
         }
-
         const onImageSelect = async () => {
                 const image = await ImagePicker.launchImageLibraryAsync({
                         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -358,16 +393,7 @@ export default function EcommerceHomeScreen() {
                 partenaire.produit.BACKGROUND_IMAGE ? partenaire.produit.BACKGROUND_IMAGE : undefined,
         ]
 
-        const { checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
-                quantite: {
-                        required: true,
-
-                },
-        }, {
-                quantite: {
-                        required: "Quantite est obligatoire"
-                },
-        })
+       
 
         const fecthProduits = async () => {
                 try {
@@ -925,9 +951,7 @@ export default function EcommerceHomeScreen() {
                                 <Text style={styles.title}>Nouveau produit</Text>
 
                                 <ScrollView>
-
                                         <View>
-
                                                 <View>
                                                         <View style={styles.inputCard}>
                                                                 <OutlinedTextField
@@ -984,6 +1008,7 @@ export default function EcommerceHomeScreen() {
                                                                         onBlur={() => checkFieldData('prix')}
                                                                         error={hasError('prix') ? getError('prix') : ''}
                                                                         lineWidth={0.5}
+                                                                        keyboardType="number-pad"
                                                                         activeLineWidth={0.5}
                                                                         baseColor={COLORS.smallBrown}
                                                                         tintColor={COLORS.primary}
@@ -1052,7 +1077,7 @@ export default function EcommerceHomeScreen() {
                                                 <Text style={{ fontSize: 17, fontWeight: "bold" }}>Categories</Text>
                                         </View>
                                         <View>
-                                                <View style={{ flexDirection: "row", alignItems: "center", alignContent: "center", justifyContent: "space-between", marginBottom: 25, paddingHorizontal: 10 }}>
+                                                {!autreCategorie && <View style={{ flexDirection: "row", alignItems: "center", alignContent: "center", justifyContent: "space-between", marginBottom: 25, paddingHorizontal: 10 }}>
                                                         <View style={styles.searchSection}>
                                                                 <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
                                                                 <TextInput
@@ -1062,28 +1087,89 @@ export default function EcommerceHomeScreen() {
                                                                         placeholder="Rechercher "
                                                                 />
                                                         </View>
-                                                </View>
-                                               {!loadingCatagories && <TouchableOpacity 
-                                               onPress={setAutreCategorie(true)}style={styles.modalAutres} >
+                                                </View>}
+                                                {!loadingCatagories && <TouchableOpacity onPress={autreCategoriePress} style={styles.modalAutres} >
                                                         {autreCategorie ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
                                                                 <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
                                                         <Text style={{ fontSize: 15, }}>Autres</Text>
                                                 </TouchableOpacity>}
-                                                
-                                                {loadingCatagories ?
-                                               <CategoriesRearchSkeletons/>
-                                                        :
-                                                        categories.map((categorie, index) => {
-                                                                return (
-                                                                        <TouchableOpacity key={index} onPress={() => onCategorieSelect(categorie)}>
-                                                                                <View style={styles.modalItemModel2} >
-                                                                                        {CategorieSelect?.ID_CATEGORIE_PRODUIT == categorie.ID_CATEGORIE_PRODUIT ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
-                                                                                                <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
-                                                                                        <Text>{categorie.NOM}</Text>
-                                                                                </View>
-                                                                        </TouchableOpacity>
-                                                                )
-                                                        })}
+                                                {autreCategorie &&
+                                                        <View>
+                                                                <View style={styles.inputCard}>
+                                                                        <OutlinedTextField
+                                                                                label={"Nom categorie"}
+                                                                                fontSize={14}
+                                                                                value={data.nomCategorie}
+                                                                                onChangeText={(newValue) => handleChange('nomCategorie', newValue)}
+                                                                                onBlur={() => checkFieldData('nomCategorie')}
+                                                                                error={hasError('nomCategorie') ? getError('nomCategorie') : ''}
+                                                                                lineWidth={0.5}
+                                                                                activeLineWidth={0.5}
+                                                                                baseColor={COLORS.smallBrown}
+                                                                                tintColor={COLORS.primary}
+                                                                        />
+                                                                </View>
+                                                                <View style={styles.selectControl}>
+                                                                        <Text style={{}}>Image Categorie </Text>
+                                                                        <View style={styles.images}>
+                                                                                <TouchableWithoutFeedback onPress={onImagesSelect}>
+
+                                                                                        <View style={styles.addImager}>
+                                                                                                {imageCategorie ? <Image source={{ uri: imageCategorie.uri }} style={styles.addImager} /> :
+                                                                                                        <Feather name="image" size={24} color="#777" />
+
+                                                                                                }
+
+                                                                                        </View>
+
+
+                                                                                </TouchableWithoutFeedback>
+                                                                                {/* {images.map((image, index) => {
+                                                                                        return (
+                                                                                                <TouchableWithoutFeedback onPress={() => onRemoveImage(index)} key={index}>
+                                                                                                        <Image style={[styles.addImager, index > 0 && { marginLeft: 10 }]} source={{ uri: image.uri }} />
+                                                                                                </TouchableWithoutFeedback>
+                                                                                        )
+                                                                                })}
+                                                                                {images.length ==1 ? <TouchableWithoutFeedback onPress={onImageSelect}>
+                                                                                        <View style={[styles.addImager, images.length > 0 && { marginLeft: 10 }]}>
+                                                                                                <Feather name="image" size={30} color="#777" />
+                                                                                        </View>
+                                                                                </TouchableWithoutFeedback> : null} */}
+                                                                        </View>
+                                                                </View>
+                                                                {/* <TouchableOpacity onPress={SendData}>
+                                                                        <View style={styles.button}>
+                                                                                <Text style={styles.buttonText} > Enregistrer</Text>
+                                                                        </View>
+                                                                </TouchableOpacity> */}
+                                                                <TouchableWithoutFeedback
+                                                                      disabled={!isValidate()}
+                                                                      onPress={SendData} >
+                                                                      <View style={[styles.button, !isValidate() && { opacity: 0.5 }]}>
+                                                                                <Text style={styles.buttonText}>Ajouter</Text>
+                                                                      </View>
+                                                            </TouchableWithoutFeedback> 
+                                                        </View>
+                                                }
+
+                                                {
+
+                                                        loadingCatagories ?
+                                                                <CategoriesRearchSkeletons />
+                                                                :
+                                                                !autreCategorie &&
+                                                                categories.map((categorie, index) => {
+                                                                        return (
+                                                                                <TouchableOpacity key={index} onPress={() => onCategorieSelect(categorie)}>
+                                                                                        <View style={styles.modalItemModel2} >
+                                                                                                {CategorieSelect?.ID_CATEGORIE_PRODUIT == categorie.ID_CATEGORIE_PRODUIT ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                                                                        <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                                                                                <Text>{categorie.NOM}</Text>
+                                                                                        </View>
+                                                                                </TouchableOpacity>
+                                                                        )
+                                                                })}
                                         </View>
                                 </>
                         </Modalize>
@@ -1095,7 +1181,7 @@ export default function EcommerceHomeScreen() {
                                                 <Text style={{ fontSize: 17, fontWeight: "bold" }}>Sous Categories</Text>
                                         </View>
                                         <View>
-                                        <View style={{ flexDirection: "row", alignItems: "center", alignContent: "center", justifyContent: "space-between", marginBottom: 25, paddingHorizontal: 10 }}>
+                                                <View style={{ flexDirection: "row", alignItems: "center", alignContent: "center", justifyContent: "space-between", marginBottom: 25, paddingHorizontal: 10 }}>
                                                         <View style={styles.searchSection}>
                                                                 <FontAwesome name="search" size={24} color={COLORS.ecommercePrimaryColor} />
                                                                 <TextInput
@@ -1113,19 +1199,19 @@ export default function EcommerceHomeScreen() {
                                                 </TouchableOpacity>
                                                 {
                                                         loadingCatagories ?
-                                                                <CategoriesRearchSkeletons/>:
-                                                souscategories.map((souscategorie, index) => {
-                                                        return (
-                                                                <TouchableOpacity key={index} onPress={() => onSousCategorieSelect(souscategorie)}>
-                                                                        <View style={styles.modalItemModel2} >
-                                                                                {selectedSousCategorie?.ID_PRODUIT_SOUS_CATEGORIE == souscategorie.ID_PRODUIT_SOUS_CATEGORIE ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
-                                                                                        <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
-                                                                                <Text>{souscategorie.NOM}</Text>
-                                                                        </View>
-                                                                </TouchableOpacity>
-                                                        )
-                                                })
-                                                
+                                                                <CategoriesRearchSkeletons /> :
+                                                                souscategories.map((souscategorie, index) => {
+                                                                        return (
+                                                                                <TouchableOpacity key={index} onPress={() => onSousCategorieSelect(souscategorie)}>
+                                                                                        <View style={styles.modalItemModel2} >
+                                                                                                {selectedSousCategorie?.ID_PRODUIT_SOUS_CATEGORIE == souscategorie.ID_PRODUIT_SOUS_CATEGORIE ? <MaterialCommunityIcons name="radiobox-marked" size={24} color="#007bff" /> :
+                                                                                                        <MaterialCommunityIcons name="radiobox-blank" size={24} color="#777" />}
+                                                                                                <Text>{souscategorie.NOM}</Text>
+                                                                                        </View>
+                                                                                </TouchableOpacity>
+                                                                        )
+                                                                })
+
                                                 }
 
 
@@ -1798,7 +1884,7 @@ const styles = StyleSheet.create({
                 alignItems: 'center',
                 alignContent: 'center'
         },
-        
+
         modalAutres: {
                 paddingHorizontal: 20,
                 flexDirection: 'row',
