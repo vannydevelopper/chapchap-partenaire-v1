@@ -7,34 +7,32 @@ import fetchApi from "../../helpers/fetchApi";
 import useFetch from "../../hooks/useFetch";
 import { useForm } from "../../hooks/useForm";
 import { COLORS } from "../../styles/COLORS";
-import { SimpleLineIcons, AntDesign, Ionicons } from '@expo/vector-icons';
+import { SimpleLineIcons, AntDesign, Ionicons, EvilIcons, Entypo } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useFormErrorsHandle } from "../../hooks/useFormErrorsHandle";
 import Loading from "../../components/app/Loading";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import { useNavigation } from "@react-navigation/native";
+import { OutlinedTextField } from 'rn-material-ui-textfield'
+import NewVariantModalize from "../../components/ecommerce/newProduct/NewVariantModalize";
+import cartesian from "../../helpers/cartesian";
+import Variant from "../../components/ecommerce/newProduct/Variant";
+import { useCallback } from "react";
+import InventoryItem from "../../components/ecommerce/newProduct/InventoryItem";
 
-
-export default function NewProductSreen() {
-          const [showTaille, setshowTaille] = useState(false)
-          const [selectedTaille, setselectedTaille] = useState(false)
+const VARIANT_LIMIT= 5
+export default function NewProductScreen() {
           const navigation = useNavigation()
           const [isOpen, setIsOpen] = useState(false)
           const [loadingForm, setLoadingForm] = useState(true)
           const [isLoading, setIsLoading] = useState(false)
-          const [showSize, setshowSize] = useState(false)
-          const [showColor, setshowColor] = useState(false)
-
-          const [taille, setsTaille] = useState([])
-          let total = 0
-          const produitsModalizeRef = useRef(null)
           const categoriesModalizeRef = useRef(null)
           const subCategoriesModalizeRef = useRef()
-          const sizeModalizeRef = useRef(null)
-          const detailsModalizeRef = useRef(null)
-
-
+          const variantModalizeRef = useRef()
+          const [variants, setVariants] = useState([])
+          const [inventories, setInventories] = useState([])
+          
           const [data, handleChange] = useForm({
                     produit: null,
                     category: null,
@@ -47,11 +45,6 @@ export default function NewProductSreen() {
                     color: "",
                     quantiteDetail: ""
           })
-
-          const add = (total, sizeId, size, quantite, colorId, color) => {
-                    setsTaille(s => [...s, { total, sizeId, size, quantite, colorId, color }])
-          }
-          // console.log(taille)
 
           const { errors, setError, getErrors, setErrors, checkFieldData, isValidate, getError, hasError } = useFormErrorsHandle(data, {
                     produit: {
@@ -76,7 +69,8 @@ export default function NewProductSreen() {
                     },
                     montant: {
                               required: true,
-                              length: [1, 11]
+                              length: [1, 11],
+                              number: true
                     }
           }, {
                     produit: {
@@ -90,23 +84,21 @@ export default function NewProductSreen() {
                     },
                     nom: {
                               required: "Le nom du produit est obligatoire",
-                              length: "Le nom du produit ne peut pas dépasser 100 caractères"
+                              length: "Le nom du produit est invalide"
                     },
                     description: {
-                              length: "La description du produit ne peut pas dépasser 3000 caractères"
+                              length: "La description du produit est invalide"
                     },
                     quantite: {
                               required: "La quantité est obligatoire",
                               length: "Quantité invalide"
                     },
                     montant: {
-                              required: "Le prix unitaire est obligatoire",
-                              length: "Prix unitaire invalide"
+                              required: "Le prix est obligatoire",
+                              length: "Prix invalide",
+                              number: 'Prix invalide'
                     }
           })
-
-          const [produits, setProduits] = useState([])
-          const [loadingProduits, setLoadingProduits] = useState(true)
 
           const [categories, setCategories] = useState([])
           const [loadingCategories, setLoadingCategories] = useState(true)
@@ -114,31 +106,51 @@ export default function NewProductSreen() {
           const [subCategories, setSubCategories] = useState([])
           const [loadingSubCategories, setLoadingSubCategories] = useState(true)
 
-          const [sizes, setSizes] = useState([])
-          const [loadingSizes, setLoadingSizes] = useState(true)
 
-          const [colors, setColors] = useState([])
-          const [loadingColors, setLoadingColors] = useState(true)
+          /**
+           * Fonction qui sera déclanchée quand on appui sur le bouton de modifier la variante
+           */
+          const handleVariantEdit = useCallback((id, variantName, options) => {
+                    const newVariants = variants.map(variant => {
+                              if(variant.id == id) {
+                                        return {
+                                                  id, variantName, options
+                                        }
+                              }
+                              return variant
+                    })
+                    setVariants(newVariants)
+          }, [variants])
 
-          const [isFocused, setIsFocused] = useState(false)
-          const [isDescFocused, setIsDescFocused] = useState(false)
-          const [isAmountFocused, setIsAmountFocused] = useState(false)
-          const [isPriceFocused, setIsPriceFocused] = useState(false)
+          /**
+           * Fonction qui sera déclanchée quand on appui sur le bouton de supprimer la variante
+           */
+          const handleVariantDelete = useCallback((id) => {
+                    const newVariants = variants.filter(variant => variant.id != id)
+                    setVariants(newVariants)
+          }, [variants])
 
-          const descriptionRef = useRef(null)
-          const amountRef = useRef(null)
-          const priceRef = useRef(null)
-          const [amount, setAmount] = useState(1)
+          const handleInventoryEdit = useCallback((id, price, quantity) => {
+                    const newInventory = inventories.map(env => {
+                              if(env.id == id) {
+                                        return {
+                                                  id,
+                                                  price,
+                                                  quantity,
+                                                  items: env.items
+                                        }
+                              }
+                              return env
+                    })
+                    setInventories(newInventory)
+          }, [inventories])
+
+          const handleInventoryDelete = useCallback((id) => {
+                    const newinventory = inventories.filter(inv => inv.id != id)
+                    setInventories(newinventory)
+          }, [inventories])
 
           const [images, setImages] = useState([])
-          //   const onChangeText = am => {
-          //     setAmount(am)
-          // }
-
-          const onSizeSelect = () => {
-                    setshowSize(true)
-          }
-          // console.log(showSize)
           const fetchCategories = async () => {
                     try {
                               const pdts = await fetchApi('/products/categories')
@@ -147,26 +159,6 @@ export default function NewProductSreen() {
                               console.log(error)
                     } finally {
                               setLoadingCategories(false)
-                    }
-          }
-          const fetchColors = async () => {
-                    try {
-                              const colors = await fetchApi('/products/colors')
-                              setColors(colors)
-                    } catch (error) {
-                              console.log(error)
-                    } finally {
-                              setLoadingColors(false)
-                    }
-          }
-          const fetchProduits = async () => {
-                    try {
-                              const pdts = await fetchApi(`/partenaire/produits/${data.category.ID_CATEGORIE_PRODUIT}`)
-                              setProduits(pdts)
-                    } catch (error) {
-                              console.log(error)
-                    } finally {
-                              setLoadingProduits(false)
                     }
           }
 
@@ -178,18 +170,6 @@ export default function NewProductSreen() {
                               console.log(error)
                     } finally {
                               setLoadingSubCategories(false)
-                    }
-          }
-          const fetchSizes = async () => {
-                    try {
-                              const size = await fetchApi(`/products/sizes/${data.category.ID_CATEGORIE_PRODUIT}/${data.subCategory.ID_PRODUIT_SOUS_CATEGORIE}`)
-                              setSizes(size)
-                              // console.log(sizes)
-
-                    } catch (error) {
-                              console.log(error)
-                    } finally {
-                              setLoadingSizes(false)
                     }
           }
 
@@ -236,19 +216,16 @@ export default function NewProductSreen() {
                                                   })
                                         }))
                               }
-                              // console.log(form)
                               const newProduct = await fetchApi('/partenaire/produit/create', {
                                         method: "POST",
                                         body: form
                               })
-                              // console.log(newProduct)
                               navigation.navigate("NeProductDetail", {
                                         product: newProduct,
                                         index: 3,
                                         totalLength: 3,
                                         fixMargins: 3
                               })
-
                     } catch (error) {
                               console.log(error)
                     } finally {
@@ -258,23 +235,11 @@ export default function NewProductSreen() {
 
           useEffect(() => {
                     fetchCategories()
-                    fetchColors()
           }, [])
-          useEffect(() => {
-                    if (data.category) {
-                              fetchProduits()
-
-                    }
-          }, [data])
 
           useEffect(() => {
                     if (data.category) {
                               fetchSubCategories()
-                    }
-          }, [data])
-          useEffect(() => {
-                    if (data.category && data.subCategory) {
-                              fetchSizes()
                     }
           }, [data])
 
@@ -289,6 +254,21 @@ export default function NewProductSreen() {
                     }
           }, [isOpen])
 
+          useEffect(() => {
+                    if(variants.length > 0) {
+                              const options = variants.map(variant => {
+                                        const variantOptions = variant.options.map(option => ({ ...option, variantId: variant.id }))
+                                        return variantOptions
+                              })
+                              const result = cartesian(options)
+                              const newinventory = result.map((inv, index) => ({
+                                        id: `${index}_${Date.now()}`,
+                                        price: data.montant, quantity: 1,
+                                        items: inv,
+                              }))
+                              setInventories(newinventory)
+                    }
+          }, [variants])
 
           const CategoriesModalize = () => {
                     return (
@@ -365,310 +345,123 @@ export default function NewProductSreen() {
                                         </View>
                     )
           }
-          const ProduitsModalize = () => {
-                    return (
-                              (loadingForm || loadingProduits) ? <ActivityIndicator
-                                        animating
-                                        size={"small"}
-                                        color='#777'
-                                        style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
-                              /> :
-                                        <View style={styles.modalContainer}>
-                                                  <View style={styles.modalHeader}>
-                                                            <Text style={styles.modalTitle}>Les produits</Text>
-                                                            <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                            </View>
-                                                  </View>
-                                                  {produits.result?.map((produit, index) => {
-                                                            return (
-                                                                      <TouchableNativeFeedback key={produit.ID_PRODUIT} onPress={() => {
-                                                                                handleChange("produit", produit)
-                                                                                produitsModalizeRef.current.close()
-                                                                      }} >
-                                                                                <View style={[styles.modalItem, produit.ID_PRODUIT == data.produit?.ID_PRODUIT && { backgroundColor: '#ddd' }]}>
-                                                                                          <Text style={[styles.itemTitle, { marginLeft: 0 }]}>{produit.NOM_PRODUIT}</Text>
-                                                                                </View>
-                                                                      </TouchableNativeFeedback>
-                                                            )
-                                                  })}
-                                        </View>
-                    )
-          }
-          const DetailsModalize = () => {
-                    const [dataDetail, handleChangeDetail] = useForm({
-                              size: "",
-                              color: "",
-                              quantiteDetail: "",
-                              quantite: ""
-                    })
-
-
-
-                    //   const checkAmount = () => {
-                    //     handleChangeDetail("quantiteDetail",((parseInt(dataDetail.quantiteDetail)+total) <= data.quantite ?  parseInt(dataDetail.quantiteDetail):data.quantite-total ) )
-                    //   }
-                    return (
-                              (loadingForm || loadingSizes) ? <ActivityIndicator
-                                        animating
-                                        size={"small"}
-                                        color='#777'
-                                        style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
-                              /> :
-                                        <View style={styles.modalContainer}>
-                                                  <Text style={styles.modalTitle}>Les détails</Text>
-                                                  <View style={styles.modalHeader}>
-                                                            <TouchableOpacity style={styles.newProductBtn}>
-                                                                      <Text style={styles.newProductText}>Nouveau</Text>
-                                                            </TouchableOpacity>
-                                                            <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                            </View>
-                                                  </View>
-
-                                                  <View style={styles.selectControl}>
-                                                            <Text style={styles.selectLabel}>taille</Text>
-
-                                                            <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => setshowSize(true)}>
-                                                                      <Text style={styles.selectedLabel} >
-                                                                                {data.size ? data.size.TAILLE : "Aucun taille selectionné"}
-                                                                      </Text>
-                                                            </TouchableOpacity>
-                                                            {
-                                                                      showSize &&
-
-                                                                      sizes.result?.map((size, index) => {
-                                                                                return (
-                                                                                          <TouchableNativeFeedback key={size.ID_TAILLE} onPress={() => {
-                                                                                                    handleChange("size", size)
-                                                                                                    setshowSize(false)
-                                                                                          }} >
-                                                                                                    <View style={[styles.modalItem, size.ID_TAILLE == data.size?.ID_TAILLE && { backgroundColor: '#ddd' }]}>
-                                                                                                              <Text style={[styles.itemTitle, { marginLeft: 0 }]}>{size.TAILLE}</Text>
-                                                                                                    </View>
-                                                                                          </TouchableNativeFeedback>
-                                                                                )
-                                                                      })
-
-                                                            }
-                                                  </View>
-                                                  <View style={styles.selectControl}>
-                                                            <Text style={styles.selectLabel}>Couleur</Text>
-
-                                                            <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => setshowColor(true)}>
-                                                                      <Text style={styles.selectedLabel} >
-                                                                                {data.color ? data.color.COULEUR : "Aucun couleur selectionné"}
-                                                                      </Text>
-                                                            </TouchableOpacity>
-                                                            {
-                                                                      showColor &&
-                                                                      colors.result?.map((color, index) => {
-                                                                                return (
-                                                                                          <TouchableNativeFeedback key={color.ID_COULEUR} onPress={() => {
-                                                                                                    handleChange("color", color)
-                                                                                                    setshowColor(false)
-                                                                                          }} >
-                                                                                                    <View style={[styles.modalItem, color.ID_COULEUR == data.color?.ID_COULEUR && { backgroundColor: '#ddd' }]}>
-                                                                                                              <Text style={[styles.itemTitle, { marginLeft: 0 }]}>{color.COULEUR}</Text>
-                                                                                                    </View>
-                                                                                          </TouchableNativeFeedback>
-                                                                                )
-                                                                      })
-
-                                                            }
-                                                  </View>
-
-
-
-                                                  <View style={styles.selectControl}>
-                                                            <Text style={styles.selectLabel}>Quantité {data.quantite}</Text>
-                                                            <TextInput
-                                                                      ref={amountRef}
-                                                                      style={[styles.input, isAmountFocused && { borderColor: COLORS.primary }]}
-                                                                      value={data.quantite - dataDetail.quantiteDetail}
-                                                                      defaultValue={10}
-                                                                      onChangeText={detail => handleChangeDetail("quantiteDetail", detail, "quantite", data.quantite)}
-                                                                      onFocus={() => setIsAmountFocused(true)}
-                                                                      placeholder="Combien de pièces à detail ?"
-                                                                      onBlur={() => {
-                                                                                setIsAmountFocused(false)
-                                                                                // checkAmount()
-                                                                      }}
-                                                                      keyboardType="decimal-pad"
-                                                                      returnKeyType="next"
-
-
-                                                                      onSubmitEditing={() => priceRef.current.focus()}
-                                                                      blurOnSubmit={false}
-                                                            />
-                                                  </View>
-
-                                                  <TouchableOpacity style={styles.addBtn} onPress={() => {
-                                                            add(total, data.size.ID_TAILLE, data.size.TAILLE, dataDetail.quantiteDetail, data.color.ID_COULEUR, data.color.COULEUR)
-
-
-                                                            detailsModalizeRef.current?.close()
-
-                                                  }} disabled={showColor == false || showSize == false} >
-                                                            <Text style={[styles.addBtnText]}>Ajouter</Text>
-                                                  </TouchableOpacity >
-                                        </View >
-                    )
-          }
-          const SizesModalize = () => {
-                    return (
-                              (loadingForm || loadingProduits) ? <ActivityIndicator
-                                        animating
-                                        size={"small"}
-                                        color='#777'
-                                        style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
-                              /> :
-                                        <View style={styles.modalContainer}>
-                                                  <View style={styles.modalHeader}>
-                                                            <Text style={styles.modalTitle}>Les produits</Text>
-                                                            <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                            </View>
-                                                  </View>
-                                                  {produits.result?.map((produit, index) => {
-                                                            return (
-                                                                      <TouchableNativeFeedback key={produit.ID_PRODUIT} onPress={() => {
-                                                                                handleChange("produit", produit)
-                                                                                produitsModalizeRef.current.close()
-                                                                      }} >
-                                                                                <View style={[styles.modalItem, produit.ID_PRODUIT == data.produit?.ID_PRODUIT && { backgroundColor: '#ddd' }]}>
-                                                                                          <Text style={[styles.itemTitle, { marginLeft: 0 }]}>{produit.NOM_PRODUIT}</Text>
-                                                                                </View>
-                                                                      </TouchableNativeFeedback>
-                                                            )
-                                                  })}
-                                        </View>
-                    )
-          }
           return (
                     <>
-                              <ScrollView style={styles.container}>
+                              <ScrollView style={styles.container} keyboardShouldPersistTaps='always'>
                                         {isLoading && <Loading />}
                                         <View style={styles.header}>
                                                   <Text style={styles.title}>Nouveau produit</Text>
-                                                  <TouchableNativeFeedback useForeground onPress={() => navigation.goBack()}>
-                                                            <View style={styles.cancelBtn}>
-                                                                      <Ionicons name="close" size={30} color="#777" />
-                                                            </View>
-                                                  </TouchableNativeFeedback>
                                         </View>
                                         <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Catégorie</Text>
-                                                  <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
-                                                            setIsOpen(true)
-                                                            categoriesModalizeRef.current?.open()
-                                                  }}>
-                                                            <Text style={styles.selectedLabel} >
-                                                                      {data.category ? data.category.NOM : "Aucune catégorie selectionnée"}
-                                                            </Text>
-                                                            <Ionicons name="caret-down" size={24} color="#777" />
-                                                  </TouchableOpacity>
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Sous catégorie</Text>
-                                                  <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
-                                                            setIsOpen(true)
-                                                            subCategoriesModalizeRef.current?.open()
-                                                  }}>
-                                                            <Text style={styles.selectedLabel} >
-                                                                      {data.subCategory ? data.subCategory.NOM_SOUS_CATEGORIE : "Aucun sous-catégorie selectionné"}
-                                                            </Text>
-                                                            <Ionicons name="caret-down" size={24} color="#777" />
-                                                  </TouchableOpacity>
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Produit</Text>
-                                                  <TouchableOpacity style={[styles.selectedLabelContainer]} onPress={() => {
-                                                            setIsOpen(true)
-                                                            produitsModalizeRef.current?.open()
-                                                  }}>
-                                                            <Text style={styles.selectedLabel}>
-                                                                      {data.produit ? data.produit.NOM_PRODUIT : "Aucun produit selectionné"}
-                                                            </Text>
-                                                            <Ionicons name="caret-down" size={24} color="#777" />
-                                                  </TouchableOpacity>
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Nom du produit</Text>
-                                                  <TextInput
-                                                            style={[styles.input, isFocused && { borderColor: COLORS.primary }]}
+                                                  <OutlinedTextField
+                                                            label={"Nom du produit"}
+                                                            fontSize={13}
                                                             value={data.nom}
                                                             onChangeText={e => handleChange("nom", e)}
-                                                            onFocus={() => setIsFocused(true)}
-                                                            placeholder="Ecrire votre propre nom du produit"
-                                                            onBlur={() => {
-                                                                      setIsFocused(false)
-                                                            }}
+                                                            onBlur={() => checkFieldData('nom')}
+                                                            error={hasError('nom') ? getError('nom') : ''}
+                                                            lineWidth={0.5}
+                                                            activeLineWidth={0.5}
+                                                            baseColor={COLORS.smallBrown}
+                                                            tintColor={COLORS.primary}
+                                                            containerStyle={{ flex: 1, marginTop: 15 }}
+                                                            inputContainerStyle={{ borderRadius: 10 }}
                                                   />
                                         </View>
                                         <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Description du produit</Text>
-                                                  <TextInput
-                                                            ref={descriptionRef}
-                                                            style={[styles.input, isDescFocused && { borderColor: COLORS.primary }, { height: 80 }]}
+                                                  <TouchableOpacity style={styles.selectContainer} onPress={() => {
+                                                                      setIsOpen(true)
+                                                                      categoriesModalizeRef.current?.open()
+                                                            }}>
+                                                            <View style={{}}>
+                                                                      <Text style={[styles.selectLabel]}>
+                                                                                Catégorie
+                                                                      </Text>
+                                                                      {data.category ? <Text style={[styles.selectedValue, { color: '#333' }]}>
+                                                                                { data.category.NOM }
+                                                                      </Text> : null}
+                                                            </View>
+                                                            <EvilIcons name="chevron-down" size={30} color="#777" />
+                                                  </TouchableOpacity>
+                                        </View>
+                                        <View style={styles.selectControl}>
+                                                  <TouchableOpacity style={styles.selectContainer} onPress={() => {
+                                                                      setIsOpen(true)
+                                                                      subCategoriesModalizeRef.current?.open()
+                                                            }}>
+                                                            <View style={{}}>
+                                                                      <Text style={[styles.selectLabel]}>
+                                                                                Plus de précision
+                                                                      </Text>
+                                                                      {data.subCategory ? <Text style={[styles.selectedValue, { color: '#333' }]}>
+                                                                                { data.subCategory.NOM_SOUS_CATEGORIE }
+                                                                      </Text> : null}
+                                                            </View>
+                                                            <EvilIcons name="chevron-down" size={30} color="#777" />
+                                                  </TouchableOpacity>
+                                        </View>
+                                        <View style={styles.selectControl}>
+                                                  <OutlinedTextField
+                                                            label={"Prix du produit"}
+                                                            fontSize={13}
+                                                            value={data.montant}
+                                                            onChangeText={e => handleChange("montant", e)}
+                                                            onBlur={() => {
+                                                                      checkFieldData('montant')
+                                                            }}
+                                                            error={hasError('montant') ? getError('montant') : ''}
+                                                            lineWidth={0.5}
+                                                            activeLineWidth={0.5}
+                                                            baseColor={COLORS.smallBrown}
+                                                            tintColor={COLORS.primary}
+                                                            containerStyle={{ flex: 1, marginTop: 15,   }}
+                                                            inputContainerStyle={{ borderRadius: 10 }}
+                                                            keyboardType="decimal-pad"
+                                                  />
+                                        </View>
+                                        <View style={styles.selectControl}>
+                                                  <OutlinedTextField
+                                                            label={"Description du produit"}
+                                                            fontSize={13}
                                                             value={data.description}
                                                             onChangeText={e => handleChange("description", e)}
-                                                            onFocus={() => setIsDescFocused(true)}
-                                                            placeholder="Décrire votre produit(facultatif)"
-                                                            onBlur={() => {
-                                                                      setIsDescFocused(false)
-                                                            }}
+                                                            onBlur={() => checkFieldData('description')}
+                                                            error={hasError('description') ? getError('description') : ''}
+                                                            lineWidth={0.5}
+                                                            activeLineWidth={0.5}
+                                                            baseColor={COLORS.smallBrown}
+                                                            tintColor={COLORS.primary}
+                                                            containerStyle={{ flex: 1, marginTop: 15,   }}
+                                                            inputContainerStyle={{ borderRadius: 10 }}
                                                             multiline
                                                   />
                                         </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Quantité</Text>
-                                                  <TextInput
-                                                            ref={amountRef}
-                                                            style={[styles.input, isAmountFocused && { borderColor: COLORS.primary }]}
-                                                            value={data.quantite}
-                                                            onChangeText={e => handleChange("quantite", e)}
-                                                            onFocus={() => setIsAmountFocused(true)}
-                                                            placeholder="Combien de pièces à mettre en stock ?"
-                                                            onBlur={() => {
-                                                                      setIsAmountFocused(false)
-                                                            }}
-                                                            keyboardType="decimal-pad"
-                                                            returnKeyType="next"
-                                                            onSubmitEditing={() => priceRef.current.focus()}
-                                                            blurOnSubmit={false}
-                                                  />
-                                        </View>
-                                        <View style={styles.selectControl}>
-                                                  <Text style={styles.selectLabel}>Prix unitaire</Text>
-                                                  <TextInput
-                                                            ref={priceRef}
-                                                            style={[styles.input, isPriceFocused && { borderColor: COLORS.primary }]}
-                                                            value={data.montant}
-                                                            onChangeText={e => handleChange("montant", e)}
-                                                            onFocus={() => setIsPriceFocused(true)}
-                                                            placeholder="Prix pour chaque pièce ?"
-                                                            onBlur={() => {
-                                                                      setIsPriceFocused(false)
-                                                            }}
-                                                            keyboardType="decimal-pad"
-                                                  />
-                                        </View>
+                                        {(data.montant != '' && parseInt(data.montant) > 0) ? <View style={styles.variantsSection}>
+                                                  <Text style={styles.sectionTitle}>Les variantes</Text>
+                                                  {variants.length > 0 ? <View style={styles.variants}>
+                                                            {variants.map((variant, index) => {
+                                                                      return (
+                                                                                <Variant variant={variant} key={index} index={index} handleVariantEdit={handleVariantEdit} handleVariantDelete={handleVariantDelete} />
+                                                                      )
+                                                            })}
+                                                  </View> : null}
+                                                  {variants.length < VARIANT_LIMIT ? <View>
+                                                            <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple('#C4C4C4')} useForeground onPress={() => variantModalizeRef.current.open()}>
+                                                                      <View style={styles.addVariantBtn}>
+                                                                                <AntDesign name="pluscircleo" size={22} color="#777" style={{ fontWeight: "bold" }} />
+                                                                                <Text style={styles.addVariantText}>Ajouter une variante</Text>
+                                                                      </View>
+                                                            </TouchableNativeFeedback>
+                                                  </View> : null}
+                                        </View> : null}
+                                        {inventories.length > 0 ? <View style={[styles.variantsSection, { marginTop: 10 }]}>
+                                                  <Text style={styles.sectionTitle}>Votre inventaire</Text>
+                                                   <View style={styles.inventories}>
+                                                            {inventories.map((inventory, index) => {
+                                                                      return <InventoryItem inventory={inventory} key={index} index={index} handleInventoryDelete={handleInventoryDelete} handleInventoryEdit={handleInventoryEdit} />
+                                                            })}
+                                                  </View> 
+                                        </View>: null}
                                         <View style={styles.selectControl}>
                                                   <Text style={styles.selectLabel}>Images du produit</Text>
                                                   <View style={styles.images}>
@@ -686,30 +479,12 @@ export default function NewProductSreen() {
                                                             </TouchableWithoutFeedback> : null}
                                                   </View>
                                         </View>
+                              </ScrollView>
+                              <View style={styles.actionContainer}>
                                         <TouchableOpacity style={[styles.addBtn, (!isValidate() || images.length == 0) && { opacity: 0.5 }]} onPress={onSubmit} disabled={!isValidate() || images.length == 0}>
                                                   <Text style={[styles.addBtnText]}>Publier le produit</Text>
                                         </TouchableOpacity>
-                              </ScrollView>
-                              <Modalize
-                                        ref={produitsModalizeRef}
-                                        adjustToContentHeight
-                                        handlePosition='inside'
-                                        modalStyle={{
-                                                  borderTopRightRadius: 25,
-                                                  borderTopLeftRadius: 25,
-                                                  paddingVertical: 20
-                                        }}
-                                        handleStyle={{ marginTop: 10 }}
-                                        scrollViewProps={{
-                                                  keyboardShouldPersistTaps: "handled"
-                                        }}
-                                        onClosed={() => {
-                                                  setIsOpen(false)
-                                                  setLoadingForm(true)
-                                        }}
-                              >
-                                        <ProduitsModalize />
-                              </Modalize>
+                              </View>
                               <Modalize
                                         ref={categoriesModalizeRef}
                                         adjustToContentHeight
@@ -750,46 +525,16 @@ export default function NewProductSreen() {
                               >
                                         <SubCategoriesModalize />
                               </Modalize>
-                              <Modalize
-                                        ref={sizeModalizeRef}
-                                        adjustToContentHeight
-                                        handlePosition='inside'
-                                        modalStyle={{
-                                                  borderTopRightRadius: 25,
-                                                  borderTopLeftRadius: 25,
-                                                  paddingVertical: 20
+                              <NewVariantModalize
+                                        variantModalizeRef={variantModalizeRef}
+                                        onVariantSubmit={(variantName, options) => {
+                                                  setVariants(t => [...t, {
+                                                            id: `${variantName[0]}_${Date.now()}`,
+                                                            variantName,
+                                                            options
+                                                  }])
                                         }}
-                                        handleStyle={{ marginTop: 10 }}
-                                        scrollViewProps={{
-                                                  keyboardShouldPersistTaps: "handled"
-                                        }}
-                                        onClosed={() => {
-                                                  setIsOpen(false)
-                                                  setLoadingForm(true)
-                                        }}
-                              >
-                                        <SizesModalize />
-                              </Modalize>
-                              <Modalize
-                                        ref={detailsModalizeRef}
-                                        adjustToContentHeight
-                                        handlePosition='inside'
-                                        modalStyle={{
-                                                  borderTopRightRadius: 25,
-                                                  borderTopLeftRadius: 25,
-                                                  paddingVertical: 20
-                                        }}
-                                        handleStyle={{ marginTop: 10 }}
-                                        scrollViewProps={{
-                                                  keyboardShouldPersistTaps: "handled"
-                                        }}
-                                        onClosed={() => {
-                                                  setIsOpen(false)
-                                                  setLoadingForm(true)
-                                        }}
-                              >
-                                        <DetailsModalize />
-                              </Modalize>
+                              />
                     </>
           )
 }
@@ -798,20 +543,14 @@ const styles = StyleSheet.create({
                     flex: 1
           },
           header: {
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    paddingHorizontal: 20
+                    paddingHorizontal: 10
           },
           title: {
                     fontWeight: "bold",
-                    fontSize: 18,
-                    textAlign: "center",
-                    marginVertical: 40
+                    fontSize: 18
           },
           selectControl: {
-                    paddingHorizontal: 20,
-                    marginTop: 10
+                    paddingHorizontal: 10
           },
           product: {
                     maxWidth: 900,
@@ -834,9 +573,21 @@ const styles = StyleSheet.create({
                     fontWeight: 'bold',
                     textAlign: "center"
           },
+          selectContainer: {
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    // marginHorizontal: 10,
+                    backgroundColor: "#fff",
+                    padding: 13,
+                    borderRadius: 5,
+                    borderWidth: 0.5,
+                    borderColor: "#777",
+                    marginVertical: 10
+          },
           selectLabel: {
-                    fontWeight: "bold",
-                    marginLeft: 5
+                    color: '#777',
+                    fontSize: 13
           },
           selectedLabelContainer: {
                     borderWidth: 1,
@@ -909,16 +660,18 @@ const styles = StyleSheet.create({
           },
           input: {
                     borderRadius: 5,
-                    borderWidth: 1,
-                    borderColor: '#ddd',
+                    borderWidth: 0.5,
+                    borderColor: '#777',
                     height: 50,
-                    color: COLORS.ecommercePrimaryColor,
-                    fontWeight: 'bold',
+                    color: '#333',
+                    paddingHorizontal: 10
+          },
+          actionContainer: {
                     paddingHorizontal: 10
           },
           addBtn: {
                     paddingVertical: 10,
-                    minWidth: "90%",
+                    width: "100%",
                     alignSelf: "center",
                     backgroundColor: COLORS.ecommerceOrange,
                     borderRadius: 10,
@@ -942,5 +695,54 @@ const styles = StyleSheet.create({
           },
           images: {
                     flexDirection: "row"
-          }
+          },
+          variantsSection: {
+                    paddingHorizontal: 10,
+                    marginTop: 5
+          },
+          variants: {
+                    borderWidth: 0.5,
+                    borderColor: '#777',
+                    borderBottomWidth: 0,
+                    borderRadius: 5,
+                    marginTop: 5
+          },
+          sectionTitle: {
+                    fontSize: 16
+          },
+          addVariantBtn: {
+                    borderColor: '#777',
+                    borderWidth: 0.5,
+                    borderRadius: 5,
+                    padding: 10,
+                    marginTop: 5,
+                    overflow: "hidden",
+                    flexDirection: 'row',
+                    alignItems: "center",
+          },
+          addVariantText: {
+                    color: '#777',
+                    marginLeft: 5,
+                    fontWeight: "bold"
+          },
+          variantBtn: {
+                    borderColor: '#777',
+                    borderBottomWidth: 0.5,
+                    padding: 10,
+                    overflow: "hidden",
+                    flexDirection: 'row',
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    borderRadius: 5
+          },
+          variantText: {
+                    color: '#777'
+          },
+          inventories: {
+                    borderWidth: 0.5,
+                    borderColor: '#777',
+                    borderBottomWidth: 0,
+                    borderRadius: 5,
+                    marginTop: 5
+          },
 })

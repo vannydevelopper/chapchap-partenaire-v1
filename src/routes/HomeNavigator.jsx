@@ -12,13 +12,22 @@ import ApprovisionnementScreen from "../screens/e-commerce/ApprovisionnementScre
 import PaymentScreen from "../screens/home/PaymentScreen";
 import Header from "../components/app/Header";
 import ShopHeader from "../components/ecommerce/home/ShopHeader";
+import NewProductScreen from "../screens/e-commerce/NewProductScreen";
 
 export default function HomeNavigator() {
           const Stack = createStackNavigator()
           return (
                     <Stack.Navigator screenOptions={{ header: () => <Header  /> }}>
                               <Stack.Screen name='HomeScreen' component={HomeScreen} />
-                              <Stack.Screen name="EcommerceHomeScreen" component={EcommerceHomeScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid, header: props => <ShopHeader {...props} /> }}/>
+                              <Stack.Screen name="EcommerceHomeScreen" component={EcommerceHomeScreen} options={{
+                                        cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid,
+                                        header: props => <ShopHeader {...props} />,
+                                        headerMode: 'float'
+                              }}/>
+                              <Stack.Screen name="NewProductScreen" component={NewProductScreen} options={{
+                                        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                                        header: props => <ShopHeader {...props} />
+                              }} />
                               <Stack.Screen name="HomeAllServiceScreen" component={HomeAllServiceScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
                               <Stack.Screen name="ServiceNotFoundScreen" component={ServiceNotFoundScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }} />
                               <Stack.Screen name="InscriptionPartenaireScreen" component={InscriptionPartenaireScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, headerShown: false }} />

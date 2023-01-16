@@ -21,21 +21,22 @@ export default class Validation {
           }
 
           required(key, intitialValue) {
-                    // const value = intitialValue.trim()
-                    const value = intitialValue
+                    const value =  typeof(intitialValue) == 'string' ? intitialValue ? intitialValue.trim() : '' : "yeah"
                    if(!value || value === '' || value.length === 0) {
                              this.setError(key, this.customMessages?.[key]?.required || `This field is required`)
                    }
           }
 
-          length(key, value, params) {
-                    if(!value) return
+          length(key, intitialValue, params) {
+                    const value =  typeof(intitialValue) == 'string' ? intitialValue ? intitialValue.trim() : '' : "yeah"
+                    const trimedValue = value.trim()
+                    if(!trimedValue) return
                     const [min, max] = params
-                    if(min && !max && value.length < min) {
+                    if(min && !max && trimedValue.length < min) {
                               this.setError(key, this.customMessages?.[key]?.length || `Enter et least ${min} characters`)
-                    } else if (!min && max && value.length > max) {
+                    } else if (!min && max && trimedValue.length > max) {
                               this.setError(key, this.customMessages?.[key]?.length || `You can not exceed ${max} characters`)
-                    }else if((min && max ) && (value.length < min || value.length > max)) {
+                    }else if((min && max ) && (trimedValue.length < min || trimedValue.length > max)) {
                               this.setError(key, this.customMessages?.[key]?.length || `The value of this field must be between ${min} and ${max}`)
                     }
           }
@@ -57,6 +58,13 @@ export default class Validation {
                     const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
                     if(!validEmail) {
                               this.setError(key, this.customMessages?.[key]?.email || 'Incorrect email')
+                    }
+          }
+          number(key, value) {
+                    if(!value) return
+                    let isnum = /^\d+$/.test(value);
+                    if(!isnum) {
+                              this.setError(key, this.customMessages?.[key]?.required || `This field is must be a number`)
                     }
           }
 
