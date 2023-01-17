@@ -30,7 +30,7 @@ export default function InventoryItem({ inventory, handleInventoryEdit, handleIn
                                                                                 Prix:
                                                                       </Text>
                                                                       <Text style={styles.inventoryPrice}>
-                                                                                {inventory.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Fbu
+                                                                                {inventory.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} FBU
                                                                       </Text>
                                                             </View>
                                                             <View style={styles.inventoryDetail}>

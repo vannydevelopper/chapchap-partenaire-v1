@@ -64,7 +64,23 @@ export default class Validation {
                     if(!value) return
                     let isnum = /^\d+$/.test(value);
                     if(!isnum) {
-                              this.setError(key, this.customMessages?.[key]?.required || `This field is must be a number`)
+                              this.setError(key, this.customMessages?.[key]?.number || `This field must be a valid number`)
+                    }
+          }
+          string(key, value) {
+                    if(!value) return
+                    const pattern = /^[a-zA-Z0-9!@#%^&*()_+]+$/
+                    let isString = pattern.test(value);
+                    if(!isString) {
+                              this.setError(key, this.customMessages?.[key]?.string || `This field must be a valid string`)
+                    }
+          }
+          alpha(key, value) {
+                    if(!value) return
+                    const pattern = /^[\w\s!"#$%&'()*+,-./:;<=>?@[\\\]^_`{|}~\u00C0-\u017F]+$/u
+                    let isString = pattern.test(value);
+                    if(!isString) {
+                              this.setError(key, this.customMessages?.[key]?.alpha || `This field must contains alphanumeric characters only`)
                     }
           }
 

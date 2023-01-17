@@ -7,16 +7,17 @@ import { OutlinedTextField } from 'rn-material-ui-textfield'
 import { useRef } from 'react'
 import { useCallback } from 'react'
 import { useFormErrorsHandle } from '../../../hooks/useFormErrorsHandle'
+import { Portal } from 'react-native-portalize'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 const LIMIT_OPTIONS = 5
 /**
  * Modal qui affiche l'ajout d'une nouvelle variante
  * @author Dukizwe Darcie <darcy@mediabox.bi>
  * @date 16/01/2021
- * @param {*} param0 
  * @returns 
  */
-export default function NewVariantModalize({ variantModalizeRef, onVariantSubmit }) {
+export default function NewVariantModalize({ variantModalizeRef, onVariantSubmit, isNewVariantOpen, setIsNewVariantOpen }) {
           const [variantName, setVariantName] = useState('')
           const [optionName, setOptionName] = useState('')
           const [options, setOptions] = useState([])
@@ -67,6 +68,9 @@ export default function NewVariantModalize({ variantModalizeRef, onVariantSubmit
                               adjustToContentHeight
                               handlePosition='inside'
                               scrollViewProps={{ keyboardShouldPersistTaps: 'always' }}
+                              onClosed={() => {
+                                        setIsNewVariantOpen(false)
+                              }}
                               onClose={() => Keyboard.dismiss()}>
                               <View style={styles.modalContainer}>
                                         <Text style={styles.modalTitle}>

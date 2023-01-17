@@ -96,6 +96,7 @@ export default function EditInventoryItemModalize({ editInventoryModalizeRef, on
                                                                                           onSubmitEditing={() => optionRef.current.focus()}
                                                                                           blurOnSubmit={false}
                                                                                           keyboardType="decimal-pad"
+                                                                                          suffiex="FBU"
                                                                                 />
                                                                                 <OutlinedTextField
                                                                                           label={"Quantité"}

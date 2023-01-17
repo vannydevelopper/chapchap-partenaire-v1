@@ -32,7 +32,6 @@ export default function ShopHeader(props) {
 const styles = StyleSheet.create({
           header: {
                     backgroundColor: '#fff',
-                    paddingHorizontal: 10,
                     flexDirection: 'row',
                     alignItems: "center",
                     justifyContent: "space-between",

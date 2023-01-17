@@ -53,7 +53,7 @@ export default function ProductsTabScreen({ shop }) {
                     </Tabs.ScrollView>
                     <TouchableNativeFeedback
                               background={TouchableNativeFeedback.Ripple('#C4C4C4', true)}
-                              onPress={() => navigation.navigate('NewProductScreen')}>
+                              onPress={() => navigation.navigate('NewProductScreen', { shop })}>
                               <View style={styles.newProductBtn}>
                                         <Ionicons name="add" size={40} color="white" />
                               </View>

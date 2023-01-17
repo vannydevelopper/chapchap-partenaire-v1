@@ -22,11 +22,12 @@ export default function HomeNavigator() {
                               <Stack.Screen name="EcommerceHomeScreen" component={EcommerceHomeScreen} options={{
                                         cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid,
                                         header: props => <ShopHeader {...props} />,
-                                        headerMode: 'float'
+                                        headerShown: false
                               }}/>
                               <Stack.Screen name="NewProductScreen" component={NewProductScreen} options={{
                                         cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-                                        header: props => <ShopHeader {...props} />
+                                        header: props => <ShopHeader {...props} />,
+                                        headerShown: false
                               }} />
                               <Stack.Screen name="HomeAllServiceScreen" component={HomeAllServiceScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
                               <Stack.Screen name="ServiceNotFoundScreen" component={ServiceNotFoundScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }} />
