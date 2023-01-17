@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, Image, TouchableWithoutFeedback, TouchableNativ
 import { COLORS } from '../../../styles/COLORS'
 import { EvilIcons } from '@expo/vector-icons';
 
-export const HEADER_HEIGHT = 260;
+export const HEADER_HEIGHT = 262;
 export default function ShopCollapsableHeader({ shop }) {
           return (
                     <View style={styles.header}>

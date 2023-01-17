@@ -21,8 +21,7 @@ export default function HomeNavigator() {
                               <Stack.Screen name='HomeScreen' component={HomeScreen} />
                               <Stack.Screen name="EcommerceHomeScreen" component={EcommerceHomeScreen} options={{
                                         cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid,
-                                        header: props => <ShopHeader {...props} />,
-                                        headerShown: false
+                                        header: props => <ShopHeader {...props} />
                               }}/>
                               <Stack.Screen name="NewProductScreen" component={NewProductScreen} options={{
                                         cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,

@@ -2,6 +2,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import EcommerceTabs from "../../routes/EcommmerceTabs";
+import ShopHeader from "../../components/ecommerce/home/ShopHeader";
 
 export default function EcommerceHomeScreen() {
           const navigation = useNavigation()

@@ -8,8 +8,10 @@ import InscriptionPartenaireScreen from './src/screens/welcome/InscriptionParten
 import HomeScreen from './src/screens/welcome/HomeScreen';
 import CommandeEmiseScreen from './src/screens/e-commerce/CommandeEmiseScreen';
 import { StatusBar } from 'expo-status-bar';
+import { LogBox } from 'react-native';
 
 
+LogBox.ignoreLogs(["flexWrap: `wrap``"]);
 export default function App() {
           return (
                     <Provider store={store}>

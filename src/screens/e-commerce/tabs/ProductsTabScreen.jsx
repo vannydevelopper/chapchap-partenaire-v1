@@ -6,7 +6,9 @@ import { Tabs } from 'react-native-collapsible-tab-view'
 import fetchApi from '../../../helpers/fetchApi'
 import { Feather, Ionicons } from '@expo/vector-icons'; 
 import { COLORS } from '../../../styles/COLORS'
-import { useNavigation } from '@react-navigation/native'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
+import Product from '../../../components/ecommerce/main/Product'
+import { useCallback } from 'react'
 
 /**
  * Un composant d'un onglet qui affiche les produits d'un partenaire
@@ -18,8 +20,18 @@ export default function ProductsTabScreen({ shop }) {
           const [products, setProducts] = useState([])
           const [loading, setLoading] = useState(true)
           const navigation = useNavigation()
+
+          const renderProducts = ({ item: product, index}) => {
+                    return (
+                              <Product
+                                        product={product}
+                                        index={index}
+                                        totalLength={products.length}
+                              />
+                    )
+          }
           
-          useEffect(() => {
+          useFocusEffect(useCallback(() => {
                     (async () => {
                               try {
                                         var url = `/partenaire/produit/${shop.ID_PARTENAIRE_SERVICE}`
@@ -31,26 +43,33 @@ export default function ProductsTabScreen({ shop }) {
                                         setLoading(false)
                               }
                     })()
-          }, [])
+          }, []))
           return (
                     <>
-                    <Tabs.ScrollView showsVerticalScrollIndicator={false}>
+                    {loading ? <Tabs.ScrollView showsVerticalScrollIndicator={false}>
                               <View style={styles.container}>
-                                        {loading ? <View style={styles.loadingContainer}>
+                                         <View style={styles.loadingContainer}>
                                                   <ActivityIndicator size={"large"} color='#777' />
-                                        </View> :
-                                        (
-                                                  products.length == 0 ? <View style={styles.emptyContainer}>
+                                        </View>
+                              </View>
+                    </Tabs.ScrollView> : 
+                              products.length == 0 ?
+                              <Tabs.ScrollView showsVerticalScrollIndicator={false}>
+                                        <View style={styles.container}>
+                                                  <View style={styles.emptyContainer}>
                                                             <Feather name="check-square" size={24} color="#777" />
                                                             <Text style={styles.emptyFeedback}>
                                                                       Votre stock est vide. Cliquez sur le bouton en bas pour ajouter un nouveau produit
                                                             </Text>
-                                                  </View> :
-                                                  <View>
                                                   </View>
-                                        )}
-                              </View>
-                    </Tabs.ScrollView>
+                                        </View>
+                              </Tabs.ScrollView> : 
+                              <Tabs.FlatList
+                                        data={products}
+                                        renderItem={renderProducts}
+                                        contentContainerStyle={styles.products}
+                              />
+                    }
                     <TouchableNativeFeedback
                               background={TouchableNativeFeedback.Ripple('#C4C4C4', true)}
                               onPress={() => navigation.navigate('NewProductScreen', { shop })}>
@@ -93,5 +112,10 @@ const styles = StyleSheet.create({
                     position: 'absolute',
                     bottom: 20,
                     right: 20
+          },
+          products: {
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    flexWrap: 'wrap'
           }
 })
