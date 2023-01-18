@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, View, Text, TouchableNativeFeedback, StatusBar } from "react-native";
-import { Ionicons, Feather } from '@expo/vector-icons'; 
+import { Ionicons, Feather, FontAwesome, EvilIcons, AntDesign } from '@expo/vector-icons'; 
 import { useNavigation } from "@react-navigation/native";
 
 export default function ShopHeader(props) {
@@ -20,11 +20,20 @@ export default function ShopHeader(props) {
                               <Text style={styles.shopName}>
                                         { shopName }
                               </Text>
-                              <TouchableNativeFeedback>
-                                        <View style={styles.headerBtn}>
-                                                  <Feather name="more-horizontal" size={24} color="black" />
-                                        </View>
-                              </TouchableNativeFeedback>
+                              <View style={styles.endBtns}>
+                                        <TouchableNativeFeedback 
+                                        background={TouchableNativeFeedback.Ripple('#c9c5c5', true)} >
+                                                  <View style={styles.headerBtn}>
+                                                            <AntDesign name="search1" size={20} color="black" />
+                                                  </View>
+                                        </TouchableNativeFeedback>
+                                        <TouchableNativeFeedback
+                                        background={TouchableNativeFeedback.Ripple('#c9c5c5', true)} >
+                                                  <View style={[styles.headerBtn]}>
+                                                            <Feather name="more-horizontal" size={24} color="black" />
+                                                  </View>
+                                        </TouchableNativeFeedback>
+                              </View>
                     </View>
           )
 }
@@ -42,5 +51,9 @@ const styles = StyleSheet.create({
           },
           shopName: {
                     fontWeight: "bold"
+          },
+          endBtns: {
+                    flexDirection: 'row',
+                    alignItems: 'center',
           }
 })

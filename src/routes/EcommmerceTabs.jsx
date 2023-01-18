@@ -55,13 +55,13 @@ export default function EcommerceTabs({ shop }) {
                                                   <View style={[styles.box, styles.boxB]} />
                                         </Tabs.ScrollView>
                               </Tabs.Tab>
-                              <Tabs.Tab name="supp" label="Informations">
+                              <Tabs.Tab name="supp" label="Revues">
                                         <Tabs.ScrollView>
                                                   <View style={[styles.box, styles.boxA]} />
                                                   <View style={[styles.box, styles.boxB]} />
                                         </Tabs.ScrollView>
                               </Tabs.Tab>
-                              <Tabs.Tab name="shop" label="Boutiques">
+                              <Tabs.Tab name="shop" label="Suivis">
                                         <Tabs.ScrollView>
                                                   <View style={[styles.box, styles.boxA]} />
                                                   <View style={[styles.box, styles.boxB]} />

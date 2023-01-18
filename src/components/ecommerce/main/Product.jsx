@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from 'react'
-import { Image, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native'
+import { Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, useWindowDimensions, View } from 'react-native'
 import { Fontisto, AntDesign } from '@expo/vector-icons';
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
@@ -18,20 +18,12 @@ export default function Product({ product, index, totalLength, fixMargins = fals
                     // marginLeft: index > 0 ? PRODUCT_MARGIN : (fixMargins ? PRODUCT_MARGIN : 0),
                     // marginRight: index == totalLength - 1 ? PRODUCT_MARGIN : (fixMargins ? 0 : 0)
           }
-
-          const modalizeRef = useRef(null)
-          const [isOpen, setIsOpen] = useState(false)
-          const [loadingForm, setLoadingForm] = useState(true)
-          const detail = async (product) => {
-                    const details = product
-                    navigation.navigate("ProductDetailScreen", { product: product })
-          }
-
           return (
+                    <TouchableWithoutFeedback onPress={() => navigation.push("ProductDetailsScreen", { product: product })} >
                     <View key={index} style={[styles.product, additionStyles,]}>
-                              <TouchableOpacity onPress={() => detail()} style={styles.imageCard}>
+                              <View style={styles.imageCard}>
                                         <Image source={{ uri: product.IMAGE_1 }} style={styles.image} />
-                              </TouchableOpacity>
+                              </View>
                               <View style={styles.productNames}>
                                         <Text numberOfLines={2} style={styles.productName}>
                                                   <Text numberOfLines={2} style={styles.productName}>{product.NOM}</Text>
@@ -51,6 +43,7 @@ export default function Product({ product, index, totalLength, fixMargins = fals
                                         })}, {moment(product.DATE_INSERTION).format('HH:mm')}
                               </Text>
                     </View>
+                    </TouchableWithoutFeedback>
           )
 }
 

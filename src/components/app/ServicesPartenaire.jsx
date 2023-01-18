@@ -75,7 +75,7 @@ export default function ServicesPartenaire() {
                                                                                 )
                                                                       })}
                                                             </View>
-                                                            <AvailableServices title="Autres services" />
+                                                            <AvailableServices title="Enregistrer un nouveau service" />
                                                   </>}
                                         </ScrollView>}
                               </View>

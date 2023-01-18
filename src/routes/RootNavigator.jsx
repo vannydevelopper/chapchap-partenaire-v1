@@ -10,7 +10,7 @@ export default function RootNavigator() {
                     <NavigationContainer
                               theme={{
                                         colors: {
-                                                  background: "#fff",
+                                                  background: "#FFF",
                                         }
                               }}>
                               <Stack.Navigator screenOptions={{ headerShown: false }}>
