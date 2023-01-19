@@ -43,6 +43,9 @@ export default function ServicesPartenaire() {
           useEffect(() => {
                     modalizeRef.current?.open()
           }, [modalizeRef])
+
+          
+
           const searchProduit = (service) => {
                     navigation.navigate("EcommerceHomeScreen", { partenaire: service })
           }
