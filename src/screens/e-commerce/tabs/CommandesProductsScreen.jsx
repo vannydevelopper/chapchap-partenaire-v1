@@ -22,13 +22,11 @@ export default function CommandesProductsScreen({ shop }) {
 
         const renderProducts = ({ item: commande, index }) => {
                 return (
-                        <TouchableNativeFeedback>
-                                <CommandeEmise
-                                        commande={commande}
-                                        index={index}
-                                        totalLength={commandes.length}
-                                />
-                        </TouchableNativeFeedback>
+                        <CommandeEmise
+                                commande={commande}
+                                index={index}
+                                totalLength={commandes.length}
+                        />
 
                 )
         }

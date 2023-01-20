@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity,Image } from "react-native";
 import { Feather, Ionicons, Entypo, AntDesign } from '@expo/vector-icons';
 import { COLORS } from '../../../styles/COLORS'
 import moment from "moment/moment";
@@ -34,11 +34,11 @@ export default function CommandeEmise({ commande, index }) {
                 return '#B9BDCA'
         }
         return (
-                <TouchableOpacity onPress={()=>navigation.push("SearchLivreurScreen", {commande:commande})}>
+                <TouchableOpacity onPress={()=>navigation.push("SearchLivreurScreen", {commande:commande, index:index})}>
                         <View style={styles.container}>
                                 <View style={styles.commande}>
                                         <View style={styles.cardAchat}>
-                                                {/* <Image source={{ uri: commande.details[0]?.IMAGE_1 }} style={styles.productImage} /> */}
+                                                <Image source={{ uri: commande.details[0]?.IMAGE_1 }} style={styles.productImage} />
                                         </View>
                                         <View style={{ marginLeft: 15, flex: 1 }}>
                                                 <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
