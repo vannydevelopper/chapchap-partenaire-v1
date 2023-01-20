@@ -18,6 +18,7 @@ export default function SearchLivreurScreen() {
         const [loadingStatus, setLoadingStatus] = useState(true)
         const [currentStatus, setCurrentStatus] = useState(null)
         const [peddingStatus, setPeddingStatus] = useState(null)
+        const [activer, setActiver] = useState(null)
         moment.updateLocale('fr', {
                 calendar: {
                         sameDay: "[Aujourd'hui]",
@@ -27,6 +28,19 @@ export default function SearchLivreurScreen() {
                         sameElse: 'DD-M-YYYY',
                 },
         })
+
+        const activerLivreur = async () => {
+                try{
+                        const updateRepStatus = await fetchApi(`/commandes/status/update/${commande.ID_COMMANDE}`, {
+                                method: 'PUT',
+                                headers: { "Content-Type": "application/json" },
+                        })
+                        setActiver(updateRepStatus.result)
+                }
+                catch(error){
+                        console.log(error)
+                }
+        }
 
         useEffect(() => {
                 (async () => {
@@ -40,7 +54,6 @@ export default function SearchLivreurScreen() {
                                 setCurrentStatus(current)
                                 setPeddingStatus(pedding)
                                 setStatus(stts.result)
-                                console.log(stts.result)
                         } catch (error) {
                                 console.log(error)
                         } finally {
@@ -52,9 +65,9 @@ export default function SearchLivreurScreen() {
         return (
                 <View style={{ flex: 1 }}>
                         <View style={styles.header}>
-                               {currentStatus ? <Text style={styles.titlePrincipal}>
+                                {currentStatus ? <Text style={styles.titlePrincipal}>
                                         {currentStatus.NEXT_STATUS}
-                                </Text>:null}
+                                </Text> : null}
                                 {(currentStatus && currentStatus.ID_STATUT == 4) ? <LottieView style={{ width: 200, height: 200, alignSelf: "center" }} source={require('../../../assets/lotties/check.json')} autoPlay loop={false} /> :
                                         <LottieView style={{ width: 100, height: 100, alignSelf: "center" }} source={require('../../../assets/lotties/loading.json')} autoPlay loop={true} />}
                         </View>
@@ -82,7 +95,7 @@ export default function SearchLivreurScreen() {
                                                 {!loadingStatus && status.filter(t => t.ID_STATUT != 1).map((status, index) => {
                                                         return (
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 25 }} key={index}>
-                                                                           <View style={{ flexDirection: "row" }}>
+                                                                        <View style={{ flexDirection: "row" }}>
                                                                                 <View style={styles.cardIcon}>
                                                                                         <Zocial name="statusnet" size={24} color="#777" />
                                                                                 </View>
@@ -102,12 +115,15 @@ export default function SearchLivreurScreen() {
                                         <View style={styles.statusCheckes}>
                                                 {!loadingStatus && status.filter(t => t.ID_STATUT != 2).map((status, index) => {
                                                         return (
-                                                                <TouchableOpacity style={[styles.statutVue, !status.completed && status.ID_STATUT != peddingStatus.ID_STATUT && { backgroundColor: '#ddd', elevation: 0 }]} key={index}>
-                                                                        {status.completed && <AntDesign name="check" size={15} color="white" />}
-                                                                </TouchableOpacity>
+                                                                <>
+                                                                        {!status.completed && status.ID_STATUT != peddingStatus.ID_STATUT ? null : <TouchableOpacity style={[styles.statutVue, !status.completed && status.ID_STATUT != peddingStatus.ID_STATUT && { backgroundColor: '#F1F1F1', elevation: 0 }]} key={index} onPress={activerLivreur}>
+                                                                                {/* {status.completed && <AntDesign name="check" size={15} color="white" />} */}
+                                                                                {activer?.ID_STATUT==3 ? <AntDesign name="check" size={25} color="white" /> : null}
+                                                                        </TouchableOpacity>}
+                                                                </>
                                                         )
                                                 })}
-                                                <View style={styles.progressIndicator} />
+                                                {/* <View style={styles.progressIndicator} /> */}
                                         </View>
                                 </View>
                                 <View style={styles.navigation}>
@@ -194,10 +210,10 @@ const styles = StyleSheet.create({
                 justifyContent: "space-around"
         },
         statutVue: {
-                width: 22,
-                height: 22,
+                width: 40,
+                height: 40,
                 backgroundColor: COLORS.ecommercePrimaryColor,
-                borderRadius: 50,
+                borderRadius: 10,
                 justifyContent: "center",
                 alignItems: "center",
                 alignContent: "center",
