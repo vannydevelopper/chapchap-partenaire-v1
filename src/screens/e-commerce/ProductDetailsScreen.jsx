@@ -4,11 +4,15 @@ import { Ionicons, AntDesign, Feather } from '@expo/vector-icons';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { COLORS } from "../../styles/COLORS";
 import ProductImages from "../../components/ecommerce/details/ProductImages";
+import { useRef } from "react";
+import OptionsDeleteProduitModalize from "../../components/ecommerce/main/OptionsDeleteProduitModalize";
+import { Portal } from "react-native-portalize";
 
 export default function ProductDetailsScreen() {
           const navigation = useNavigation()
           const route = useRoute()
           const { product } = route.params
+          const deleteProduitModalizeRef=useRef()
           var IMAGES = [
                     product.IMAGE_1 ? product.IMAGE_1 : undefined,
                     product.IMAGE_2 ? product.IMAGE_2 : undefined,
@@ -26,7 +30,11 @@ export default function ProductDetailsScreen() {
                                                             </View>
                                                   </TouchableNativeFeedback>
                                                   <TouchableNativeFeedback
-                                                            background={TouchableNativeFeedback.Ripple('#c9c5c5', true)} >
+                                                            background={TouchableNativeFeedback.Ripple('#c9c5c5', true)} 
+                                                            onPress={()=>{
+                                                                deleteProduitModalizeRef.current.open()
+                                                            }}
+                                                            >
                                                             <View style={[styles.headerBtn]}>
                                                                       <Feather name="more-horizontal" size={24} color="black" />
                                                             </View>
@@ -68,6 +76,7 @@ export default function ProductDetailsScreen() {
                                                   </ScrollView>
                                         </View>
                               </View>
+                              <OptionsDeleteProduitModalize deleteProduitModalizeRef={deleteProduitModalizeRef}/>
                     </>
           )
 }

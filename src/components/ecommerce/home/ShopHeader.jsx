@@ -6,6 +6,8 @@ import { useNavigation } from "@react-navigation/native";
 export default function ShopHeader(props) {
           const shopName = props.options.title
           const navigation = useNavigation()
+
+
           return (
                     <View style={styles.header}>
                               <TouchableNativeFeedback

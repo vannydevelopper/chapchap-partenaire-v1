@@ -6,10 +6,16 @@ import { MaterialTabBar, MaterialTabItem, Tabs } from 'react-native-collapsible-
 import ShopCollapsableHeader, { HEADER_HEIGHT } from "../components/ecommerce/home/ShopCollapsableHeader";
 import { AntDesign } from '@expo/vector-icons'; 
 import ProductsTabScreen from "../screens/e-commerce/tabs/ProductsTabScreen";
+import { useEffect } from "react";
+import fetchApi from "../helpers/fetchApi";
+import CommandesProductsScreen from "../screens/e-commerce/tabs/CommandesProductsScreen";
 const TopTab = createMaterialTopTabNavigator()
 
 export default function EcommerceTabs({ shop }) {
           const [activeIndex, setActiveIndex] = useState(0)
+          const [commandes, setCommandes] = useState([])
+          const [countProduits, setCountProduits] = useState([])
+
           const Header = () => {
                     return <ShopCollapsableHeader shop={shop} />
           }
@@ -25,6 +31,26 @@ export default function EcommerceTabs({ shop }) {
                               {...props}
                     />
           )
+
+          useEffect(()=>{
+                (async()=>{
+                        try{
+                                const res = await fetchApi(`/commandes/count/${shop.ID_PARTENAIRE_SERVICE}`)
+                                setCommandes(res.result)
+                        }
+                        catch(error){
+                                console.log(error)
+                        }
+                })()
+          },[])
+
+          useEffect(()=>{
+                (async()=>{
+                        const res = await fetchApi(`/products/products/count/${shop.ID_PARTENAIRE_SERVICE}`)
+                        setCountProduits(res.result)
+                })()
+          },[])
+
           return (
                     <Tabs.Container
                               renderHeader={Header}
@@ -45,15 +71,19 @@ export default function EcommerceTabs({ shop }) {
                     >
                               <Tabs.Tab name="produits" label={<View style={{ flexDirection: 'row', alignItems: "center"}}>
                                         <Text style={[{ fontWeight: "bold" }, { color: activeIndex == 0 ? '#000' : "#777"}]}>Produits</Text>
-                                        <AntDesign name="pluscircle" size={18} color={activeIndex == 0 ? '#000' : "#777"} style={{ marginLeft: 5 }} />
+                                        {countProduits.length > 0 ? <View style={styles.actionBadge}>
+                                                <Text style={styles.actionBadgeText}>{countProduits[0].NBRE_PRODUITS}</Text>
+                                        </View>: null}
                               </View>}>
                                         <ProductsTabScreen shop={shop} />
                               </Tabs.Tab>
-                              <Tabs.Tab name="commandes" label={"Commandes"}>
-                                        <Tabs.ScrollView>
-                                                  <View style={[styles.box, styles.boxA]} />
-                                                  <View style={[styles.box, styles.boxB]} />
-                                        </Tabs.ScrollView>
+                              <Tabs.Tab name="commandes" label={<View style={{ flexDirection: 'row', alignItems: "center"}}>
+                                        <Text style={[{ fontWeight: "bold" }, { color: activeIndex == 0 ? '#777' : "#000"}]}>Commandes</Text>
+                                        {commandes.length > 0 ? <View style={styles.actionBadge}>
+                                                <Text style={styles.actionBadgeText}>{commandes[0].NBRE}</Text>
+                                        </View>: null}
+                              </View>}>
+                              <CommandesProductsScreen shop={shop} />
                               </Tabs.Tab>
                               <Tabs.Tab name="supp" label="Revues">
                                         <Tabs.ScrollView>
@@ -88,4 +118,22 @@ const styles = StyleSheet.create({
                     width: '100%',
                     backgroundColor: '#2196f3',
           },
+          actionBadge: {
+                minWidth: 20,
+                minHeight: 18,
+                backgroundColor: "#000",
+                borderRadius: 100,
+                position: 'absolute',
+                right: -25,
+                // top: -9,
+                justifyContent: 'center',
+                alignItems: 'center',
+                paddingHorizontal: 3
+            },
+            actionBadgeText: {
+                color: '#FFF',
+                fontSize: 12,
+                marginTop: -2,
+                fontWeight: "bold"
+              }
 })

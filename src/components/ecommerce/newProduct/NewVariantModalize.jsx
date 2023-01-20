@@ -12,7 +12,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 const LIMIT_OPTIONS = 5
 /**
- * Modal qui affiche l'ajout d'une nouvelle variante
+ * Modal  ui affiche l'ajout d'une nouvelle variante
  * @author Dukizwe Darcie <darcy@mediabox.bi>
  * @date 16/01/2021
  * @returns 

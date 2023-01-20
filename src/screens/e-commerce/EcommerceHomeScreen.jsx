@@ -11,7 +11,7 @@ export default function EcommerceHomeScreen() {
           navigation.setOptions({ title: shop.NOM_ORGANISATION })
           return (
                     <View style={styles.container}>
-                              <EcommerceTabs shop={shop} />
+                            <EcommerceTabs shop={shop} />
                     </View>
           )
 }
