@@ -20,6 +20,13 @@ export default function ProductsTabScreen({ shop }) {
           const [products, setProducts] = useState([])
           const [loading, setLoading] = useState(true)
           const navigation = useNavigation()
+          
+          const handleServicePress = shop => {
+            if(shop.ID_SERVICE ==2) {
+                     navigation.navigate('NewMenuPublieScreen', { shop:shop })
+           }
+ }
+ 
 
           const renderProducts = ({ item: product, index}) => {
                     return (
@@ -72,7 +79,7 @@ export default function ProductsTabScreen({ shop }) {
                     }
                     <TouchableNativeFeedback
                               background={TouchableNativeFeedback.Ripple('#C4C4C4', true)}
-                              onPress={() => navigation.navigate('NewProductScreen', { shop })}>
+                              onPress={() => handleServicePress(shop)}>
                               <View style={styles.newProductBtn}>
                                         <Ionicons name="add" size={40} color="white" />
                               </View>

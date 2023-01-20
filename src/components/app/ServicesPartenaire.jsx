@@ -22,7 +22,7 @@ export default function ServicesPartenaire() {
           const user = useSelector(userSelector)
           
           const handleServicePress = service => {
-                    if(service.ID_SERVICE == ServicesIDS.ecommerce) {
+                     {
                               navigation.navigate('EcommerceHomeScreen', { shop: service })
                     }
           }
