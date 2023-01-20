@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, View, ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, ActivityIndicator, TouchableNativeFeedback } from 'react-native'
 import { Tabs } from 'react-native-collapsible-tab-view'
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
@@ -22,11 +22,14 @@ export default function CommandesProductsScreen({ shop }) {
 
         const renderProducts = ({ item: commande, index }) => {
                 return (
-                        <CommandeEmise
-                                commande={commande}
-                                index={index}
-                                totalLength={commandes.length}
-                        />
+                        <TouchableNativeFeedback>
+                                <CommandeEmise
+                                        commande={commande}
+                                        index={index}
+                                        totalLength={commandes.length}
+                                />
+                        </TouchableNativeFeedback>
+
                 )
         }
 
