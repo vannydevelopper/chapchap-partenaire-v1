@@ -221,8 +221,7 @@ export default function NewMenuPublieScreen() {
                                                   })
                                         }))
                               }
-                              console.log(form)
-                              const newProduct = await fetchApi('/resto/menu/create/',{
+                              const newProduct = await fetchApi('/resto/menu/create',{
                                         method: "POST",
                                         body: form
                               })
