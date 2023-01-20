@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
           container: {
                     backgroundColor: '#F1F1F1',
                     // paddingBottom: 60,
-                    height: 200
+                    height: 250
           },
           modalContent: {
                     marginTop: 20
@@ -209,10 +209,9 @@ const styles = StyleSheet.create({
                     alignItems: "center"
           },
           productImage: {
-                    width: '95%',
-                    height: '100%',
-                    minHeight: 150,
-                    maxHeight: 200,
-                    resizeMode: "contain",
+                    width: '100%',
+                    height: "120%",
+                    alignSelf: 'center',
+                    resizeMode: "contain"
           },
 })
