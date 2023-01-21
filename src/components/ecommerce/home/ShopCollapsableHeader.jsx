@@ -52,7 +52,9 @@ export default function ShopCollapsableHeader({ shop }) {
                                                 <Text style={styles.shopName}>
                                                         {shop.NOM_ORGANISATION}
                                                 </Text>
-                                                <Text style={styles.topCategory}>{shop.categories[0].NOM}</Text>
+                                                {shop.categories && shop.categories[0] ? <Text style={styles.topCategory}>
+                                                        {shop.categories[0].NOM}
+                                                </Text> : null}
                                         </View>
                                         <TouchableWithoutFeedback>
                                                 <View style={styles.topFollowers}>

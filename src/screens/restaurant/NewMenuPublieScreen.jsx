@@ -197,7 +197,7 @@ export default function NewMenuPublieScreen() {
                               }
                               form.append("NOM", data.nom)
                               // form.append("QUANTITE_STOCKE", data.quantite)
-                              form.append("MONTANT", data.montant)
+                              form.append("PRIX", data.montant)
                               // form.append("DETAIL", JSON.stringify(taille))
                               if (data.DESCRIPTION != "") {
                                         form.append("DESCRIPTION", data.description)
@@ -329,7 +329,7 @@ export default function NewMenuPublieScreen() {
                               /> :
                                         <View style={styles.modalContainer}>
                                                   <View style={styles.modalHeader}>
-                                                            <Text style={styles.modalTitle}>
+                                                            <Text style={styles.modalTitle}> 
                                                                       Plus de précision
                                                             </Text>
                                                             {false && <View style={{ flexDirection: "row", alignItems: "center" }}>

@@ -9,6 +9,7 @@ import ProductsTabScreen from "../screens/e-commerce/tabs/ProductsTabScreen";
 import { useEffect } from "react";
 import fetchApi from "../helpers/fetchApi";
 import CommandesProductsScreen from "../screens/e-commerce/tabs/CommandesProductsScreen";
+import ServicesIDS from "../constants/ServicesIDS";
 const TopTab = createMaterialTopTabNavigator()
 
 export default function EcommerceTabs({ shop }) {
@@ -16,8 +17,11 @@ export default function EcommerceTabs({ shop }) {
           const [commandes, setCommandes] = useState([])
           const [countProduits, setCountProduits] = useState([])
 
+          
+
           const Header = () => {
                     return <ShopCollapsableHeader shop={shop} />
+                    console.log(shop)
           }
           const renderItem = React.useCallback(({ index }) => {
                     return (
@@ -70,12 +74,14 @@ export default function EcommerceTabs({ shop }) {
                               onIndexChange={index => setActiveIndex(index)}
                     >
                               <Tabs.Tab name="produits" label={<View style={{ flexDirection: 'row', alignItems: "center"}}>
-                                        <Text style={[{ fontWeight: "bold" }, { color: activeIndex == 0 ? '#000' : "#777"}]}>Produits</Text>
+                                        {shop.ID_SERVICE=ServicesIDS.resto?<Text style={[{ fontWeight: "bold" },
+                                        { color: activeIndex == 0 ? '#000' : "#777"}]} >Menus</Text>:<Text style={[{ fontWeight: "bold" }, 
+                                        { color: activeIndex == 0 ? '#000' : "#777"}]}>Produits</Text>}
                                         {countProduits.length > 0 ? <View style={styles.actionBadge}>
                                                 <Text style={styles.actionBadgeText}>{countProduits[0].NBRE_PRODUITS}</Text>
                                         </View>: null}
                               </View>}>
-                                        <ProductsTabScreen shop={shop} />
+                                        <ProductsTabScreen shop={shop}/>
                               </Tabs.Tab>
                               <Tabs.Tab name="commandes" label={<View style={{ flexDirection: 'row', alignItems: "center"}}>
                                         <Text style={[{ fontWeight: "bold" }, { color: activeIndex == 0 ? '#777' : "#000"}]}>Commandes</Text>

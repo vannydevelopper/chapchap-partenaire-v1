@@ -9,6 +9,8 @@ import { COLORS } from '../../../styles/COLORS'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import Product from '../../../components/ecommerce/main/Product'
 import { useCallback } from 'react'
+import ServicesIDS from '../../../constants/ServicesIDS'
+ 
 
 /**
  * Un composant d'un onglet qui affiche les produits d'un partenaire
@@ -21,8 +23,9 @@ export default function ProductsTabScreen({ shop }) {
           const [loading, setLoading] = useState(true)
           const navigation = useNavigation()
           
+          console.log(shop)
           const handleServicePress = shop => {
-            if(shop.ID_SERVICE ==2) {
+            if(shop.ID_SERVICE=ServicesIDS.resto) {
                      navigation.navigate('NewMenuPublieScreen', { shop:shop })
            }
  }
