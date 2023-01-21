@@ -44,9 +44,17 @@ export default function ProductsTabScreen({ shop, serviceResto, serviceEco }) {
           useFocusEffect(useCallback(() => {
                     (async () => {
                               try {
-                                        var url = `/partenaire/produit/${shop.ID_PARTENAIRE_SERVICE}`
-                                        const produits = await fetchApi(url)
-                                        setProducts(produits.result)
+                                if(serviceEco==shop.ID_SERVICE){
+                                  var url = `/partenaire/produit/${shop.ID_PARTENAIRE_SERVICE}`
+                                  const produits = await fetchApi(url)
+                                  setProducts(produits.result)
+                                 
+                                }else if(serviceResto==shop.ID_SERVICE){
+                                  var url = `/resto/menu/resto/${shop.ID_PARTENAIRE_SERVICE}`
+                                  const produits = await fetchApi(url)
+                                  setProducts(produits.result)
+                                }
+                                       
                               } catch (error) {
                                         console.log(error)
                               } finally {
@@ -54,6 +62,7 @@ export default function ProductsTabScreen({ shop, serviceResto, serviceEco }) {
                               }
                     })()
           }, []))
+
           return (
                     <>
                     {loading ? <Tabs.ScrollView showsVerticalScrollIndicator={false}>

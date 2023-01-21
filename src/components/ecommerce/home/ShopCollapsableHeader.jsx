@@ -9,7 +9,7 @@ export const HEADER_HEIGHT = 262;
 export default function ShopCollapsableHeader({ shop }) {
         const [isOpen, setIsOpen] = useState(false)
         const optionModalizeRef = useRef()
-
+        console.log()
 
         return (
                 <>
