@@ -7,6 +7,7 @@ import { Portal } from "react-native-portalize";
 
 export const HEADER_HEIGHT = 262;
 export default function ShopCollapsableHeader({ shop }) {
+        const [isOpen, setIsOpen] = useState(false)
         const optionModalizeRef = useRef()
 
 
@@ -38,6 +39,7 @@ export default function ShopCollapsableHeader({ shop }) {
                                                         accessibilityRole="button"
                                                         background={TouchableNativeFeedback.Ripple('#c9c5c5', true)}
                                                         onPress={() => {
+                                                                setIsOpen(true)
                                                                 optionModalizeRef.current.open()
                                                         }}
                                                 >
@@ -79,6 +81,8 @@ export default function ShopCollapsableHeader({ shop }) {
                         <Portal>
                                 <OptionsModalize
                                         optionModalizeRef={optionModalizeRef}
+                                        isOpen={isOpen}
+                                        setIsOpen={setIsOpen}
                                 />
                         </Portal>
 

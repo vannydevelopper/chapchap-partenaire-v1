@@ -12,21 +12,21 @@ export default function OptionsDeleteProduitModalize({ deleteProduitModalizeRef 
                         "Suppression du produits"
 
                         [
-                                {
-                                        text:"NON",
-                                        style: "Cancel"
-                                },
-                                {
-                                        text:"OUI",
-                                         onPress: async () => {
-                                               console.log("supprimer")
-                                        }
+                        {
+                                text: "NON",
+                                style: "Cancel"
+                        },
+                        {
+                                text: "OUI",
+                                onPress: async () => {
+                                        console.log("supprimer")
                                 }
+                        }
                         ]
                 )
         }
 
-        const onEdithProduit = () =>{
+        const onEdithProduit = () => {
                 deleteProduitModalizeRef.current.close()
         }
 
@@ -39,30 +39,31 @@ export default function OptionsDeleteProduitModalize({ deleteProduitModalizeRef 
                         scrollViewProps={{ keyboardShouldPersistTaps: 'always' }}
                 >
                         <View style={styles.modalContainer}>
-                                <View >
+                                <TouchableNativeFeedback>
                                         <View style={styles.modalAction}>
+                                                <View style={styles.actionIcon} onPress={onEdithProduit}>
+                                                        <Feather name="edit-3" size={24} color="black" />
+                                                </View>
                                                 <View style={styles.actionLabels}>
                                                         <Text style={styles.modalActionText}>
                                                                 Modification du Produit
                                                         </Text>
                                                 </View>
-                                                <TouchableOpacity style={styles.actionIcon} onPress={onEdithProduit}>
-                                                        <Feather name="edit-3" size={24} color="black" />
-                                                </TouchableOpacity>
                                         </View>
-                                </View>
-                                <View >
+                                </TouchableNativeFeedback>
+                                <TouchableNativeFeedback>
                                         <View style={styles.modalAction}>
+                                                <View style={styles.actionIcon} onPress={onDeleteProduit}>
+                                                        <Feather name="trash" size={24} color="red" />
+                                                </View>
                                                 <View style={styles.actionLabels}>
                                                         <Text style={styles.modalActionText}>
                                                                 Suppression la boutique
                                                         </Text>
                                                 </View>
-                                                <TouchableOpacity style={styles.actionIcon} onPress={onDeleteProduit}>
-                                                        <Feather name="trash" size={24} color="red" />
-                                                </TouchableOpacity>
+
                                         </View>
-                                </View>
+                                </TouchableNativeFeedback>
                         </View>
 
                 </Modalize>
@@ -85,9 +86,9 @@ const styles = StyleSheet.create({
                 width: 40,
                 height: 40,
                 justifyContent: "center",
-                backgroundColor:"#ddd",
-                borderRadius:50,
-                alignItems:"center"
+                backgroundColor: "#ddd",
+                borderRadius: 50,
+                alignItems: "center"
         },
         actionLabels: {
                 marginLeft: 10

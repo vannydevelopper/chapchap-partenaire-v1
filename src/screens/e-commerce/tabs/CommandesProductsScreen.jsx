@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, View, ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, ActivityIndicator, TouchableNativeFeedback } from 'react-native'
 import { Tabs } from 'react-native-collapsible-tab-view'
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
@@ -27,6 +27,7 @@ export default function CommandesProductsScreen({ shop }) {
                                 index={index}
                                 totalLength={commandes.length}
                         />
+
                 )
         }
 

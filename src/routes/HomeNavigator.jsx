@@ -14,6 +14,7 @@ import Header from "../components/app/Header";
 import ShopHeader from "../components/ecommerce/home/ShopHeader";
 import NewMenuPublieScreen from "../screens/restaurant/NewMenuPublieScreen";
 import NewProductScreen from "../screens/e-commerce/NewProductScreen";
+import SearchLivreurScreen from "../screens/e-commerce/SearchLivreurScreen";
 
 
 export default function HomeNavigator() {
@@ -43,6 +44,7 @@ export default function HomeNavigator() {
                               <Stack.Screen name="ProductDetailsScreen" component={ProductDetailsScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid, headerShown: false }}/>
                               <Stack.Screen name="ApprovisionnementScreen" component={ApprovisionnementScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid }}/>
                               <Stack.Screen name='PaymentScreen' component={PaymentScreen}/>
+                              <Stack.Screen name="SearchLivreurScreen" component={SearchLivreurScreen} options={{ cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid, headerShown: false }}/>
                               
                     </Stack.Navigator>
           )
