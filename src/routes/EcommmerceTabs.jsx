@@ -12,16 +12,17 @@ import CommandesProductsScreen from "../screens/e-commerce/tabs/CommandesProduct
 import ServicesIDS from "../constants/ServicesIDS";
 const TopTab = createMaterialTopTabNavigator()
 
-export default function EcommerceTabs({ shop }) {
+export default function EcommerceTabs({ shop, service }) {
           const [activeIndex, setActiveIndex] = useState(0)
           const [commandes, setCommandes] = useState([])
           const [countProduits, setCountProduits] = useState([])
 
-          
+          var serviceResto =ServicesIDS.resto
+          var serviceEco = ServicesIDS.ecommerce
+
 
           const Header = () => {
                     return <ShopCollapsableHeader shop={shop} />
-                    console.log(shop)
           }
           const renderItem = React.useCallback(({ index }) => {
                     return (
@@ -74,14 +75,15 @@ export default function EcommerceTabs({ shop }) {
                               onIndexChange={index => setActiveIndex(index)}
                     >
                               <Tabs.Tab name="produits" label={<View style={{ flexDirection: 'row', alignItems: "center"}}>
-                                        {shop.ID_SERVICE=ServicesIDS.resto?<Text style={[{ fontWeight: "bold" },
-                                        { color: activeIndex == 0 ? '#000' : "#777"}]} >Menus</Text>:<Text style={[{ fontWeight: "bold" }, 
-                                        { color: activeIndex == 0 ? '#000' : "#777"}]}>Produits</Text>}
+                                        {(service=ServicesIDS.resto && service!=ServicesIDS.ecommerce) ?
+                                        <Text style={[{ fontWeight: "bold" },{ color: activeIndex == 0 ? '#000' : "#777"}]} >Menus</Text>: 
+                                        <Text style={[{ fontWeight: "bold" }, { color: activeIndex == 0 ? '#000' : "#777"}]}>Produits</Text>}
+
                                         {countProduits.length > 0 ? <View style={styles.actionBadge}>
                                                 <Text style={styles.actionBadgeText}>{countProduits[0].NBRE_PRODUITS}</Text>
                                         </View>: null}
                               </View>}>
-                                        <ProductsTabScreen shop={shop}/>
+                                        <ProductsTabScreen shop={shop} serviceResto={serviceResto} serviceEco={serviceEco}/>
                               </Tabs.Tab>
                               <Tabs.Tab name="commandes" label={<View style={{ flexDirection: 'row', alignItems: "center"}}>
                                         <Text style={[{ fontWeight: "bold" }, { color: activeIndex == 0 ? '#777' : "#000"}]}>Commandes</Text>

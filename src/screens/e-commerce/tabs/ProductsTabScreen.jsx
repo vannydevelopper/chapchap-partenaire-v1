@@ -18,18 +18,18 @@ import ServicesIDS from '../../../constants/ServicesIDS'
  * @date 10/01/2023
  * @returns 
  */
-export default function ProductsTabScreen({ shop }) {
+export default function ProductsTabScreen({ shop, serviceResto, serviceEco }) {
           const [products, setProducts] = useState([])
           const [loading, setLoading] = useState(true)
           const navigation = useNavigation()
           
-          console.log(shop)
-          const handleServicePress = shop => {
-            if(shop.ID_SERVICE=ServicesIDS.resto) {
-                     navigation.navigate('NewMenuPublieScreen', { shop:shop })
-           }
- }
- 
+          const handleServicePress = (shop) => {
+              navigation.navigate('NewProductScreen', { shop:shop })
+          } 
+
+          const handleServicePressMenu = () =>{
+              navigation.navigate('NewMenuPublieScreen', { shop:shop })
+          }
 
           const renderProducts = ({ item: product, index}) => {
                     return (
@@ -80,13 +80,25 @@ export default function ProductsTabScreen({ shop }) {
                                         contentContainerStyle={styles.products}
                               />
                     }
-                    <TouchableNativeFeedback
-                              background={TouchableNativeFeedback.Ripple('#C4C4C4', true)}
-                              onPress={() => handleServicePress(shop)}>
-                              <View style={styles.newProductBtn}>
-                                        <Ionicons name="add" size={40} color="white" />
-                              </View>
-                    </TouchableNativeFeedback>
+
+                   
+
+                    {(serviceEco==shop.ID_SERVICE) ? <TouchableNativeFeedback
+                          background={TouchableNativeFeedback.Ripple('#C4C4C4', true)}
+                          onPress={() => handleServicePress(shop)}>
+                          <View style={styles.newProductBtn}>
+                                    <Ionicons name="add" size={40} color="white" />
+                          </View>
+                  </TouchableNativeFeedback> :
+                  <TouchableNativeFeedback
+                        background={TouchableNativeFeedback.Ripple('#C4C4C4', true)}
+                        onPress={() => handleServicePressMenu(shop)}>
+                        <View style={styles.newProductBtn}>
+                                  <Ionicons name="add" size={40} color="white" />
+                        </View>
+                    </TouchableNativeFeedback> 
+                  }
+                    
                     </>
           )
 }

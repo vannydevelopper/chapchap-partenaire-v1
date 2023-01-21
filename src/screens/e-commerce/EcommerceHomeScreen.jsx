@@ -8,10 +8,11 @@ export default function EcommerceHomeScreen() {
           const navigation = useNavigation()
           const route = useRoute()
           const { shop } = route.params
+        //   console.log(shop.ID_SERVICE)
           navigation.setOptions({ title: shop.NOM_ORGANISATION })
           return (
                     <View style={styles.container}>
-                            <EcommerceTabs shop={shop} />
+                            <EcommerceTabs shop={shop} service={shop.ID_SERVICE} />
                     </View>
           )
 }

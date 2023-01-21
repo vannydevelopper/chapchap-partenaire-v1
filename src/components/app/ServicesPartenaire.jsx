@@ -21,7 +21,7 @@ export default function ServicesPartenaire() {
           const [loading, setLoading] = useState(false)
           const user = useSelector(userSelector)
           
-          const handleServicePress = service => {
+          const handleServicePress = (service) => {
                      {
                               navigation.navigate('EcommerceHomeScreen', { shop: service })
                     }
