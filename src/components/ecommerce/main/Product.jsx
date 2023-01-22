@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../../../styles/COLORS';
 import moment from 'moment'
 
-export default function Product({ product, index, totalLength, fixMargins = false, onRemove }) {
+export default function Product({ product, index, totalLength, fixMargins = false, onRemove,shop ,serviceResto,serviceEco}) {
           const navigation = useNavigation()
           const { width } = useWindowDimensions()
           const PRODUCT_MARGIN = 10
@@ -19,7 +19,7 @@ export default function Product({ product, index, totalLength, fixMargins = fals
                     // marginRight: index == totalLength - 1 ? PRODUCT_MARGIN : (fixMargins ? 0 : 0)
           }
           return (
-                    <TouchableWithoutFeedback onPress={() => navigation.push("ProductDetailsScreen", { product: product })} >
+                    <TouchableWithoutFeedback onPress={() => navigation.push("ProductDetailsScreen", { product: product, shop:shop, serviceResto:serviceResto,  serviceEco:serviceEco })} >
                     <View key={index} style={[styles.product, additionStyles,]}>
                               <View style={styles.imageCard}>
                                         <Image source={{ uri: product.IMAGE_1 }} style={styles.image} />

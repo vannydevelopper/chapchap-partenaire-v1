@@ -34,6 +34,9 @@ export default function ProductsTabScreen({ shop, serviceResto, serviceEco }) {
           const renderProducts = ({ item: product, index}) => {
                     return (
                               <Product
+                                        shop={shop}
+                                        serviceResto={serviceResto}
+                                        serviceEco={serviceEco}
                                         product={product}
                                         index={index}
                                         totalLength={products.length}

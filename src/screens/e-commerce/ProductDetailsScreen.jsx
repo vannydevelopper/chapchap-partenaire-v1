@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Text, TouchableNativeFeedback, ScrollView, StatusBar } from "react-native"
+import { View, StyleSheet, Text, TouchableNativeFeedback, ScrollView, StatusBar, ActivityIndicator } from "react-native"
 import { Ionicons, AntDesign, Feather } from '@expo/vector-icons';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { COLORS } from "../../styles/COLORS";
@@ -7,12 +7,41 @@ import ProductImages from "../../components/ecommerce/details/ProductImages";
 import { useRef } from "react";
 import OptionsDeleteProduitModalize from "../../components/ecommerce/main/OptionsDeleteProduitModalize";
 import { Portal } from "react-native-portalize";
+import HomeProduits from "../../components/ecommerce/main/HomeProduits";
+import { useState } from "react";
+import { useEffect } from "react";
+import fetchApi from "../../helpers/fetchApi";
 
 export default function ProductDetailsScreen() {
           const navigation = useNavigation()
           const route = useRoute()
-          const { product } = route.params
+          const { product, shop ,serviceResto,serviceEco } = route.params 
           const deleteProduitModalizeRef=useRef()
+
+        const [similarProducs, setSimilarProducs] = useState([])
+        const[loadingSimilarProduits,setLoadingSimilarProduits] = useState(true)
+
+        useEffect(()=>{
+                (async()=>{
+                    try{
+                        if(serviceEco==shop.ID_SERVICE){
+                            const res = await fetchApi(`/partenaire/produit/${product.ID_PARTENAIRE_SERVICE}?category=${product.ID_CATEGORIE_PRODUIT}`)
+                            setSimilarProducs(res.result)
+                        } else if(serviceResto==shop.ID_SERVICE){
+                            const res = await fetchApi(`/resto/menu/resto/${product.ID_PARTENAIRE_SERVICE}?category=${product.ID_CATEGORIE_PRODUIT}`)
+                            setSimilarProducs(res.result)
+                            console.log(res.result)
+                        }
+                        
+                    }
+                    catch(error){
+                        console.log(error)
+                    }finally{
+                        setLoadingSimilarProduits(false)
+                    }
+                })()
+        },[])
+
           var IMAGES = [
                     product.IMAGE_1 ? product.IMAGE_1 : undefined,
                     product.IMAGE_2 ? product.IMAGE_2 : undefined,
@@ -73,7 +102,18 @@ export default function ProductDetailsScreen() {
                                                                                 </Text>
                                                                       </View> : null}
                                                             </View>
+                                                   {loadingSimilarProduits ? <View style={styles.container}>
+                                                            <View style={styles.loadingContainer}>
+                                                                    <ActivityIndicator size={"large"} color='#777' />
+                                                            </View>
+                                                    </View>:
+                                                        <HomeProduits
+                                                                products={similarProducs}
+                                                                title="Similaires"
+                                                                category={product.NOM_CATEGORIE}
+                                                        />}
                                                   </ScrollView>
+                                                 
                                         </View>
                               </View>
                               <OptionsDeleteProduitModalize deleteProduitModalizeRef={deleteProduitModalizeRef}/>
@@ -149,5 +189,9 @@ const styles = StyleSheet.create({
           },
           headerBtn: {
                     padding: 10
-          }
+          },
+          loadingContainer: {
+            flex: 1,
+            marginTop: 30
+  },
 })
