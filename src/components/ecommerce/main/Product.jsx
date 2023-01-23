@@ -30,9 +30,9 @@ export default function Product({ product, index, totalLength, fixMargins = fals
                                         </Text>
                               </View>
                               {product.PRIX ? <Text style={styles.price}>{product.PRIX.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} FBU</Text> : null}
-                              <Text style={styles.piecesCount}>
+                              {shop.ID_SERVICE==1 ? <Text style={styles.piecesCount}>
                                         { product.quantity } pièce{product.quantity > 0 && 's'}
-                              </Text>
+                              </Text>:null}
                               <Text style={styles.date}>
                                         {moment(product.DATE_INSERTION).calendar(null, {
                                                   sameDay: `[Auj]`,

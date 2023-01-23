@@ -9,7 +9,6 @@ export const HEADER_HEIGHT = 262;
 export default function ShopCollapsableHeader({ shop }) {
         const [isOpen, setIsOpen] = useState(false)
         const optionModalizeRef = useRef()
-        console.log()
 
         return (
                 <>
@@ -57,6 +56,7 @@ export default function ShopCollapsableHeader({ shop }) {
                                                 {shop.categories && shop.categories[0] ? <Text style={styles.topCategory}>
                                                         {shop.categories[0].NOM}
                                                 </Text> : null}
+                                                {shop.ID_SERVICE==2 ? <Text style={styles.topCategory}>Restaurant</Text>:null}
                                         </View>
                                         <TouchableWithoutFeedback>
                                                 <View style={styles.topFollowers}>
