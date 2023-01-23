@@ -21,7 +21,6 @@ import Variant from "../../components/ecommerce/newProduct/Variant";
 import { useCallback } from "react";
 import InventoryItem from "../../components/ecommerce/newProduct/InventoryItem";
 import ShopHeader from "../../components/ecommerce/home/ShopHeader";
-import NewVariantMenuModalize from "../../components/ecommerce/newProduct/NewVariantMenuModalize";
 
 const VARIANT_LIMIT= 5
 export default function NewMenuPublieScreen() {
@@ -486,18 +485,6 @@ export default function NewMenuPublieScreen() {
                                         </GestureHandlerRootView>
                               </Portal>
                            
-                              {/* <NewVariantMenuModalize
-                                  variantModalizeRef={variantModalizeRef}
-                                  onVariantSubmit={(variantName, options) => {
-                                            setVariants(t => [...t, {
-                                                      id: `${variantName[0]}_${Date.now()}`,
-                                                      variantName,
-                                                      options
-                                            }])
-                                  }}
-                                  isNewVariantOpen={isNewVariantOpen}
-                                  setIsNewVariantOpen={setIsNewVariantOpen}
-                              /> */}
                               <NewVariantModalize
                                         variantModalizeRef={variantModalizeRef}
                                         onVariantSubmit={(variantName, options) => {

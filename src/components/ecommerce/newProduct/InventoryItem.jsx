@@ -33,14 +33,14 @@ export default function InventoryItem({ inventory, handleInventoryEdit, handleIn
                                                                                 {inventory.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} FBU
                                                                       </Text>
                                                             </View>
-                                                            <View style={styles.inventoryDetail}>
+                                                            {SERVICE==1 ? <View style={styles.inventoryDetail}>
                                                                       <Text style={styles.inventoryTitle}>
                                                                                 Quantité:
                                                                       </Text>
                                                                       <Text style={styles.inventoryPrice}>
                                                                                 {inventory.quantity}
                                                                       </Text>
-                                                            </View>
+                                                            </View>:null}
                                                   </View>
                                                   <View style={styles.inventoryActions}>
                                                             <Entypo name="edit" size={20} color="#777" />
