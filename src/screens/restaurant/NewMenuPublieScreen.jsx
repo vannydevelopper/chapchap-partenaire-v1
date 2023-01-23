@@ -21,6 +21,7 @@ import Variant from "../../components/ecommerce/newProduct/Variant";
 import { useCallback } from "react";
 import InventoryItem from "../../components/ecommerce/newProduct/InventoryItem";
 import ShopHeader from "../../components/ecommerce/home/ShopHeader";
+import NewVariantMenuModalize from "../../components/ecommerce/newProduct/NewVariantMenuModalize";
 
 const VARIANT_LIMIT= 5
 export default function NewMenuPublieScreen() {
@@ -36,12 +37,12 @@ export default function NewMenuPublieScreen() {
           const variantModalizeRef = useRef()
           const [variants, setVariants] = useState([])
           const [inventories, setInventories] = useState([])
+          
 
           const { shop } = route.params
           
           const [data, handleChange] = useForm({
                     category: null,
-                    subCategory: null,
                     nom: "",
                     description: "",
                     montant: "",
@@ -125,7 +126,7 @@ export default function NewMenuPublieScreen() {
                     setVariants(newVariants)
           }, [variants])
 
-          const handleInventoryEdit = useCallback((id, price, quantity) => {
+          const handleInventoryEdit = useCallback((id, price) => {
                     const newInventory = inventories.map(env => {
                               if(env.id == id) {
                                         return {
@@ -157,16 +158,6 @@ export default function NewMenuPublieScreen() {
                     }
           }
 
-        //   const fetchSubCategories = async () => {
-        //             try {
-        //                       const pdts = await fetchApi(`/products/sub_categories/${data.category.ID_CATEGORIE_PRODUIT}`)
-        //                       setSubCategories(pdts)
-        //             } catch (error) {
-        //                       console.log(error)
-        //             } finally {
-        //                       setLoadingSubCategories(false)
-        //             }
-        //   }
 
           const onImageSelect = async () => {
                     const image = await ImagePicker.launchImageLibraryAsync({
@@ -221,6 +212,9 @@ export default function NewMenuPublieScreen() {
                                                   })
                                         }))
                               }
+
+                              console.log(form)
+
                               const newProduct = await fetchApi('/resto/menu/create',{
                                         method: "POST",
                                         body: form
@@ -271,7 +265,8 @@ export default function NewMenuPublieScreen() {
                               const result = cartesian(options)
                               const newinventory = result.map((inv, index) => ({
                                         id: `${index}_${Date.now()}`,
-                                        price: data.montant, quantity: 1,
+                                        price: data.montant, 
+                                        quantity: 1,
                                         items: inv,
                               }))
                               setInventories(newinventory)
@@ -312,43 +307,6 @@ export default function NewMenuPublieScreen() {
                                                                                                     <Image style={styles.modalImage} source={{ uri: produit.IMAGE }} />
                                                                                           </View>
                                                                                           <Text style={styles.itemTitle}>{produit.NOM}</Text>
-                                                                                </View>
-                                                                      </TouchableNativeFeedback>
-                                                            )
-                                                  })}
-                                        </View>
-                    )
-          }
-          const SubCategoriesModalize = () => {
-                    return (
-                              (loadingForm || loadingSubCategories) ? <ActivityIndicator
-                                        animating
-                                        size={"small"}
-                                        color='#777'
-                                        style={{ alignSelf: 'center', marginBottom: 15, marginTop: 20 }}
-                              /> :
-                                        <View style={styles.modalContainer}>
-                                                  <View style={styles.modalHeader}>
-                                                            <Text style={styles.modalTitle}> 
-                                                                      Plus de précision
-                                                            </Text>
-                                                            {false && <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <AntDesign name="search1" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                                      <TouchableOpacity style={{ paddingHorizontal: 5 }}>
-                                                                                <SimpleLineIcons name="grid" size={24} color={COLORS.ecommercePrimaryColor} />
-                                                                      </TouchableOpacity>
-                                                            </View>}
-                                                  </View>
-                                                  {subCategories.result?.map((produit, index) => {
-                                                            return (
-                                                                      <TouchableNativeFeedback key={produit.ID_PRODUIT_SOUS_CATEGORIE} onPress={() => {
-                                                                                handleChange("subCategory", produit)
-                                                                                subCategoriesModalizeRef.current.close()
-                                                                      }} >
-                                                                                <View style={[styles.modalItem, produit.ID_PRODUIT_SOUS_CATEGORIE == data.subCategory?.ID_PRODUIT_SOUS_CATEGORIE && { backgroundColor: '#ddd' }]}>
-                                                                                          <Text style={[styles.itemTitle, { marginLeft: 0, fontWeight: "normal" }]}>{produit.NOM_SOUS_CATEGORIE}</Text>
                                                                                 </View>
                                                                       </TouchableNativeFeedback>
                                                             )
@@ -493,7 +451,7 @@ export default function NewMenuPublieScreen() {
                                                   <Text style={styles.sectionTitle}>Votre inventaire</Text>
                                                    <View style={styles.inventories}>
                                                             {inventories.map((inventory, index) => {
-                                                                      return <InventoryItem inventory={inventory} key={index} index={index} handleInventoryDelete={handleInventoryDelete} handleInventoryEdit={handleInventoryEdit} />
+                                                                      return <InventoryItem inventory={inventory} SERVICE={shop.ID_SERVICE} key={index} index={index} handleInventoryDelete={handleInventoryDelete} handleInventoryEdit={handleInventoryEdit} />
                                                             })}
                                                   </View> 
                                         </View>: null}
@@ -527,30 +485,19 @@ export default function NewMenuPublieScreen() {
                                         </Modalize>
                                         </GestureHandlerRootView>
                               </Portal>
-                              <Portal>
-                                        <GestureHandlerRootView style={{ height: isSubCategoriesOpen ? '100%' : 0, opacity: isSubCategoriesOpen ? 1 : 0, backgroundColor: 'rgba(0, 0, 0, 0)', position: 'absolute', width: '100%', zIndex: 1 }}>
-                                                  <Modalize
-                                                            ref={subCategoriesModalizeRef}
-                                                            adjustToContentHeight
-                                                            handlePosition='inside'
-                                                            modalStyle={{
-                                                                      borderTopRightRadius: 15,
-                                                                      borderTopLeftRadius: 15,
-                                                                      paddingVertical: 20
-                                                            }}
-                                                            handleStyle={{ marginTop: 10 }}
-                                                            scrollViewProps={{
-                                                                      keyboardShouldPersistTaps: "handled"
-                                                            }}
-                                                            onClosed={() => {
-                                                                      setIsSubCategoriesOpen(false)
-                                                                      setLoadingForm(true)
-                                                            }}
-                                                  >
-                                                            <SubCategoriesModalize />
-                                                  </Modalize>
-                                        </GestureHandlerRootView>
-                              </Portal>
+                           
+                              {/* <NewVariantMenuModalize
+                                  variantModalizeRef={variantModalizeRef}
+                                  onVariantSubmit={(variantName, options) => {
+                                            setVariants(t => [...t, {
+                                                      id: `${variantName[0]}_${Date.now()}`,
+                                                      variantName,
+                                                      options
+                                            }])
+                                  }}
+                                  isNewVariantOpen={isNewVariantOpen}
+                                  setIsNewVariantOpen={setIsNewVariantOpen}
+                              /> */}
                               <NewVariantModalize
                                         variantModalizeRef={variantModalizeRef}
                                         onVariantSubmit={(variantName, options) => {

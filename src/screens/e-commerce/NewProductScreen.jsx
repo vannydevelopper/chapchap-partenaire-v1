@@ -493,7 +493,7 @@ export default function NewProductScreen() {
                                                   <Text style={styles.sectionTitle}>Votre inventaire</Text>
                                                    <View style={styles.inventories}>
                                                             {inventories.map((inventory, index) => {
-                                                                      return <InventoryItem inventory={inventory} key={index} index={index} handleInventoryDelete={handleInventoryDelete} handleInventoryEdit={handleInventoryEdit} />
+                                                                      return <InventoryItem inventory={inventory} SERVICE={shop.ID_SERVICE} key={index} index={index} handleInventoryDelete={handleInventoryDelete} handleInventoryEdit={handleInventoryEdit} />
                                                             })}
                                                   </View> 
                                         </View>: null}

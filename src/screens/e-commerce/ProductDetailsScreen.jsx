@@ -30,9 +30,7 @@ export default function ProductDetailsScreen() {
                         } else if(serviceResto==shop.ID_SERVICE){
                             const res = await fetchApi(`/resto/menu/resto/${product.ID_PARTENAIRE_SERVICE}?category=${product.ID_CATEGORIE_PRODUIT}`)
                             setSimilarProducs(res.result)
-                            console.log(res.result)
                         }
-                        
                     }
                     catch(error){
                         console.log(error)
@@ -102,7 +100,7 @@ export default function ProductDetailsScreen() {
                                                                                 </Text>
                                                                       </View> : null}
                                                             </View>
-                                                   {loadingSimilarProduits ? <View style={styles.container}>
+                                                   {/* {loadingSimilarProduits ? <View style={styles.container}>
                                                             <View style={styles.loadingContainer}>
                                                                     <ActivityIndicator size={"large"} color='#777' />
                                                             </View>
@@ -111,7 +109,7 @@ export default function ProductDetailsScreen() {
                                                                 products={similarProducs}
                                                                 title="Similaires"
                                                                 category={product.NOM_CATEGORIE}
-                                                        />}
+                                                        />} */}
                                                   </ScrollView>
                                                  
                                         </View>

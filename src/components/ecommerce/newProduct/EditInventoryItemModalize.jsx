@@ -20,7 +20,7 @@ const LIMIT_OPTIONS = 5
  * @param {*} param0 
  * @returns 
  */
-export default function EditInventoryItemModalize({ editInventoryModalizeRef, onVariantSubmit, onVariantDelete, inventory, isOpen, setIsOpen }) {
+export default function EditInventoryItemModalize({ editInventoryModalizeRef, onVariantSubmit, onVariantDelete, inventory, isOpen, setIsOpen,SERVICE }) {
           const [price, setPrice] = useState(inventory.price.toString())
           const [quantity, setQuantity] = useState(inventory.quantity.toString())
           const optionRef = useRef()
@@ -98,7 +98,7 @@ export default function EditInventoryItemModalize({ editInventoryModalizeRef, on
                                                                                           keyboardType="decimal-pad"
                                                                                           suffiex="FBU"
                                                                                 />
-                                                                                <OutlinedTextField
+                                                                               { SERVICE==1 ? <OutlinedTextField
                                                                                           label={"Quantité"}
                                                                                           fontSize={13}
                                                                                           value={quantity}
@@ -113,7 +113,7 @@ export default function EditInventoryItemModalize({ editInventoryModalizeRef, on
                                                                                           containerStyle={{ flex: 1, marginTop: 15 }}
                                                                                           ref={optionRef}
                                                                                           keyboardType="decimal-pad"
-                                                                                />
+                                                                                />:null}
                                                                                 <View style={styles.formActions}>
                                                                                           <TouchableOpacity style={{ flex: 1, marginRight: 10 }} onPress={() => {
                                                                                                     onVariantDelete(inventory.id)

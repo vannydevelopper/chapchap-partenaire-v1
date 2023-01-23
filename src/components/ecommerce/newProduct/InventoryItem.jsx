@@ -4,7 +4,7 @@ import { SimpleLineIcons, AntDesign, Ionicons, EvilIcons, Entypo } from '@expo/v
 import EditInventoryItem from "./EditInventoryItemModalize";
 import EditInventoryItemModalize from "./EditInventoryItemModalize";
 
-export default function InventoryItem({ inventory, handleInventoryEdit, handleInventoryDelete }) {
+export default function InventoryItem({ inventory, handleInventoryEdit, handleInventoryDelete, SERVICE }) {
           const editInventoryModalizeRef = useRef()
           const [isOpen, setIsOpen] = useState(false)
           return (
@@ -51,6 +51,7 @@ export default function InventoryItem({ inventory, handleInventoryEdit, handleIn
                     <EditInventoryItemModalize
                               editInventoryModalizeRef={editInventoryModalizeRef}
                               inventory={inventory}
+                              SERVICE={SERVICE}
                               isOpen={isOpen}
                               setIsOpen={setIsOpen}
                               onVariantSubmit={handleInventoryEdit}
