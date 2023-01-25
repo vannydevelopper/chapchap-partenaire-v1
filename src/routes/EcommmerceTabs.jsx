@@ -6,6 +6,7 @@ import { MaterialTabBar, MaterialTabItem, Tabs } from 'react-native-collapsible-
 import ShopCollapsableHeader, { HEADER_HEIGHT } from "../components/ecommerce/home/ShopCollapsableHeader";
 import { AntDesign } from '@expo/vector-icons';
 import ProductsTabScreen from "../screens/e-commerce/tabs/ProductsTabScreen";
+import MenuTabScreen from "../screens/restaurant/tabs/MenuTabScreen"
 import { useEffect } from "react";
 import fetchApi from "../helpers/fetchApi";
 import CommandesProductsScreen from "../screens/e-commerce/tabs/CommandesProductsScreen";
@@ -100,7 +101,9 @@ export default function EcommerceTabs({ shop, service }) {
                                                 <Text style={styles.actionBadgeText}>{countProduits[0].NBRE_PRODUITS}</Text>
                                         </View>: null}  */}
                         </View>}>
-                                <ProductsTabScreen shop={shop} serviceResto={serviceResto} serviceEco={serviceEco} />
+                               {(service = ServicesIDS.resto && service != ServicesIDS.ecommerce) ?
+                                <MenuTabScreen shop={shop} serviceResto={serviceResto} serviceEco={serviceEco}/>:
+                                <ProductsTabScreen shop={shop} serviceResto={serviceResto} serviceEco={serviceEco} />}
                         </Tabs.Tab>
                         <Tabs.Tab name="commandes" label={<View style={{ flexDirection: 'row', alignItems: "center" }}>
                                 <Text style={[{ fontWeight: "bold" }, { color: activeIndex == 0 ? '#777' : "#000" }]}>Commandes</Text>

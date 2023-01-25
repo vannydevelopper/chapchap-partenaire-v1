@@ -11,21 +11,22 @@ import Product from '../../../components/ecommerce/main/Product'
 import { useCallback } from 'react'
 import ServicesIDS from '../../../constants/ServicesIDS'
  
-
 /**
- * Un composant d'un onglet qui affiche les produits d'un partenaire
- * @author Dukizwe Darcie <darcy@mediabox.bi>
- * @date 10/01/2023
+ * composant pour afficher la listes des menus pour un partenaire
+ * @author Vanny Boy <vanny@mediabox.bi>
+ * @date 25/1/2023
+ * @param {*} param0 
  * @returns 
  */
-export default function ProductsTabScreen({ shop, serviceResto, serviceEco }) {
+
+export default function MenuTabScreen({ shop, serviceResto, serviceEco }) {
           const [products, setProducts] = useState([])
           const [loading, setLoading] = useState(true)
           const navigation = useNavigation()
           
-          const handleServicePress = (shop) => {
-              navigation.navigate('NewProductScreen', { shop:shop })
-          } 
+          const handleServicePressMenu = () =>{
+              navigation.navigate('NewMenuPublieScreen', { shop:shop })
+          }
 
           const renderProducts = ({ item: product, index}) => {
                     return (
@@ -43,9 +44,10 @@ export default function ProductsTabScreen({ shop, serviceResto, serviceEco }) {
           useFocusEffect(useCallback(() => {
                     (async () => {
                               try {
-                                  var url = `/partenaire/produit/${shop.ID_PARTENAIRE_SERVICE}`
+                                  var url = `/resto/menu/resto/${shop.ID_PARTENAIRE_SERVICE}`
                                   const produits = await fetchApi(url)
-                                  setProducts(produits.result)      
+                                  setProducts(produits.result)
+                                       
                               } catch (error) {
                                         console.log(error)
                               } finally {
@@ -82,14 +84,13 @@ export default function ProductsTabScreen({ shop, serviceResto, serviceEco }) {
                     }
 
                    
-
-                    <TouchableNativeFeedback
-                          background={TouchableNativeFeedback.Ripple('#C4C4C4', true)}
-                          onPress={() => handleServicePress(shop)}>
-                          <View style={styles.newProductBtn}>
-                                    <Ionicons name="add" size={40} color="white" />
-                          </View>
-                  </TouchableNativeFeedback> 
+                  <TouchableNativeFeedback
+                        background={TouchableNativeFeedback.Ripple('#C4C4C4', true)}
+                        onPress={() => handleServicePressMenu(shop)}>
+                        <View style={styles.newProductBtn}>
+                                  <Ionicons name="add" size={40} color="white" />
+                        </View>
+                    </TouchableNativeFeedback> 
                     
                     </>
           )
