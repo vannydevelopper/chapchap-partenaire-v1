@@ -10,6 +10,7 @@ import MenuTabScreen from "../screens/restaurant/tabs/MenuTabScreen"
 import { useEffect } from "react";
 import fetchApi from "../helpers/fetchApi";
 import CommandesProductsScreen from "../screens/e-commerce/tabs/CommandesProductsScreen";
+import CommandesMenusScreen from "../screens/restaurant/tabs/CommandesMenusScreen"
 import ServicesIDS from "../constants/ServicesIDS";
 const TopTab = createMaterialTopTabNavigator()
 
@@ -18,6 +19,7 @@ export default function EcommerceTabs({ shop, service }) {
         const [commandes, setCommandes] = useState([])
         const [countProduits, setCountProduits] = useState([])
         const [countMenu, setCountMenu] = useState([])
+        const[countRestoCommandes,setCountRestoCommandes] = useState([])
 
         var serviceResto = ServicesIDS.resto
         var serviceEco = ServicesIDS.ecommerce
@@ -42,29 +44,37 @@ export default function EcommerceTabs({ shop, service }) {
         useEffect(() => {
                 (async () => {
                         try {
-                                const res = await fetchApi(`/commandes/count/${shop.ID_PARTENAIRE_SERVICE}`)
-                                setCommandes(res.result)
+                                if(service == serviceEco){
+                                        const res = await fetchApi(`/commandes/count/${shop.ID_PARTENAIRE_SERVICE}`)
+                                        setCommandes(res.result)
+                                }else if(service == serviceResto){
+                                        const res = await fetchApi(`/commandes/count/restaurant/${shop.ID_PARTENAIRE_SERVICE}`)
+                                        setCountRestoCommandes(res.result)
+                                }
                         }
                         catch (error) {
                                 console.log(error)
                         }
                 })()
-        }, [])
+        }, [shop])
 
         useEffect(() => {
                 (async () => {
-                        const res = await fetchApi(`/products/products/count/${shop.ID_PARTENAIRE_SERVICE}`)
-                        setCountProduits(res.result)
-                })()
-        }, [])
+                        try {
+                                if (service == serviceEco) {
+                                        const res = await fetchApi(`/products/products/count/${shop.ID_PARTENAIRE_SERVICE}`)
+                                        setCountProduits(res.result)
+                                } else if(service == serviceResto){
+                                        const res = await fetchApi(`/resto/menu/restaurant/count/${shop.ID_PARTENAIRE_SERVICE}`)
+                                        setCountMenu(res.result)
+                                }
+                        } catch (error) {
+                                console.log(error)
+                        }
 
-        useEffect(() => {
-                (async () => {
-                        const res = await fetchApi(`/resto/menu/restaurant/count/${shop.ID_PARTENAIRE_SERVICE}`)
-                        setCountMenu(res.result)
-                        console.log(res.result)
                 })()
-        }, [])
+        }, [service, serviceEco, serviceResto])
+
 
         return (
                 <Tabs.Container
@@ -85,11 +95,11 @@ export default function EcommerceTabs({ shop, service }) {
                         onIndexChange={index => setActiveIndex(index)}
                 >
                         <Tabs.Tab name="produits" label={<View style={{ flexDirection: 'row', alignItems: "center" }}>
-                                {(service = ServicesIDS.resto && service != ServicesIDS.ecommerce) ?
+                                {(service != ServicesIDS.ecommerce) ?
                                         <Text style={[{ fontWeight: "bold" }, { color: activeIndex == 0 ? '#000' : "#777" }]} >Menus</Text> :
                                         <Text style={[{ fontWeight: "bold" }, { color: activeIndex == 0 ? '#000' : "#777" }]}>Produits</Text>}
 
-                                {(service = ServicesIDS.resto && service != ServicesIDS.ecommerce && countProduits.length > 0) ?
+                                {(service != ServicesIDS.serviceResto && countProduits.length > 0) ?
                                         <View style={styles.actionBadge}>
                                                 <Text style={styles.actionBadgeText}>{countProduits[0].NBRE_PRODUITS}</Text>
                                         </View> :
@@ -101,17 +111,21 @@ export default function EcommerceTabs({ shop, service }) {
                                                 <Text style={styles.actionBadgeText}>{countProduits[0].NBRE_PRODUITS}</Text>
                                         </View>: null}  */}
                         </View>}>
-                               {(service = ServicesIDS.resto && service != ServicesIDS.ecommerce) ?
-                                <MenuTabScreen shop={shop} serviceResto={serviceResto} serviceEco={serviceEco}/>:
-                                <ProductsTabScreen shop={shop} serviceResto={serviceResto} serviceEco={serviceEco} />}
+                                {(service == ServicesIDS.resto && service != ServicesIDS.ecommerce) ?
+                                        <MenuTabScreen shop={shop} serviceResto={serviceResto} serviceEco={serviceEco} /> :
+                                        <ProductsTabScreen shop={shop} serviceResto={serviceResto} serviceEco={serviceEco} />}
                         </Tabs.Tab>
                         <Tabs.Tab name="commandes" label={<View style={{ flexDirection: 'row', alignItems: "center" }}>
-                                <Text style={[{ fontWeight: "bold" }, { color: activeIndex == 0 ? '#777' : "#000" }]}>Commandes</Text>
+                                <Text style={[{ fontWeight: "bold" }, { color: activeIndex == 0 ? '#777' : "#000" }]}>Commandes </Text>
                                 {commandes.length > 0 ? <View style={styles.actionBadge}>
                                         <Text style={styles.actionBadgeText}>{commandes[0].NBRE}</Text>
                                 </View> : null}
+                                { countRestoCommandes.length > 0 ? <View style={styles.actionBadge}>
+                                        <Text style={styles.actionBadgeText}>{countRestoCommandes[0].NBRE}</Text>
+                                </View> : null}
                         </View>}>
-                                <CommandesProductsScreen shop={shop} />
+                               { (service == ServicesIDS.resto && service != ServicesIDS.ecommerce) ? <CommandesMenusScreen shop={shop}/>:
+                                <CommandesProductsScreen shop={shop} />}
                         </Tabs.Tab>
                         <Tabs.Tab name="supp" label="Revues">
                                 <Tabs.ScrollView>

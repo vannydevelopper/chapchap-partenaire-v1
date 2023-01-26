@@ -71,7 +71,7 @@ export default function MenuTabScreen({ shop, serviceResto, serviceEco }) {
                                                   <View style={styles.emptyContainer}>
                                                             <Feather name="check-square" size={24} color="#777" />
                                                             <Text style={styles.emptyFeedback}>
-                                                                      Votre stock est vide. Cliquez sur le bouton en bas pour ajouter un nouveau produit
+                                                                      Votre stock est vide. Cliquez sur le bouton en bas pour ajouter un nouveau menu
                                                             </Text>
                                                   </View>
                                         </View>

@@ -9,14 +9,13 @@ import fetchApi from '../../../helpers/fetchApi';
 import CommandeEmise from '../../../components/ecommerce/main/CommandeEmise';
 
 /**
- * un composant pour afficher les commandes du partenaire ecommerce
+ * un composant pour afficher les commandes du partenaire restauration
  * @author Vanny Boy <vanny@mediabox.bi>
- * @date 19/1/2023
+ * @date 26/1/2023
  * @returns 
  */
 
-export default function CommandesProductsScreen({ shop }) {
-
+export default function CommandesMenusScreen({ shop }) {
         const [commandes, setCommandes] = useState([])
         const [loading, setLoading] = useState(true)
 
@@ -34,7 +33,7 @@ export default function CommandesProductsScreen({ shop }) {
         useFocusEffect(useCallback(() => {
                 (async () => {
                         try {
-                                var url = `/commandes/partenaire/${shop.ID_PARTENAIRE_SERVICE}`
+                                var url = `/commandes/partenaire/restaurant/${shop.ID_PARTENAIRE_SERVICE}`
                                 const commandes = await fetchApi(url)
                                 setCommandes(commandes.result)
                         }
@@ -62,7 +61,7 @@ export default function CommandesProductsScreen({ shop }) {
                                         <View style={styles.container}>
                                                 <View style={styles.emptyContainer}>
                                                         <Text style={styles.emptyFeedback}>
-                                                                Aucune commande effectue dans votre boutique
+                                                                Aucune commande effectue dans votre restaurant
                                                         </Text>
                                                 </View>
                                         </View>
@@ -73,13 +72,13 @@ export default function CommandesProductsScreen({ shop }) {
                                         />
                         }
                 </>
-
         )
 }
 
 const styles = StyleSheet.create({
         container: {
                 flex: 1,
+                backgroundColor:"red"
         },
         emptyContainer: {
                 justifyContent: "center",

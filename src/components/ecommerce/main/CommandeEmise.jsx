@@ -50,9 +50,9 @@ export default function CommandeEmise({ commande, index }) {
                                                                         {moment(commande.DATE_COMMANDE).calendar()} {moment(commande.DATE_COMMANDE).format('HH:mm')}   {commande.ITEMS} produit{commande.ITEMS > 1 && 's'}
                                                                 </Text>
                                                         </View>
-                                                        <Text style={styles.montant}>
+                                                       {commande.TOTAL ?  <Text style={styles.montant}>
                                                                 {commande.TOTAL.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Fbu
-                                                        </Text>
+                                                        </Text>: null}
                                                 </View>
                                                 <View style={{ flexDirection: "row", marginTop: 10, alignItems: "center" }}>
                                                         {commande.ID_STATUT == 4 ? <AntDesign name="checkcircle" size={10} color={COLORS.primary} /> :
